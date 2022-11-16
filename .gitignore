@@ -1,0 +1,23 @@
+# vscode
+.vscode/
+*.code-workspace
+
+# binarios
+*.d
+*.o
+*.out
+*.exe
+
+# bib
+*.dll
+
+# docs
+*.pdf
+
+# spikes
+test_cmake/
+spike/
+
+# outros
+*.zip
+*.rar
