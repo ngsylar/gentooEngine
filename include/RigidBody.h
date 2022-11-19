@@ -11,7 +11,7 @@ class RigidBody: public Component {
         Vec2 previousPosition, movementDirection;
     
     public:
-        bool grounded;
+        bool grounded, pastedLeft, pastedRight;
 
         RigidBody(GameObject& associated);
         void Start();
