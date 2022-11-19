@@ -32,6 +32,7 @@
 
 // Engine Object Components
 #include "CameraFollower.h"
+#include "RigidBody.h"
 #include "Collider.h"
 #include "Sprite.h"
 #include "TileSet.h"
