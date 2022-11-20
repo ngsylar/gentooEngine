@@ -14,6 +14,7 @@ class Component {
         virtual void Update(float dt);
         virtual void Render();
         virtual void NotifyCollision(GameObject& other);
+        virtual void NotifyNoCollision(GameObject& other);
         virtual bool Is(std::string type);
 };
 

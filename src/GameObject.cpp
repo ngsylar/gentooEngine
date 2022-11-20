@@ -79,3 +79,9 @@ void GameObject::NotifyCollision (GameObject& other) {
         components[i]->NotifyCollision(other);
     }
 }
+
+void GameObject::NotifyNoCollision (GameObject& other) {
+    for (int i=0; i < (int)components.size(); i++) {
+        components[i]->NotifyNoCollision(other);
+    }
+}

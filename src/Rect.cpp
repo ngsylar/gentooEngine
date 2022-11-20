@@ -37,9 +37,9 @@ void Rect::SetPosition (Vec2 point) {
     y = (point.y - h/2.0f) - offset.y;
 }
 
-void Rect::Translate (Vec2 target) {
-    x += target.x;
-    y += target.y;
+void Rect::Translate (Vec2 displacement) {
+    x += displacement.x;
+    y += displacement.y;
 }
 
 void Rect::RotateAround (Vec2 point, Vec2 axis, float angle) {

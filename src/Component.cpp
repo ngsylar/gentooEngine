@@ -12,6 +12,8 @@ void Component::Render () {}
 
 void Component::NotifyCollision (GameObject& other) {}
 
+void Component::NotifyNoCollision (GameObject& other) {}
+
 bool Component::Is (std::string type) {
     return (type == "Component");
 }

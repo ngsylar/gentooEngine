@@ -18,7 +18,7 @@ class Rect {
         void SetSize(float w, float h);
         void SetPosition(float x, float y);
         void SetPosition(Vec2 point);
-        void Translate(Vec2 target);
+        void Translate(Vec2 displacement);
         void RotateAround(Vec2 point, Vec2 axis, float angle);
 
         // Access

@@ -31,6 +31,7 @@ class GameObject {
         void RemoveComponent(Component* cpt);
         Component* GetComponent(std::string type);
         void NotifyCollision(GameObject& other);
+        void NotifyNoCollision(GameObject& other);
         
         // sylar's extra layer rendering
         static bool CompareLayers(

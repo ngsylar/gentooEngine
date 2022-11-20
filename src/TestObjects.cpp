@@ -10,9 +10,13 @@ void Ball::Start () {
 void Ball::Update (float dt) {
     InputManager& input = InputManager::GetInstance();
     if (input.IsKeyDown(KEY_ARROW_LEFT))
-        associated.box.Translate(Vec2(-150,0)*dt);
+        rigidBody->Translate(Vec2(-150,0)*dt);
     if (input.IsKeyDown(KEY_ARROW_RIGHT))
-        associated.box.Translate(Vec2(150,0)*dt);
-    if (input.KeyPress(KEY_ARROW_UP))
-        rigidBody->AddForce(Vec2(0,-12));
+        rigidBody->Translate(Vec2(150,0)*dt);
+    // if (input.KeyPress(KEY_ARROW_UP))
+    //     rigidBody->AddForce(Vec2(0,-12));
+    if (input.IsKeyDown(KEY_ARROW_UP))
+        rigidBody->Translate(Vec2(0,-150)*dt);
+    if (input.IsKeyDown(KEY_ARROW_DOWN))
+        rigidBody->Translate(Vec2(0,150)*dt);
 }

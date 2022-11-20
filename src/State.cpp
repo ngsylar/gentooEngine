@@ -8,6 +8,7 @@ State::State () {
 }
 
 State::~State () {
+    renderingArray.clear();
     objectArray.clear();
 }
 
@@ -138,6 +139,10 @@ void State::DetectCollisions () {
             if (thereIsCollision) {
                 objectArray[i]->NotifyCollision(*objectArray[j]);
                 objectArray[j]->NotifyCollision(*objectArray[i]);
+            }
+            else {
+                objectArray[i]->NotifyNoCollision(*objectArray[j]);
+                objectArray[j]->NotifyNoCollision(*objectArray[i]);
             }
         }
 }
