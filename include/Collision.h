@@ -5,32 +5,37 @@
 #include <cmath>
 
 class Collision {
-
 	public:
+		// enum DetectionType {AABB, SAT};
+
 		// Observação: IsColliding espera ângulos em radianos!
 		// Para usar graus, forneça a sua própria implementação de Rotate,
 		// ou transforme os ângulos no corpo de IsColliding.
-		static inline bool IsColliding(Rect& a, Rect& b, float angleOfA, float angleOfB) {
+		static inline bool IsColliding (Rect& a, Rect& b, float angleA, float angleB) {
+			if (not (angleA or angleB)) {
+				return ((a.x+a.w >= b.x) && (a.x <= b.x+b.w) && (a.y+a.h >= b.y) && (a.y <= b.y+b.h));
+			}
+
 			Vec2 A[] = { Vec2( a.x, a.y + a.h ),
-						  Vec2( a.x + a.w, a.y + a.h ),
-						  Vec2( a.x + a.w, a.y ),
-						  Vec2( a.x, a.y )
-						};
+				Vec2( a.x + a.w, a.y + a.h ),
+				Vec2( a.x + a.w, a.y ),
+				Vec2( a.x, a.y )
+			};
 			Vec2 B[] = { Vec2( b.x, b.y + b.h ),
-						  Vec2( b.x + b.w, b.y + b.h ),
-						  Vec2( b.x + b.w, b.y ),
-						  Vec2( b.x, b.y )
-						};
+				Vec2( b.x + b.w, b.y + b.h ),
+				Vec2( b.x + b.w, b.y ),
+				Vec2( b.x, b.y )
+			};
 
 			for (auto& v : A) {
-				v = Rotate(v - a.GetGlobalCenter(), angleOfA) + a.GetGlobalCenter();
+				v = Rotate(v - a.GetGlobalCenter(), angleA) + a.GetGlobalCenter();
 			}
 
 			for (auto& v : B) {
-				v = Rotate(v - b.GetGlobalCenter(), angleOfB) + b.GetGlobalCenter();
+				v = Rotate(v - b.GetGlobalCenter(), angleB) + b.GetGlobalCenter();
 			}
 
-			Vec2 axes[] = { Norm(A[0] - A[1]), Norm(A[1] - A[2]), Norm(B[0] - B[1]), Norm(B[1] - B[2]) };
+			Vec2 axes[] = {Norm(A[0]-A[1]), Norm(A[1]-A[2]), Norm(B[0]-B[1]), Norm(B[1]-B[2])};
 
 			for (auto& axis : axes) {
 				float P[4];
@@ -53,20 +58,19 @@ class Collision {
 		}
 
 	private:
-
-		static inline float Mag(const Vec2& p) {
+		static inline float Mag (const Vec2& p) {
 			return std::sqrt(p.x * p.x + p.y * p.y);
 		}
 
-		static inline Vec2 Norm(const Vec2& p) {
+		static inline Vec2 Norm (const Vec2& p) {
 			return p * (1.f / Mag(p));
 		}
 
-		static inline float Dot(const Vec2& a, const Vec2& b) {
+		static inline float Dot (const Vec2& a, const Vec2& b) {
 			return a.x * b.x + a.y * b.y;
 		}
 
-		static inline Vec2 Rotate(const Vec2& p, float angle) {
+		static inline Vec2 Rotate (const Vec2& p, float angle) {
 			float cs = std::cos(angle), sn = std::sin(angle);
 			return Vec2 ( p.x * cs - p.y * sn, p.x * sn + p.y * cs );
 		}

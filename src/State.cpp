@@ -133,8 +133,7 @@ void State::DetectCollisions () {
 
             thereIsCollision = Collision::IsColliding(
                 colliderA->box, colliderB->box,
-                Deg2Rad(objectArray[i]->angleDeg),
-                Deg2Rad(objectArray[j]->angleDeg)
+                Deg2Rad(objectArray[i]->angleDeg), Deg2Rad(objectArray[j]->angleDeg)
             );
             if (thereIsCollision) {
                 objectArray[i]->NotifyCollision(*objectArray[j]);

@@ -24,6 +24,15 @@ void TestScene::LoadAssets () {
     rawPlat->AddComponent(platSpr);
     AddObject(rawPlat);
     mini_platform = GetObjectPtr(rawPlat);
+    platSpr->SetScale(15.0f, 1.0f);
+    rawPlat->box.SetPosition(512, 100);
+    rawPlat->AddComponent(new Collider(*rawPlat));
+
+    rawPlat = new GameObject(LAYER_BLACK_SQUARE);
+    platSpr = new Sprite(*rawPlat, SPRITE_BLACK_SQUARE);
+    rawPlat->AddComponent(platSpr);
+    AddObject(rawPlat);
+    mini_platform = GetObjectPtr(rawPlat);
     platSpr->SetScale(1.0f, 7.0f);
     rawPlat->box.SetPosition(100, 300);
     rawPlat->AddComponent(new Collider(*rawPlat));
@@ -53,8 +62,7 @@ void TestScene::LoadAssets () {
     rawBall->AddComponent(new Ball(*rawBall));
     rawBall->AddComponent(new RigidBody(*rawBall));
     rawBall->AddComponent(new Collider(*rawBall));
-    rawBall->box.SetPosition(512,0);
-    // rawBall->box.SetPosition(512,500);
+    rawBall->box.SetPosition(512,300);
 }
 
 void TestScene::Start () {}

@@ -13,7 +13,7 @@ class RigidBody: public Component {
         float gravity, acceleration;
         Vec2 force, velocity;
         Vec2 previousPosition, movementDirection;
-        std::vector<std::pair<std::weak_ptr<GameObject>, CollisionType>> collidingObjects;
+        std::vector<std::pair<std::weak_ptr<GameObject>, CollisionType>> collidingOthers;
     
         void HandleGravity(Vec2 position, float dt);
 
@@ -21,7 +21,7 @@ class RigidBody: public Component {
         // enum BodyType {DYNAMIC, KINEMATIC, STATIC};
 
         // BodyType bodyType;
-        bool collisionFace[4];
+        bool collidingFaces[4];
 
         RigidBody(GameObject& associated);
         void Start();
