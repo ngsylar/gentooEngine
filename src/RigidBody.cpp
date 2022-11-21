@@ -2,10 +2,7 @@
 
 RigidBody::RigidBody (GameObject& associated): Component(associated) {
     // bodyType = DYNAMIC;
-
-    pixelScale = 2;
-    gravity = 10.0f;
-    acceleration = pixelScale * gravity;
+    gravity = 20.0f;
 
     collidingFaces[UP] = false;
     collidingFaces[DOWN] = false;
@@ -20,41 +17,26 @@ void RigidBody::Start () {
 void RigidBody::Update (float dt) {
     Vec2 position = associated.box.GetPosition();
     movementDirection = (position - previousPosition).Normalize();
-
-    // if (pastedLeft) {
-    //     if (movementDirection.x < 0) {
-    //         associated.box.SetPosition(previousPosition.x, position.y);
-    //         position = Vec2(previousPosition.x, position.y);
-    //         SDL_Log("pastedLeft");
-    //     } else if (movementDirection.x > 0)
-    //         pastedLeft = false;
-    // }
-    // if (pastedRight) {
-    //     if (movementDirection.x > 0) {
-    //         associated.box.SetPosition(previousPosition.x, position.y);
-    //         position = Vec2(previousPosition.x, position.y);
-    //         SDL_Log("pastedRight");
-    //     } else if (movementDirection.x < 0)
-    //         pastedRight = false;
-    // }
-
     previousPosition = position;
-    // HandleGravity(position, dt);
+    
+    if (gravity)
+        HandleGravity();
+    Translate(velocity*dt);
 }
 
-void RigidBody::HandleGravity (Vec2 position, float dt) {
-    // if (grounded) {
-    //     velocity.y = 0.0f;
-    //     return;
-    // }
-    velocity.y += acceleration * dt;
-    position += velocity;
-    associated.box.SetPosition(position);
+bool RigidBody::IsGrounded () {
+    return collidingFaces[DOWN];
 }
 
-void RigidBody::AddForce (Vec2 force) {
-    velocity += force;
-    // grounded = false; // remover
+void RigidBody::HandleGravity () {
+    float gravitationalAcceleration = 0.0f;
+
+    if (collidingFaces[DOWN])
+        gravitationalAcceleration = 0.0f;
+    else
+        gravitationalAcceleration = gravity;
+
+    velocity.y += gravitationalAcceleration;
 }
 
 void RigidBody::Translate (Vec2 displacement) {
@@ -63,6 +45,10 @@ void RigidBody::Translate (Vec2 displacement) {
     if ((collidingFaces[LEFT] and (displacement.x < 0)) or (collidingFaces[RIGHT] and (displacement.x > 0)))
         displacement.x = 0;
     associated.box.Translate(displacement);
+}
+
+void RigidBody::AddForce (Vec2 force) {
+    velocity += force;
 }
 
 void RigidBody::NotifyCollision (GameObject& other) {
@@ -79,11 +65,10 @@ void RigidBody::NotifyCollision (GameObject& other) {
     /*--------------------------------------------------------------------------------------------------*/
 
     std::weak_ptr<GameObject> otherPtr = Game::GetInstance().GetCurrentState().GetObjectPtr(&other);
-    bool isColliding[4] = {false, false, false, false};
+    bool isColliding[4] = {false};
 
     if (movementDirection.y < 0) {
         isColliding[UP] = true;
-        // velocity.y = 0.0f;
     }
     if (movementDirection.y > 0) {
         isColliding[DOWN] = true;
@@ -153,21 +138,25 @@ void RigidBody::NotifyCollision (GameObject& other) {
         associated.box.SetPosition(position.x, otherFaceDown+heightHalf);
         collidingOthers.push_back(std::make_pair(otherPtr, UP));
         collidingFaces[UP] = true;
+        velocity.y = 0.0f;
     }
     if (isColliding[DOWN]) {
         associated.box.SetPosition(position.x, otherFaceUp-heightHalf);
         collidingOthers.push_back(std::make_pair(otherPtr, DOWN));
         collidingFaces[DOWN] = true;
+        velocity.y = 0.0f;
     }
     if (isColliding[LEFT]) {
         associated.box.SetPosition(otherFaceRight+widthHalf, position.y);
         collidingOthers.push_back(std::make_pair(otherPtr, LEFT));
         collidingFaces[LEFT] = true;
+        velocity.x = 0.0f;
     }
     if (isColliding[RIGHT]) {
         associated.box.SetPosition(otherFaceLeft-widthHalf, position.y);
         collidingOthers.push_back(std::make_pair(otherPtr, RIGHT));
         collidingFaces[RIGHT] = true;
+        velocity.x = 0.0f;
     }
     // SDL_Log("%d %d %d %d", isColliding[UP], isColliding[DOWN], isColliding[LEFT], isColliding[RIGHT]);
 }
@@ -177,7 +166,7 @@ void RigidBody::NotifyNoCollision (GameObject& other) {
     // remove movement restriction
     /*--------------------------------------------------------------------------------------------------*/
 
-    bool isColliding[4] = {false, false, false, false};
+    bool isColliding[4] = {false};
 
     for (int i=(int)collidingOthers.size()-1; i >= 0; i--) {
         if (collidingOthers[i].first.lock().get() == &other)

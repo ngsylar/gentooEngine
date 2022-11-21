@@ -6,6 +6,7 @@
 class Ball: public Component {
     private:
         RigidBody* rigidBody;
+        bool isJumping;
     public:
         Ball (GameObject& associated);
         void Start ();

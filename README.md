@@ -1,16 +1,8 @@
-# Let's Get The Aliens
+# Gentoo Engine
 
-UnB :: Tópicos Avançados em Computadores :: 2021/1
-
-UnB :: Introdução ao Desenvolvimento de Jogos :: 2022/1
+UnB :: Introdução ao Desenvolvimento de Jogos :: 2022/2
 
 Gabriel Rocha Fontenele :: 15/1026760
-
-## Como executar
-
-Para executar em Windows, baixe a última versão do executável de 32-bits (compátivel com ambas as edições x86 e x64) disponível em [Releases](https://github.com/ngsylar/TACJE_IDJ/releases), extraia TODOS os arquivos da pasta zipada para um mesmo diretório e em seguida abra _GAME.exe_ (ou _GAME_with_log.exe_ para acompanhar o log de eventos).
-
-Para executar em Linux, leia a seção [Como compilar](#como-compilar).
 
 ## Como compilar
 
