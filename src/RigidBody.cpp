@@ -2,7 +2,8 @@
 
 RigidBody::RigidBody (GameObject& associated): Component(associated) {
     // bodyType = DYNAMIC;
-    gravity = 20.0f;
+    gravityEnabled = true;
+    gravityValue = 20.0f;
 
     collidingFaces[UP] = false;
     collidingFaces[DOWN] = false;
@@ -19,7 +20,7 @@ void RigidBody::Update (float dt) {
     movementDirection = (position - previousPosition).Normalize();
     previousPosition = position;
     
-    if (gravity)
+    if (gravityEnabled)
         HandleGravity();
     Translate(velocity*dt);
 }
@@ -34,7 +35,7 @@ void RigidBody::HandleGravity () {
     if (collidingFaces[DOWN])
         gravitationalAcceleration = 0.0f;
     else
-        gravitationalAcceleration = gravity;
+        gravitationalAcceleration = gravityValue;
 
     velocity.y += gravitationalAcceleration;
 }
@@ -49,6 +50,21 @@ void RigidBody::Translate (Vec2 displacement) {
 
 void RigidBody::AddForce (Vec2 force) {
     velocity += force;
+}
+
+void RigidBody::CancelForces (RigidBody::ForceDirection axis) {
+    switch (axis) {
+        case ALL:
+            velocity = Vec2();
+            break;
+        case VERTICAL:
+            velocity.y = 0.0f;
+            break;
+        case HORIZONTAL:
+            velocity.x = 0.0f;
+            break;        
+        default: break;
+    }
 }
 
 void RigidBody::NotifyCollision (GameObject& other) {
