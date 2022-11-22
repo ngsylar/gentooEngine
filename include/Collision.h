@@ -11,9 +11,11 @@ class Collision {
 		// Observação: IsColliding espera ângulos em radianos!
 		// Para usar graus, forneça a sua própria implementação de Rotate,
 		// ou transforme os ângulos no corpo de IsColliding.
-		static inline bool IsColliding (Rect& a, Rect& b, float angleA, float angleB) {
+		static inline bool IsColliding (Rect& a, Rect& b, float angleA=0.0f, float angleB=0.0f) {
 			if (not (angleA or angleB)) {
-				return ((a.x+a.w >= b.x) && (a.x <= b.x+b.w) && (a.y+a.h >= b.y) && (a.y <= b.y+b.h));
+				bool axisX = (a.x+a.w >= b.x) && (a.x <= b.x+b.w);
+				bool axisY = (a.y+a.h >= b.y) && (a.y <= b.y+b.h);
+				return (axisX && axisY);
 			}
 
 			Vec2 A[] = { Vec2( a.x, a.y + a.h ),

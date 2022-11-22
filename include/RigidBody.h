@@ -2,6 +2,7 @@
 #define RIGID_BODY_H
 
 #include <utility>
+#include <queue>
 
 #include "Component.h"
 
@@ -9,7 +10,7 @@ class RigidBody: public Component {
     public:
         // enum BodyType {DYNAMIC, KINEMATIC, STATIC};
         enum ForceDirection {ALL, VERTICAL, HORIZONTAL};
-        enum CollisionType {UP, DOWN, LEFT, RIGHT};
+        enum CollisionFace {UP, DOWN, LEFT, RIGHT};
 
         float gravityValue;
         bool gravityEnabled;
@@ -29,8 +30,9 @@ class RigidBody: public Component {
 
     private:
         Vec2 velocity;
-        Vec2 previousPosition, movementDirection;
-        std::vector<std::pair<std::weak_ptr<GameObject>, CollisionType>> collidingOthers;
+        Vec2 movementDirection;
+        std::queue<Vec2> previousPosition;
+        std::vector<std::pair<std::weak_ptr<GameObject>, CollisionFace>> collidingOthers;
     
         void HandleGravity();
 };

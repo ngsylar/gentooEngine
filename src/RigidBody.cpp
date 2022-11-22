@@ -12,13 +12,20 @@ RigidBody::RigidBody (GameObject& associated): Component(associated) {
 }
 
 void RigidBody::Start () {
-    previousPosition = associated.box.GetPosition();
+    Vec2 position = associated.box.GetPosition();
+    previousPosition.emplace(position);
+    previousPosition.emplace(position);
+    previousPosition.emplace(position);
 }
 
 void RigidBody::Update (float dt) {
     Vec2 position = associated.box.GetPosition();
-    movementDirection = (position - previousPosition).Normalize();
-    previousPosition = position;
+    movementDirection = position - previousPosition.front();
+    previousPosition.emplace(position);
+    previousPosition.pop();
+
+    // SDL_Log("1: %f\t%f", previousPosition.front().x, previousPosition.front().y);
+    // SDL_Log("3: %f\t%f", position.x, position.y);
     
     if (gravityEnabled)
         HandleGravity();
@@ -86,18 +93,23 @@ void RigidBody::NotifyCollision (GameObject& other) {
 
     std::weak_ptr<GameObject> otherPtr = Game::GetInstance().GetCurrentState().GetObjectPtr(&other);
     bool isColliding[4] = {false};
+    SDL_Log("%f\t%f", movementDirection.x, movementDirection.y);
 
     if (movementDirection.y < 0) {
         isColliding[UP] = true;
+        SDL_Log("UP");
     }
     if (movementDirection.y > 0) {
         isColliding[DOWN] = true;
+        SDL_Log("DOWN");
     }
     if (movementDirection.x < 0) {
         isColliding[LEFT] = true;
+        SDL_Log("LEFT");
     }
     if (movementDirection.x > 0) {
         isColliding[RIGHT] = true;
+        SDL_Log("RIGHT");
     }
 
     /*--------------------------------------------------------------------------------------------------*/

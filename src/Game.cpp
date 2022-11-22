@@ -89,7 +89,7 @@ Game::~Game () {
 
 void Game::CalculateDeltaTime () {
     int frameCurrent = SDL_GetTicks();
-    dt = (float)(frameCurrent - frameStart) / 1000;
+    dt = (float)(frameCurrent - frameStart) / 1000.0f;
     frameStart = frameCurrent;
 }
 
