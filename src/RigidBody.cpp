@@ -29,6 +29,10 @@ bool RigidBody::IsGrounded () {
     return collidingFaces[DOWN];
 }
 
+Vec2 RigidBody::GetVelocity () {
+    return velocity;
+}
+
 void RigidBody::HandleGravity () {
     float gravitationalAcceleration = 0.0f;
 

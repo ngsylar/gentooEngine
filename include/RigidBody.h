@@ -19,6 +19,7 @@ class RigidBody: public Component {
         void Start();
         void Update(float dt);
         bool IsGrounded();
+        Vec2 GetVelocity();
         void Translate(Vec2 displacement);
         void AddForce(Vec2 force);
         void CancelForces(ForceDirection axis=ALL);
@@ -27,7 +28,7 @@ class RigidBody: public Component {
         bool Is(std::string type);
 
     private:
-        Vec2 force, velocity;
+        Vec2 velocity;
         Vec2 previousPosition, movementDirection;
         std::vector<std::pair<std::weak_ptr<GameObject>, CollisionType>> collidingOthers;
     

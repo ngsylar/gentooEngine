@@ -2,9 +2,9 @@
 #include "TestObjects.h"
 
 Ball::Ball (GameObject& associated): Component(associated) {
-    jumpForce = 340;
+    jumpTimer.SetResetTime(120.0f);
+    jumpForce = 340.0f;
     isJumping = false;
-    jumpPseudoTimer = 0.0f;
 }
 
 void Ball::Start () {
@@ -13,23 +13,23 @@ void Ball::Start () {
 
 void Ball::Update (float dt) {
     InputManager& input = InputManager::GetInstance();
-    
+
     if (isJumping) {
-        if ((jumpPseudoTimer < 120) and input.IsKeyDown(KEY_ARROW_UP)) {
-            jumpPseudoTimer += jumpForce * dt;
+        if (not jumpTimer.IsOver() and input.IsKeyDown(KEY_ARROW_UP)) {
+            jumpTimer.Update(jumpForce*dt);
             rigidBody->Translate(Vec2(0,-jumpForce)*dt);
-            SDL_Log("up");
-        } else {
+        }
+        else {
             rigidBody->AddForce(Vec2(0,-jumpForce));
             rigidBody->gravityEnabled = true;
-            jumpPseudoTimer = 0.0f;
             isJumping = false;
+            jumpTimer.Reset();
         }
         if (rigidBody->collidingFaces[RigidBody::UP]) {
             rigidBody->CancelForces(RigidBody::VERTICAL);
             rigidBody->gravityEnabled = true;
-            jumpPseudoTimer = 0.0f;
             isJumping = false;
+            jumpTimer.Reset();
         }
     }
     if (input.KeyPress(KEY_ARROW_UP) and rigidBody->IsGrounded()) {

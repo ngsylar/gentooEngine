@@ -6,7 +6,8 @@
 class Ball: public Component {
     private:
         RigidBody* rigidBody;
-        float jumpForce, jumpPseudoTimer;
+        Timer jumpTimer;
+        float jumpForce;
         bool isJumping;
 
     public:

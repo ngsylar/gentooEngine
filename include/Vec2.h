@@ -22,6 +22,9 @@ class Vec2 {
         Vec2 Normalize();
         Vec2 Rotate(float angle);
 
+        bool operator==(const Vec2& vec) const;
+        bool operator!=(const Vec2& vec) const;
+
         Vec2 operator-();
         Vec2 operator+(const Vec2& vec);
         Vec2 operator-(const Vec2& vec);
