@@ -67,4 +67,8 @@ void TestScene::LoadAssets () {
 
 void TestScene::Start () {}
 
-void TestScene::Update (float dt) {}
+void TestScene::Update (float dt) {
+    if (InputManager::GetInstance().KeyPress(KEY_ESCAPE)) {
+        popRequested = true;
+    }
+}

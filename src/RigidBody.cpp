@@ -11,6 +11,12 @@ RigidBody::RigidBody (GameObject& associated): Component(associated) {
     collidingFaces[RIGHT] = false;
 }
 
+RigidBody::~RigidBody () {
+    collidingOthers.clear();
+    while (not previousPosition.empty())
+        previousPosition.pop();
+}
+
 void RigidBody::Start () {
     Vec2 position = associated.box.GetPosition();
     previousPosition.emplace(position);
@@ -79,7 +85,7 @@ void RigidBody::AddForce (Vec2 force) {
     velocity += force;
 }
 
-void RigidBody::CancelForces (RigidBody::Axes axis) {
+void RigidBody::CancelForces (RigidBody::Axis axis) {
     switch (axis) {
         case HORIZONTAL:
             velocity.x = 0.0f;

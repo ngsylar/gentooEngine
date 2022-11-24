@@ -9,7 +9,7 @@
 class RigidBody: public Component {
     public:
         // enum BodyType {DYNAMIC, KINEMATIC, STATIC};
-        enum Axes {HORIZONTAL, VERTICAL, ALL};
+        enum Axis {HORIZONTAL, VERTICAL, ALL};
         enum ColliderFace {UP, DOWN, LEFT, RIGHT};
 
         float gravityValue;
@@ -17,13 +17,14 @@ class RigidBody: public Component {
         bool collidingFaces[4];
 
         RigidBody(GameObject& associated);
+        ~RigidBody();
         void Start();
         void Update(float dt);
         bool IsGrounded();
         Vec2 GetVelocity();
         void Translate(Vec2 displacement);
         void AddForce(Vec2 force);
-        void CancelForces(Axes axis=ALL);
+        void CancelForces(Axis axis=ALL);
         void NotifyCollision(GameObject& other);
         void NotifyNoCollision(GameObject& other);
         bool Is(std::string type);
