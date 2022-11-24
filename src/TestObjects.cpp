@@ -26,7 +26,7 @@ void Ball::Update (float dt) {
             jumpTimer.Reset();
         }
         if (rigidBody->collidingFaces[RigidBody::UP]) {
-            rigidBody->CancelForces(RigidBody::VERTICAL);
+            // rigidBody->CancelForces(RigidBody::VERTICAL); // editar: essa linha parece estar redundante, remover?
             rigidBody->gravityEnabled = true;
             isJumping = false;
             jumpTimer.Reset();

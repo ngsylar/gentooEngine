@@ -33,6 +33,12 @@ void GameObject::Update (float dt) {
     }
 }
 
+void GameObject::LateUpdate (float dt) {
+    for (int i=0; i < (int)components.size(); i++) {
+        components[i]->LateUpdate(dt);
+    }
+}
+
 void GameObject::Render () {
     for (int i=0; i < (int)components.size(); i++) {
         components[i]->Render();

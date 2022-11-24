@@ -30,11 +30,9 @@ void State::UpdateBase (float dt) {
     }
 
     // DEBUG
-    if (input.IsKeyDown(KEY_CTRL_LEFT) and input.IsKeyDown(KEY_SHIFT_LEFT) and input.KeyPress(KEY_P)) {
+    if (input.IsKeyDown(KEY_CTRL_LEFT) and input.IsKeyDown(KEY_SHIFT_LEFT) and input.KeyPress(KEY_P))
         debugMode = not debugMode;
-    }
 
-    Camera::Update(dt);
     Update(dt);
 
     for (int i=0; i < (int)objectArray.size(); i++)
@@ -42,10 +40,14 @@ void State::UpdateBase (float dt) {
 
     DetectCollisions();
 
-    for (int i=(int)objectArray.size()-1; i >= 0; i--) {
+    for (int i=(int)objectArray.size()-1; i >= 0; i--)
         if (objectArray[i]->IsDead())
             objectArray.erase(objectArray.begin()+i);
-    }
+
+    Camera::Update(dt);
+
+    for (int i=0; i < (int)objectArray.size(); i++)
+        objectArray[i]->LateUpdate(dt);
 }
 
 void State::RenderBase () {

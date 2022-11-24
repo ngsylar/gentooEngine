@@ -25,4 +25,16 @@ class TestScene: public State {
         void Update(float dt);
 };
 
+
+class TestScene2: public State {
+    private:
+        std::weak_ptr<GameObject> mini_platform, square;
+
+    public:
+        TestScene2();
+        void LoadAssets();
+        void Start();
+        void Update(float dt);
+};
+
 #endif

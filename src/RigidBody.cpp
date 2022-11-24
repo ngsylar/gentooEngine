@@ -29,9 +29,6 @@ void RigidBody::Update (float dt) {
     movementDirection = position - previousPosition.front();
     previousPosition.emplace(position);
     previousPosition.pop();
-
-    // SDL_Log("1: %f\t%f", previousPosition.front().x, previousPosition.front().y);
-    // SDL_Log("3: %f\t%f", position.x, position.y);
     
     if (gravityEnabled)
         HandleGravity();
@@ -47,7 +44,7 @@ void RigidBody::CheckDeletedColliders () {
         if (collidingOthers[i].first.expired())
             collidingOthers.erase(collidingOthers.begin()+i);
         else
-        collidingCount[collidingOthers[i].second]++;
+            collidingCount[collidingOthers[i].second]++;
 
     for (int i=0; i<4; i++)
         if (collidingCount[i] == 0)

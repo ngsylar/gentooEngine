@@ -24,6 +24,7 @@ class GameObject {
         ~GameObject();
         void Start();
         void Update(float dt);
+        void LateUpdate(float dt);
         void Render();
         bool IsDead();
         void RequestDelete();

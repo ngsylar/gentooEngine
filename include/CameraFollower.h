@@ -8,8 +8,7 @@ class CameraFollower: public Component {
         Vec2 offset;
         
         CameraFollower(GameObject& go);
-        void Update(float dt);
-        void Render();
+        void LateUpdate(float dt);
         bool Is(std::string type);
 };
 

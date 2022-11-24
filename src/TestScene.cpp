@@ -4,8 +4,8 @@
 
 TestScene::TestScene () {
     GameObject* bg = new GameObject(SCENE_TEST_LAYER, SCENE_TEST_LABEL);
-    Sprite* bgSprite = new Sprite(*bg, SCENE_TEST_BACKGROUND);
-    bg->AddComponent(bgSprite);
+    bg->AddComponent(new Sprite(*bg, SCENE_TEST_BACKGROUND));
+    bg->AddComponent(new CameraFollower(*bg));
     AddObject(bg);
 }
 
@@ -65,10 +65,25 @@ void TestScene::LoadAssets () {
     rawSquare->box.SetPosition(512,300);
 }
 
-void TestScene::Start () {}
+void TestScene::Start () {
+    Camera::Follow(square.lock().get());
+}
 
 void TestScene::Update (float dt) {
     if (InputManager::GetInstance().KeyPress(KEY_ESCAPE)) {
         popRequested = true;
     }
 }
+
+TestScene2::TestScene2 () {
+    GameObject* bg = new GameObject(SCENE_TEST_LAYER, SCENE_TEST_LABEL);
+    bg->AddComponent(new Sprite(*bg, SCENE_TEST_BACKGROUND));
+    bg->AddComponent(new CameraFollower(*bg));
+    AddObject(bg);
+}
+
+void TestScene2::LoadAssets () {}
+
+void TestScene2::Start () {}
+
+void TestScene2::Update (float dt) {}
