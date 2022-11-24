@@ -15,6 +15,7 @@ class Collider: public Component {
             Vec2 scale=Vec2(1, 1),
             Vec2 offset=Vec2(0, 0)
         );
+        void Start();
         void Update(float dt);
         void Render();
         void SetScale(Vec2 scale);

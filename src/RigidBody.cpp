@@ -30,6 +30,22 @@ void RigidBody::Update (float dt) {
     if (gravityEnabled)
         HandleGravity();
     Translate(velocity*dt);
+
+    CheckDeletedColliders();
+}
+
+void RigidBody::CheckDeletedColliders () {
+    int collidingCount[4] = {0};
+
+    for (int i=0; i < (int)collidingOthers.size(); i++)
+        if (collidingOthers[i].first.expired())
+            collidingOthers.erase(collidingOthers.begin()+i);
+        else
+        collidingCount[collidingOthers[i].second]++;
+
+    for (int i=0; i<4; i++)
+        if (collidingCount[i] == 0)
+            collidingFaces[i] = false;
 }
 
 bool RigidBody::IsGrounded () {
@@ -63,17 +79,17 @@ void RigidBody::AddForce (Vec2 force) {
     velocity += force;
 }
 
-void RigidBody::CancelForces (RigidBody::ForceDirection axis) {
+void RigidBody::CancelForces (RigidBody::Axes axis) {
     switch (axis) {
-        case ALL:
-            velocity = Vec2();
+        case HORIZONTAL:
+            velocity.x = 0.0f;
             break;
         case VERTICAL:
             velocity.y = 0.0f;
             break;
-        case HORIZONTAL:
-            velocity.x = 0.0f;
-            break;        
+        case ALL:
+            velocity = Vec2();
+            break;
         default: break;
     }
 }
@@ -116,19 +132,25 @@ void RigidBody::NotifyCollision (GameObject& other) {
     // get information about the objects
     /*--------------------------------------------------------------------------------------------------*/
 
+    Collider* collider = (Collider*)associated.GetComponent("Collider");
+    Collider* otherCollider = (Collider*)other.GetComponent("Collider");
     Vec2 position = associated.box.GetPosition();
-    float widthHalf = associated.box.w * 0.5f;
-    float heightHalf = associated.box.h * 0.5f;
-    
-    float faceUp = associated.box.y;
-    float faceDown = associated.box.y + associated.box.h;
-    float faceLeft = associated.box.x;
-    float faceRight = associated.box.x + associated.box.w;
 
-    float otherFaceUp = other.box.y;
-    float otherFaceDown = other.box.y + other.box.h;
-    float otherFaceLeft = other.box.x;
-    float otherFaceRight = other.box.x + other.box.w;
+    float halfBody[2] = {
+        collider->box.w*0.5f, collider->box.h*0.5f
+    };
+    float faces[4] = {
+        collider->box.y, collider->box.y+collider->box.h,
+        collider->box.x, collider->box.x+collider->box.w
+    };
+    float otherFaces[4] = {
+        otherCollider->box.y, otherCollider->box.y+otherCollider->box.h,
+        otherCollider->box.x, otherCollider->box.x+otherCollider->box.w
+    };
+    float pushFaceTo[4] = {
+        faces[DOWN]-otherFaces[UP], otherFaces[DOWN]-faces[UP],
+        faces[RIGHT]-otherFaces[LEFT], otherFaces[RIGHT]-faces[LEFT]
+    };
 
     /*--------------------------------------------------------------------------------------------------*/
     // decides the contact face when there is competition on the edges of the other
@@ -136,29 +158,25 @@ void RigidBody::NotifyCollision (GameObject& other) {
 
     if (isColliding[UP]) {
         if (isColliding[LEFT]) {
-            if (otherFaceRight-faceLeft < otherFaceDown-faceUp)
+            if (pushFaceTo[RIGHT] < pushFaceTo[DOWN])
                 isColliding[UP] = false;
-            else
-                isColliding[LEFT] = false;
+            else isColliding[LEFT] = false;
         }
         else if (isColliding[RIGHT]) {
-            if (faceRight-otherFaceLeft < otherFaceDown-faceUp)
+            if (pushFaceTo[LEFT] < pushFaceTo[DOWN])
                 isColliding[UP] = false;
-            else
-                isColliding[RIGHT] = false;
+            else isColliding[RIGHT] = false;
         }
     } else if (isColliding[DOWN]) {
         if (isColliding[LEFT]) {
-            if (otherFaceRight-faceLeft < faceDown-otherFaceUp)
+            if (pushFaceTo[RIGHT] < pushFaceTo[UP])
                 isColliding[DOWN] = false;
-            else
-                isColliding[LEFT] = false;
+            else isColliding[LEFT] = false;
         }
         else if (isColliding[RIGHT]) {
-            if (faceRight-otherFaceLeft < faceDown-otherFaceUp)
+            if (pushFaceTo[LEFT] < pushFaceTo[UP])
                 isColliding[DOWN] = false;
-            else
-                isColliding[RIGHT] = false;
+            else isColliding[RIGHT] = false;
         }
     }
     
@@ -167,25 +185,25 @@ void RigidBody::NotifyCollision (GameObject& other) {
     /*--------------------------------------------------------------------------------------------------*/
 
     if (isColliding[UP]) {
-        associated.box.SetPosition(position.x, otherFaceDown+heightHalf);
+        associated.box.SetPosition(position.x, otherFaces[DOWN]+halfBody[VERTICAL]);
         collidingOthers.push_back(std::make_pair(otherPtr, UP));
         collidingFaces[UP] = true;
         velocity.y = 0.0f;
     }
     if (isColliding[DOWN]) {
-        associated.box.SetPosition(position.x, otherFaceUp-heightHalf);
+        associated.box.SetPosition(position.x, otherFaces[UP]-halfBody[VERTICAL]);
         collidingOthers.push_back(std::make_pair(otherPtr, DOWN));
         collidingFaces[DOWN] = true;
         velocity.y = 0.0f;
     }
     if (isColliding[LEFT]) {
-        associated.box.SetPosition(otherFaceRight+widthHalf, position.y);
+        associated.box.SetPosition(otherFaces[RIGHT]+halfBody[HORIZONTAL], position.y);
         collidingOthers.push_back(std::make_pair(otherPtr, LEFT));
         collidingFaces[LEFT] = true;
         velocity.x = 0.0f;
     }
     if (isColliding[RIGHT]) {
-        associated.box.SetPosition(otherFaceLeft-widthHalf, position.y);
+        associated.box.SetPosition(otherFaces[LEFT]-halfBody[HORIZONTAL], position.y);
         collidingOthers.push_back(std::make_pair(otherPtr, RIGHT));
         collidingFaces[RIGHT] = true;
         velocity.x = 0.0f;

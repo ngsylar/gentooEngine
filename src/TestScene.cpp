@@ -55,14 +55,14 @@ void TestScene::LoadAssets () {
     rawPlat->box.SetPosition(300, 300);
     rawPlat->AddComponent(new Collider(*rawPlat));
 
-    GameObject* rawBall = new GameObject(LAYER_RED_BALL);
-    rawBall->AddComponent(new Sprite(*rawBall, SPRITE_RED_BALL));
-    AddObject(rawBall);
-    ball = GetObjectPtr(rawBall);
-    rawBall->AddComponent(new Ball(*rawBall));
-    rawBall->AddComponent(new RigidBody(*rawBall));
-    rawBall->AddComponent(new Collider(*rawBall));
-    rawBall->box.SetPosition(512,300);
+    GameObject* rawSquare = new GameObject(LAYER_RED_BALL);
+    rawSquare->AddComponent(new Sprite(*rawSquare, SPRITE_RED_BALL));
+    AddObject(rawSquare);
+    square = GetObjectPtr(rawSquare);
+    rawSquare->AddComponent(new Ball(*rawSquare));
+    rawSquare->AddComponent(new RigidBody(*rawSquare));
+    rawSquare->AddComponent(new Collider(*rawSquare));
+    rawSquare->box.SetPosition(512,300);
 }
 
 void TestScene::Start () {}

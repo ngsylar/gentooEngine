@@ -37,6 +37,11 @@ void Rect::SetPosition (Vec2 point) {
     y = (point.y - h/2.0f) - offset.y;
 }
 
+void Rect::Translate (float dX, float dY) {
+    x += dX;
+    y += dY;
+}
+
 void Rect::Translate (Vec2 displacement) {
     x += displacement.x;
     y += displacement.y;

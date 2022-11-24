@@ -5,6 +5,10 @@ Collider::Collider (GameObject& associated, Vec2 scale, Vec2 offset): Component(
     this->offset = offset;
 }
 
+void Collider::Start () {
+    box.SetSize(associated.box.w * scale.x, associated.box.h * scale.y);
+}
+
 void Collider::Update (float dt) {
     float angle = Deg2Rad(associated.angleDeg);
 
@@ -15,7 +19,6 @@ void Collider::Update (float dt) {
     // sylar's extra positioning
     Vec2 offsetDifference = offset - associated.box.offset;
     box.SetPosition(associated.box.GetPosition() + offsetDifference.Rotate(angle));
-    box.SetSize(associated.box.w * scale.x, associated.box.h * scale.y);
 }
 
 // DEBUG

@@ -8,7 +8,7 @@
 #define SCENE_TEST_BACKGROUND "assets/img/test_area.png"
 #define SCENE_TEST_LAYER -1
 
-#define SPRITE_RED_BALL "assets/img/red_ball.png"
+#define SPRITE_RED_BALL "assets/img/red_square.png"
 #define SPRITE_BLACK_SQUARE "assets/img/black_square.png"
 
 #define LAYER_RED_BALL 1
@@ -16,7 +16,7 @@
 
 class TestScene: public State {
     private:
-        std::weak_ptr<GameObject> mini_platform, ball;
+        std::weak_ptr<GameObject> mini_platform, square;
 
     public:
         TestScene();
