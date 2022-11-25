@@ -11,6 +11,7 @@ Sprite::Sprite (GameObject& associated): Component(associated) {
     currentFrame = 0;
     frameOneshot = false;
     selfDestruction = false;
+    parallaxFactor = 1.0f;
 }
 
 Sprite::Sprite (
@@ -49,55 +50,6 @@ void Sprite::Open (
 
 void Sprite::SetClip (int x, int y, int w, int h) {
     clipRect = SDL_Rect{x, y, w, h};
-}
-
-void Sprite::Render () {
-    Render(
-        (int)associated.box.x - Camera::pos.x,
-        (int)associated.box.y - Camera::pos.y
-    );
-}
-
-void Sprite::Render (int startX, int startY) {
-    if (texture == nullptr)
-        return;
-
-    SDL_Rect destRect = SDL_Rect{
-        startX, startY,
-        (int)associated.box.w, (int)associated.box.h
-    };
-    SDL_Point boxCenter = SDL_Point{
-        destRect.w/2 + (int)associated.box.offset.x,
-        destRect.h/2 + (int)associated.box.offset.y
-    };
-    int rendercpy = SDL_RenderCopyEx(
-        Game::GetInstance().GetRenderer(),
-        texture.get(), &clipRect, &destRect,
-        associated.angleDeg, &boxCenter,
-        SDL_FLIP_NONE
-    );
-    if (rendercpy == SPRITE_ERROR) {
-        SDL_Log("SDL_RenderCopy: %s", SDL_GetError());
-    }
-}
-
-void Sprite::RenderWithNoOffset (int startX, int startY) {
-    if (texture == nullptr)
-        return;
-
-    SDL_Rect destRect = SDL_Rect{
-        startX, startY,
-        (int)associated.box.w, (int)associated.box.h
-    };
-    int rendercpy = SDL_RenderCopyEx(
-        Game::GetInstance().GetRenderer(),
-        texture.get(), &clipRect, &destRect,
-        associated.angleDeg, nullptr,
-        SDL_FLIP_NONE
-    );
-    if (rendercpy == SPRITE_ERROR) {
-        SDL_Log("SDL_RenderCopy: %s", SDL_GetError());
-    }
 }
 
 void Sprite::SetScale (float scaleX, float scaleY) {
@@ -145,6 +97,10 @@ void Sprite::SetFrameCount (int frameCount) {
     associated.box.w = (float)frameWidth * scale.x;
 }
 
+void Sprite::AddPosition(Vec2 position) {
+    positionArray.push_back(position);
+}
+
 void Sprite::Update (float dt) {
     if (frameTimer.HasResetTime()) {
         frameTimer.Update(dt);
@@ -160,6 +116,61 @@ void Sprite::Update (float dt) {
                     associated.RequestDelete();
             }
         }
+    }
+}
+
+void Sprite::Render () {
+    if (positionArray.size() > 0) {
+        for (int i=0; i < (int)positionArray.size(); i++)
+            Render(
+                (int)positionArray[i].x - (parallaxFactor * Camera::pos.x),
+                (int)positionArray[i].y - (parallaxFactor * Camera::pos.y)
+            );
+    } else Render(
+        (int)associated.box.x - Camera::pos.x,
+        (int)associated.box.y - Camera::pos.y
+    );
+}
+
+void Sprite::Render (int startX, int startY) {
+    if (texture == nullptr)
+        return;
+
+    SDL_Rect destRect = SDL_Rect{
+        startX, startY,
+        (int)associated.box.w, (int)associated.box.h
+    };
+    SDL_Point boxCenter = SDL_Point{
+        destRect.w/2 + (int)associated.box.offset.x,
+        destRect.h/2 + (int)associated.box.offset.y
+    };
+    int rendercpy = SDL_RenderCopyEx(
+        Game::GetInstance().GetRenderer(),
+        texture.get(), &clipRect, &destRect,
+        associated.angleDeg, &boxCenter,
+        SDL_FLIP_NONE
+    );
+    if (rendercpy == SPRITE_ERROR) {
+        SDL_Log("SDL_RenderCopy: %s", SDL_GetError());
+    }
+}
+
+void Sprite::RenderWithNoOffset (int startX, int startY) {
+    if (texture == nullptr)
+        return;
+
+    SDL_Rect destRect = SDL_Rect{
+        startX, startY,
+        (int)associated.box.w, (int)associated.box.h
+    };
+    int rendercpy = SDL_RenderCopyEx(
+        Game::GetInstance().GetRenderer(),
+        texture.get(), &clipRect, &destRect,
+        associated.angleDeg, nullptr,
+        SDL_FLIP_NONE
+    );
+    if (rendercpy == SPRITE_ERROR) {
+        SDL_Log("SDL_RenderCopy: %s", SDL_GetError());
     }
 }
 

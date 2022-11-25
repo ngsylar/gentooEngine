@@ -20,8 +20,11 @@ class Sprite: public Component {
         Timer frameTimer;
         int frameWidth, frameCount, currentFrame;
         bool frameOneshot, selfDestruction;
+        std::vector<Vec2> positionArray;
 
     public:
+        float parallaxFactor;
+        
         Sprite(GameObject& associated);
         Sprite(
             GameObject& associated,
@@ -40,8 +43,6 @@ class Sprite: public Component {
             bool selfDestruction=false
         );
         void SetClip(int x, int y, int w, int h);
-        void Render();
-        void Render(int startX, int startY);
         void SetScale(float scaleX, float scaleY);
         void SetScale(float scale);
         Vec2 GetScale();
@@ -50,12 +51,13 @@ class Sprite: public Component {
         void SetFrame(int frame);
         void SetFrameTime(float frameTime);
         void SetFrameCount(int frameCount);
+        void AddPosition(Vec2 position);
         void Update(float dt);
+        void Render();
+        void Render(int startX, int startY);
+        void RenderWithNoOffset(int startX, int startY);
         bool IsOpen();
         bool Is(std::string type);
-
-        // sylar's extra rendering
-        void RenderWithNoOffset(int startX, int startY);
 };
 
 #endif

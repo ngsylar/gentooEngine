@@ -13,8 +13,6 @@ RigidBody::RigidBody (GameObject& associated): Component(associated) {
 
 RigidBody::~RigidBody () {
     collidingOthers.clear();
-    while (not previousPosition.empty())
-        previousPosition.pop();
 }
 
 void RigidBody::Start () {

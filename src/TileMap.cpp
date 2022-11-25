@@ -60,8 +60,8 @@ void TileMap::RenderLayer (int layer, int cameraX, int cameraY) {
             tile = At(x, y, layer);
             tileSet->RenderTile(
                 (unsigned)tile,
-                (float)(associated.box.x+x)*tileSet->GetTileWidth()-(1.0f+parallaxFactor)*cameraX,
-                (float)(associated.box.y+y)*tileSet->GetTileHeight()-(1.0f+parallaxFactor)*cameraY
+                (float)(associated.box.x+x)*tileSet->GetTileWidth()-(parallaxFactor*cameraX),
+                (float)(associated.box.y+y)*tileSet->GetTileHeight()-(parallaxFactor*cameraY)
             );
         }
 }

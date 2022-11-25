@@ -18,7 +18,7 @@ class TileMap: public Component {
             GameObject& associated,
             TileSet* tileSet,
             std::string file,
-            float parallaxFactor=0.0f
+            float parallaxFactor=1.0f
         );
         ~TileMap();
         void Load(std::string fileName);
