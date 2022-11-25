@@ -40,15 +40,15 @@ class TestScene2: public State {
         void Update(float dt);
 };
 
-// class TestScene3: public State {
-//     private:
-//         std::weak_ptr<GameObject> square;
+class TestScene3: public State {
+    private:
+        std::weak_ptr<GameObject> square;
 
-//     public:
-//         TestScene3();
-//         void LoadAssets();
-//         void Start();
-//         void Update(float dt);
-// };
+    public:
+        TestScene3();
+        void LoadAssets();
+        void Start();
+        void Update(float dt);
+};
 
 #endif

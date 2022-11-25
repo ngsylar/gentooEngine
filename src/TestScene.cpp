@@ -130,3 +130,21 @@ void TestScene2::Update (float dt) {
         popRequested = true;
     }
 }
+
+TestScene3::TestScene3 () {
+    // fazer o bg loop dps
+    GameObject* bg = new GameObject(SCENE_TEST_LAYER, SCENE_TEST_LABEL);
+    bg->AddComponent(new Sprite(*bg, SCENE_TEST_BACKGROUND));
+    bg->AddComponent(new CameraFollower(*bg));
+    AddObject(bg);
+}
+
+void TestScene3::LoadAssets () {}
+
+void TestScene3::Start () {}
+
+void TestScene3::Update (float dt) {
+    if (InputManager::GetInstance().KeyPress(KEY_ESCAPE)) {
+        popRequested = true;
+    }
+}

@@ -110,23 +110,23 @@ void RigidBody::NotifyCollision (GameObject& other) {
 
     std::weak_ptr<GameObject> otherPtr = Game::GetInstance().GetCurrentState().GetObjectPtr(&other);
     bool isColliding[4] = {false};
-    SDL_Log("%f\t%f", movementDirection.x, movementDirection.y);
+    // SDL_Log("%f\t%f", movementDirection.x, movementDirection.y);
 
     if (movementDirection.y < 0) {
         isColliding[UP] = true;
-        SDL_Log("UP");
+        // SDL_Log("UP");
     }
     if (movementDirection.y > 0) {
         isColliding[DOWN] = true;
-        SDL_Log("DOWN");
+        // SDL_Log("DOWN");
     }
     if (movementDirection.x < 0) {
         isColliding[LEFT] = true;
-        SDL_Log("LEFT");
+        // SDL_Log("LEFT");
     }
     if (movementDirection.x > 0) {
         isColliding[RIGHT] = true;
-        SDL_Log("RIGHT");
+        // SDL_Log("RIGHT");
     }
 
     /*--------------------------------------------------------------------------------------------------*/
@@ -234,6 +234,10 @@ void RigidBody::NotifyNoCollision (GameObject& other) {
     collidingFaces[DOWN] = isColliding[DOWN];
     collidingFaces[LEFT] = isColliding[LEFT];
     collidingFaces[RIGHT] = isColliding[RIGHT];
+}
+
+bool RigidBody::IsColliding (ColliderFace face) {
+    return collidingFaces[face];
 }
 
 bool RigidBody::Is (std::string type) {

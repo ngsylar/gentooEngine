@@ -14,7 +14,6 @@ class RigidBody: public Component {
 
         float gravityValue;
         bool gravityEnabled;
-        bool collidingFaces[4];
 
         RigidBody(GameObject& associated);
         ~RigidBody();
@@ -27,6 +26,7 @@ class RigidBody: public Component {
         void CancelForces(Axis axis=ALL);
         void NotifyCollision(GameObject& other);
         void NotifyNoCollision(GameObject& other);
+        bool IsColliding (ColliderFace face);
         bool Is(std::string type);
 
     private:
@@ -34,6 +34,7 @@ class RigidBody: public Component {
         Vec2 movementDirection;
         std::queue<Vec2> previousPosition;
         std::vector<std::pair<std::weak_ptr<GameObject>, ColliderFace>> collidingOthers;
+        bool collidingFaces[4];
     
         void CheckDeletedColliders();
         void HandleGravity();

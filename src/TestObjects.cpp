@@ -2,10 +2,11 @@
 #include "TestObjects.h"
 
 Ball::Ball (GameObject& associated): Component(associated) {
-    jumpTimer.SetResetTime(120.0f);
-    jumpForce = 340.0f;
-    isJumping = false;
     runSpeed = 200.0f;
+    jumpForce = 340.0f;
+    jumpHeightMax = 140.0f;
+    jumpHeight = 0.0f;
+    isJumping = false;
 }
 
 void Ball::Start () {
@@ -15,29 +16,35 @@ void Ball::Start () {
 void Ball::Update (float dt) {
     InputManager& input = InputManager::GetInstance();
 
+    // editar: usar altura maxima ao inves de timer
     if (isJumping) {
         // if the button continues to be pressed increases the vertical jump height
-        if (not jumpTimer.IsOver() and input.IsKeyDown(KEY_ARROW_UP)) {
-            jumpTimer.Update(jumpForce*dt);
-            rigidBody->Translate(Vec2(0,-jumpForce)*dt);
+        if ((jumpHeight < jumpHeightMax) and input.IsKeyDown(KEY_ARROW_UP)) {
+            float jumpDisplacement = jumpForce * dt;
+            rigidBody->Translate(Vec2(0,-jumpDisplacement));
+            jumpHeight += jumpDisplacement;
         }
         // applies a constant force that gradually decreases due to the gravity force
         else {
-            rigidBody->AddForce(Vec2(0,-jumpForce));
+            // SDL_Log("end: %f", associated.box.GetPosition().y);
+            rigidBody->AddForce(Vec2(0,-((jumpForce*jumpHeight)/jumpHeightMax)));
             rigidBody->gravityEnabled = true;
+            jumpHeight = 0.0f;
             isJumping = false;
-            jumpTimer.Reset();
         }
-        // if it hits the ceiling cancels the force applied in the previous condition
-        if (rigidBody->collidingFaces[RigidBody::UP]) {
+        // if it hits the ceiling cancels the jump or the force applied in previous conditions
+        if (rigidBody->IsColliding(RigidBody::UP)) {
             rigidBody->CancelForces(RigidBody::VERTICAL);
             rigidBody->gravityEnabled = true;
+            jumpHeight = 0.0f;
             isJumping = false;
-            jumpTimer.Reset();
         }
     }
     if (input.KeyPress(KEY_ARROW_UP) and rigidBody->IsGrounded()) {
-        rigidBody->Translate(Vec2(0,-jumpForce)*dt);
+        // SDL_Log("beg: %f", associated.box.GetPosition().y);
+        float jumpDisplacement = jumpForce * dt;
+        rigidBody->Translate(Vec2(0,-jumpDisplacement));
+        jumpHeight += jumpDisplacement;
         rigidBody->gravityEnabled = false;
         isJumping = true;
     }
