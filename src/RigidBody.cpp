@@ -3,7 +3,7 @@
 RigidBody::RigidBody (GameObject& associated): Component(associated) {
     // bodyType = DYNAMIC;
     gravityEnabled = true;
-    gravityValue = 20.0f;
+    gravityValue = 40.0f;
 
     collidingFaces[UP] = false;
     collidingFaces[DOWN] = false;
@@ -30,31 +30,9 @@ void RigidBody::Update (float dt) {
     
     if (gravityEnabled)
         HandleGravity();
-    Translate(velocity*dt);
-
+    
+    Translate(velocity * dt);
     CheckDeletedColliders();
-}
-
-void RigidBody::CheckDeletedColliders () {
-    int collidingCount[4] = {0};
-
-    for (int i=0; i < (int)collidingOthers.size(); i++)
-        if (collidingOthers[i].first.expired())
-            collidingOthers.erase(collidingOthers.begin()+i);
-        else
-            collidingCount[collidingOthers[i].second]++;
-
-    for (int i=0; i<4; i++)
-        if (collidingCount[i] == 0)
-            collidingFaces[i] = false;
-}
-
-bool RigidBody::IsGrounded () {
-    return collidingFaces[DOWN];
-}
-
-Vec2 RigidBody::GetVelocity () {
-    return velocity;
 }
 
 void RigidBody::HandleGravity () {
@@ -65,7 +43,18 @@ void RigidBody::HandleGravity () {
     else
         gravitationalAcceleration = gravityValue;
 
-    velocity.y += gravitationalAcceleration;
+    if ((velocityMax.y > 0.0f) and (velocity.y >= velocityMax.y))
+        velocity.y = velocityMax.y;
+    else
+        velocity.y += gravitationalAcceleration;
+}
+
+bool RigidBody::IsGrounded () {
+    return collidingFaces[DOWN];
+}
+
+Vec2 RigidBody::GetVelocity () {
+    return velocity;
 }
 
 void RigidBody::Translate (Vec2 displacement) {
@@ -238,6 +227,20 @@ void RigidBody::NotifyNoCollision (GameObject& other) {
 
 bool RigidBody::IsColliding (ColliderFace face) {
     return collidingFaces[face];
+}
+
+void RigidBody::CheckDeletedColliders () {
+    int collidingCount[4] = {0};
+
+    for (int i=0; i < (int)collidingOthers.size(); i++)
+        if (collidingOthers[i].first.expired())
+            collidingOthers.erase(collidingOthers.begin()+i);
+        else
+            collidingCount[collidingOthers[i].second]++;
+
+    for (int i=0; i<4; i++)
+        if (collidingCount[i] == 0)
+            collidingFaces[i] = false;
 }
 
 bool RigidBody::Is (std::string type) {

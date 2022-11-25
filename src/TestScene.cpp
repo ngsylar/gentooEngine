@@ -60,8 +60,6 @@ void TestScene::LoadAssets () {
     AddObject(rawSquare);
     square = GetObjectPtr(rawSquare);
     rawSquare->AddComponent(new Ball(*rawSquare));
-    rawSquare->AddComponent(new RigidBody(*rawSquare));
-    rawSquare->AddComponent(new Collider(*rawSquare));
     rawSquare->box.SetPosition(512,300);
 }
 
@@ -116,8 +114,6 @@ void TestScene2::LoadAssets () {
     AddObject(rawSquare);
     square = GetObjectPtr(rawSquare);
     rawSquare->AddComponent(new Ball(*rawSquare));
-    rawSquare->AddComponent(new RigidBody(*rawSquare));
-    rawSquare->AddComponent(new Collider(*rawSquare));
     rawSquare->box.SetPosition(512,300);
 }
 
@@ -127,6 +123,7 @@ void TestScene2::Start () {
 
 void TestScene2::Update (float dt) {
     if (InputManager::GetInstance().KeyPress(KEY_ESCAPE)) {
+        Game::GetInstance().AddState(new TestScene3());
         popRequested = true;
     }
 }
@@ -139,9 +136,36 @@ TestScene3::TestScene3 () {
     AddObject(bg);
 }
 
-void TestScene3::LoadAssets () {}
+void TestScene3::LoadAssets () {
+    for (int i=0; i < 25; i++) {
+        GameObject* rawPlat = new GameObject(LAYER_BLACK_SQUARE);
+        Sprite* platSpr = new Sprite(*rawPlat, SPRITE_BLACK_SQUARE);
+        rawPlat->AddComponent(platSpr);
+        AddObject(rawPlat);
+        platSpr->SetScale(3.0f, 1.0f);
+        rawPlat->box.SetPosition(100, i*400);
+        rawPlat->AddComponent(new Collider(*rawPlat));
 
-void TestScene3::Start () {}
+        rawPlat = new GameObject(LAYER_BLACK_SQUARE);
+        platSpr = new Sprite(*rawPlat, SPRITE_BLACK_SQUARE);
+        rawPlat->AddComponent(platSpr);
+        AddObject(rawPlat);
+        platSpr->SetScale(3.0f, 1.0f);
+        rawPlat->box.SetPosition(500, i*400);
+        rawPlat->AddComponent(new Collider(*rawPlat));
+    }
+    
+    GameObject* rawSquare = new GameObject(LAYER_RED_SQUARE);
+    rawSquare->AddComponent(new Sprite(*rawSquare, SPRITE_RED_SQUARE));
+    AddObject(rawSquare);
+    square = GetObjectPtr(rawSquare);
+    rawSquare->AddComponent(new Ball(*rawSquare));
+    rawSquare->box.SetPosition(512,300);
+}
+
+void TestScene3::Start () {
+    Camera::Follow(square.lock().get());
+}
 
 void TestScene3::Update (float dt) {
     if (InputManager::GetInstance().KeyPress(KEY_ESCAPE)) {

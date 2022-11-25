@@ -2,15 +2,18 @@
 #include "TestObjects.h"
 
 Ball::Ball (GameObject& associated): Component(associated) {
-    runSpeed = 200.0f;
-    jumpForce = 340.0f;
+    runSpeed = 300.0f;
+    jumpForce = 400.0f;
     jumpHeightMax = 140.0f;
     jumpHeight = 0.0f;
     isJumping = false;
 }
 
 void Ball::Start () {
-    rigidBody = (RigidBody*)associated.GetComponent("RigidBody");
+    rigidBody = new RigidBody(associated);
+    associated.AddComponent(rigidBody);
+    associated.AddComponent(new Collider(associated));
+    rigidBody->velocityMax.y = 800.0f;
 }
 
 void Ball::Update (float dt) {

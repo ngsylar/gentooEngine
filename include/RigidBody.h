@@ -14,6 +14,7 @@ class RigidBody: public Component {
 
         float gravityValue;
         bool gravityEnabled;
+        Vec2 velocityMax;
 
         RigidBody(GameObject& associated);
         ~RigidBody();
@@ -36,8 +37,8 @@ class RigidBody: public Component {
         std::vector<std::pair<std::weak_ptr<GameObject>, ColliderFace>> collidingOthers;
         bool collidingFaces[4];
     
-        void CheckDeletedColliders();
         void HandleGravity();
+        void CheckDeletedColliders();
 };
 
 #endif
