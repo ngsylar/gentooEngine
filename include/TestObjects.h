@@ -1,6 +1,7 @@
 #ifndef TEST_OBJECTS_H
 #define TEST_OBJECTS_H
 
+#include "InputManager.h"
 #include "Component.h"
 
 class Ball: public Component {
@@ -10,9 +11,11 @@ class Ball: public Component {
         bool isJumping;
 
     public:
-        Ball (GameObject& associated);
-        void Start ();
-        void Update (float dt);
+        Ball(GameObject& associated);
+        void Start();
+        void Update(float dt);
+        void StartJump(float dt);
+        void HandleJump(bool isKeyDown, float dt);
 };
 
 #endif
