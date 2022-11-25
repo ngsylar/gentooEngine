@@ -16,17 +16,17 @@ void Ball::Start () {
 void Ball::Update (float dt) {
     InputManager& input = InputManager::GetInstance();
 
-    // editar: usar altura maxima ao inves de timer
     if (isJumping) {
         // if the button continues to be pressed increases the vertical jump height
         if ((jumpHeight < jumpHeightMax) and input.IsKeyDown(KEY_ARROW_UP)) {
             float jumpDisplacement = jumpForce * dt;
             rigidBody->Translate(Vec2(0,-jumpDisplacement));
             jumpHeight += jumpDisplacement;
+            if (jumpHeight > jumpHeightMax)
+                jumpHeight = jumpHeightMax;
         }
         // applies a constant force that gradually decreases due to the gravity force
         else {
-            // SDL_Log("end: %f", associated.box.GetPosition().y);
             rigidBody->AddForce(Vec2(0,-((jumpForce*jumpHeight)/jumpHeightMax)));
             rigidBody->gravityEnabled = true;
             jumpHeight = 0.0f;
@@ -41,7 +41,6 @@ void Ball::Update (float dt) {
         }
     }
     if (input.KeyPress(KEY_ARROW_UP) and rigidBody->IsGrounded()) {
-        // SDL_Log("beg: %f", associated.box.GetPosition().y);
         float jumpDisplacement = jumpForce * dt;
         rigidBody->Translate(Vec2(0,-jumpDisplacement));
         jumpHeight += jumpDisplacement;
