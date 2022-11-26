@@ -19,6 +19,7 @@ class Camera {
         static void DisableFree();
         static void Update(float dt);
         static void Reset();
+        static Vec2 GetPosition();
 };
 
 #endif

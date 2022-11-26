@@ -97,10 +97,6 @@ void Sprite::SetFrameCount (int frameCount) {
     associated.box.w = (float)frameWidth * scale.x;
 }
 
-void Sprite::AddPosition(Vec2 position) {
-    positionArray.push_back(position);
-}
-
 void Sprite::Update (float dt) {
     if (frameTimer.HasResetTime()) {
         frameTimer.Update(dt);

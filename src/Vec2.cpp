@@ -61,6 +61,14 @@ bool Vec2::operator!= (const Vec2& vec) const {
     return ((x!=vec.x) and (y!=vec.y));
 }
 
+Vec2 Vec2::operator+ (const float scalar) const {
+    return Vec2(x+scalar, y+scalar);
+}
+
+Vec2 Vec2::operator- (const float scalar) const {
+    return Vec2(x-scalar, y-scalar);
+}
+
 Vec2 Vec2::operator- () {
     return Vec2(-x, -y);
 }

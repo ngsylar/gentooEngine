@@ -61,6 +61,11 @@ void TestScene::LoadAssets () {
     square = GetObjectPtr(rawSquare);
     rawSquare->AddComponent(new Ball(*rawSquare));
     rawSquare->box.SetPosition(512,300);
+
+    // rawSquare = new GameObject(4);
+    // rawSquare->AddComponent(new LoopedBackground(*rawSquare, SPRITE_RED_SQUARE));
+    // rawSquare->box.SetPosition(512,300);
+    // AddObject(rawSquare);
 }
 
 void TestScene::Start () {
@@ -97,7 +102,7 @@ void TestScene2::LoadAssets () {
     AddObject(rawRun);
     rawRun->box.SetPosition(512, 300);
     for (int i=0; i<30; i++)
-        runSpr->AddPosition(Vec2(i*142,350));
+        runSpr->positionArray.push_back(Vec2(i*142,350));
 
     rawRun = new GameObject(LAYER_RUN_LEFT);
     runSpr = new Sprite(*rawRun, SPRITE_RUN_LEFT, 12, 0.02f);
@@ -107,7 +112,7 @@ void TestScene2::LoadAssets () {
     runSpr->SetScale(2);
     runSpr->parallaxFactor = 0.25;
     for (int i=0; i<30; i++)
-        runSpr->AddPosition(Vec2(i*142,200));
+        runSpr->positionArray.push_back(Vec2(i*142,200));
     
     GameObject* rawSquare = new GameObject(LAYER_RED_SQUARE);
     rawSquare->AddComponent(new Sprite(*rawSquare, SPRITE_RED_SQUARE));

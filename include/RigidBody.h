@@ -6,6 +6,7 @@
 
 #include "Component.h"
 
+// editar: velocity esta sub-desenvolvida
 class RigidBody: public Component {
     public:
         // enum BodyType {DYNAMIC, KINEMATIC, STATIC};

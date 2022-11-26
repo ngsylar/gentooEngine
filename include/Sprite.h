@@ -20,9 +20,9 @@ class Sprite: public Component {
         Timer frameTimer;
         int frameWidth, frameCount, currentFrame;
         bool frameOneshot, selfDestruction;
-        std::vector<Vec2> positionArray;
 
     public:
+        std::vector<Vec2> positionArray;
         float parallaxFactor;
         
         Sprite(GameObject& associated);
@@ -51,7 +51,6 @@ class Sprite: public Component {
         void SetFrame(int frame);
         void SetFrameTime(float frameTime);
         void SetFrameCount(int frameCount);
-        void AddPosition(Vec2 position);
         void Update(float dt);
         void Render();
         void Render(int startX, int startY);

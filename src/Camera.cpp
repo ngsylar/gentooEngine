@@ -54,3 +54,7 @@ void Camera::Reset () {
     pos = Vec2();
     speed = Vec2();
 }
+
+Vec2 Camera::GetPosition () {
+    return (pos + (Game::GetInstance().GetWindowSize() * 0.5f));
+}

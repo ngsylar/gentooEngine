@@ -18,4 +18,22 @@ class Ball: public Component {
         void HandleJump(bool isKeyDown, float dt);
 };
 
+class LoopedBackground: public Component {
+    private:
+        Sprite* sprite;
+        int halfSize, renderingCount, middlePositionId;
+    
+    public:
+        LoopedBackground(
+            GameObject& associated,
+            std::string fileName,
+            int layerCount=2
+        );
+        ~LoopedBackground();
+        void SetLayerCount(int layerCount);
+        void Start();
+        void Update(float dt);
+        void Render();
+};
+
 #endif
