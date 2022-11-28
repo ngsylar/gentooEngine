@@ -32,7 +32,7 @@ class LoopedBackground: public Component {
         ~LoopedBackground();
         void SetLayerCount(int layerCount);
         void Start();
-        void Update(float dt);
+        void LateUpdate(float dt);
         void Render();
 };
 
