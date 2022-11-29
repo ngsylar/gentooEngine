@@ -81,7 +81,9 @@ void TestScene::Update (float dt) {
 
 TestScene2::TestScene2 () {
     GameObject* bg = new GameObject(SCENE_TEST_LAYER, SCENE_TEST_LABEL);
-    bg->AddComponent(new LoopedBackground(*bg, SCENE_TEST_BACKGROUND));
+    LoopedBackground* lbg = new LoopedBackground(*bg, SCENE_TEST_BACKGROUND);
+    lbg->parallaxFactor = 0.25f;
+    bg->AddComponent(lbg);
     AddObject(bg);
 }
 

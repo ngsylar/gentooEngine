@@ -1,5 +1,4 @@
 #include "GentooEngine.h"
-#include "TestObjects.h"
 
 LoopedBackground::LoopedBackground (
     GameObject& associated, std::string fileName, int layerCount
@@ -9,6 +8,7 @@ LoopedBackground::LoopedBackground (
     middlePositionId = renderingCount >> 1;
     halfSizes[HORIZONTAL] = ((layerCount - 1) * (int)associated.box.w) >> 1;
     halfSizes[VERTICAL] = ((layerCount - 1) * (int)associated.box.h) >> 1;
+    parallaxFactor = 1.0f;
 }
 
 LoopedBackground::~LoopedBackground () {
@@ -28,7 +28,7 @@ void LoopedBackground::Start () {
 
 void LoopedBackground::LateUpdate (float dt) {
     Vec2 position = associated.box.GetPosition();
-    Vec2 cameraDistance = Camera::GetPosition() - position;
+    Vec2 cameraDistance = (Camera::GetPosition() * parallaxFactor) - position;
 
     if (fabs(cameraDistance.x) >= halfSizes[HORIZONTAL]) {
         int signX = (std::signbit(cameraDistance.x)? -1 : 1);
@@ -48,7 +48,7 @@ void LoopedBackground::Render () {
     for (int r=-middlePositionId; r <= middlePositionId; r++)
         for (int c=-middlePositionId; c <= middlePositionId; c++)
             sprite->Render(
-                associated.box.x + (c * associated.box.w) - Camera::pos.x,
-                associated.box.y + (r * associated.box.h) - Camera::pos.y
+                associated.box.x + (c * associated.box.w) - (parallaxFactor * Camera::pos.x),
+                associated.box.y + (r * associated.box.h) - (parallaxFactor * Camera::pos.y)
             );
 }

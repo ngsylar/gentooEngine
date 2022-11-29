@@ -32,7 +32,6 @@
 #include "Resources.h"
 
 // Engine Object Components
-#include "CameraFollower.h"
 #include "RigidBody.h"
 #include "Collider.h"
 #include "Sprite.h"
@@ -41,6 +40,11 @@
 #include "Music.h"
 #include "Sound.h"
 #include "Text.h"
+
+// Engine Auxiliary Object Components
+#include "CameraFollower.h"
+// #include "CineMachine.h"
+#include "LoopedBackground.h"
 
 // Engine Control Core
 #include "State.h"
