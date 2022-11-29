@@ -62,10 +62,10 @@ void TestScene::LoadAssets () {
     rawSquare->AddComponent(new Ball(*rawSquare));
     rawSquare->box.SetPosition(512,300);
 
-    rawSquare = new GameObject(4);
-    rawSquare->AddComponent(new LoopedBackground(*rawSquare, SPRITE_RED_SQUARE));
-    rawSquare->box.SetPosition(512,300);
-    AddObject(rawSquare);
+    // rawSquare = new GameObject(4);
+    // rawSquare->AddComponent(new LoopedBackground(*rawSquare, SPRITE_RED_SQUARE));
+    // rawSquare->box.SetPosition(512,300);
+    // AddObject(rawSquare);
 }
 
 void TestScene::Start () {
@@ -81,8 +81,7 @@ void TestScene::Update (float dt) {
 
 TestScene2::TestScene2 () {
     GameObject* bg = new GameObject(SCENE_TEST_LAYER, SCENE_TEST_LABEL);
-    bg->AddComponent(new Sprite(*bg, SCENE_TEST_BACKGROUND));
-    bg->AddComponent(new CameraFollower(*bg));
+    bg->AddComponent(new LoopedBackground(*bg, SCENE_TEST_BACKGROUND));
     AddObject(bg);
 }
 

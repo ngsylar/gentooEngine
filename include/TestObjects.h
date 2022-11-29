@@ -20,8 +20,10 @@ class Ball: public Component {
 
 class LoopedBackground: public Component {
     private:
+        enum Axis {HORIZONTAL, VERTICAL};
+
         Sprite* sprite;
-        int halfSize, renderingCount, middlePositionId;
+        int halfSizes[2], renderingCount, middlePositionId;
     
     public:
         LoopedBackground(

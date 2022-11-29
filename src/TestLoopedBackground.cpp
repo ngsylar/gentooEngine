@@ -1,37 +1,47 @@
 #include "GentooEngine.h"
 #include "TestObjects.h"
 
-// editar: deixar halfSize proporcional a layerCount
 LoopedBackground::LoopedBackground (
     GameObject& associated, std::string fileName, int layerCount
 ): Component(associated) {
     sprite = new Sprite(associated, fileName);
     renderingCount = (layerCount * 2) - 1;
     middlePositionId = renderingCount >> 1;
-    halfSize = ((layerCount - 1) * (int)std::min(associated.box.w, associated.box.h)) >> 1;
+    halfSizes[HORIZONTAL] = ((layerCount - 1) * (int)associated.box.w) >> 1;
+    halfSizes[VERTICAL] = ((layerCount - 1) * (int)associated.box.h) >> 1;
 }
 
 LoopedBackground::~LoopedBackground () {
     delete(sprite);
 }
 
-// editar: deixar halfSize proporcional a layerCount
 void LoopedBackground::SetLayerCount (int layerCount) {
     renderingCount = (layerCount * 2) - 1;
     middlePositionId = renderingCount >> 1;
-    halfSize = ((layerCount - 1) * (int)std::min(associated.box.w, associated.box.h)) >> 1;
+    halfSizes[HORIZONTAL] = ((layerCount - 1) * (int)associated.box.w) >> 1;
+    halfSizes[VERTICAL] = ((layerCount - 1) * (int)associated.box.h) >> 1;
 }
 
 void LoopedBackground::Start () {
     associated.box.SetPosition(Camera::GetPosition());
-    SDL_Log("%d", halfSize);
 }
 
-// editar: respeitar distancia do centro do objeto para o centro da camera
 void LoopedBackground::LateUpdate (float dt) {
-    Vec2 cameraDistance = Camera::GetPosition() - associated.box.GetPosition();
-    if (cameraDistance.Magnitude() >= halfSize)
-        associated.box.SetPosition(Camera::GetPosition());
+    Vec2 position = associated.box.GetPosition();
+    Vec2 cameraDistance = Camera::GetPosition() - position;
+
+    if (fabs(cameraDistance.x) >= halfSizes[HORIZONTAL]) {
+        int signX = (std::signbit(cameraDistance.x)? -1 : 1);
+        associated.box.SetPosition(
+            position.x + (signX * halfSizes[HORIZONTAL]) + cameraDistance.x, position.y
+        );
+    }
+    if (fabs(cameraDistance.y) >= halfSizes[VERTICAL]) {
+        int signY = (std::signbit(cameraDistance.y) ? -1 : 1);
+        associated.box.SetPosition(
+            position.x, position.y + (signY * halfSizes[VERTICAL]) + cameraDistance.y
+        );
+    }
 }
 
 void LoopedBackground::Render () {
