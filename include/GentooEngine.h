@@ -41,9 +41,8 @@
 #include "Sound.h"
 #include "Text.h"
 
-// Engine Auxiliary Object Components
+// Engine Auxiliary Components
 #include "CameraFollower.h"
-// #include "CineMachine.h"
 #include "LoopedBackground.h"
 
 // Engine Control Core

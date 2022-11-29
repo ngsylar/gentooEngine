@@ -24,14 +24,15 @@ class Vec2 {
 
         bool operator==(const Vec2& vec) const;
         bool operator!=(const Vec2& vec) const;
+        Vec2 operator-();
 
         Vec2 operator+(const float scalar) const;
         Vec2 operator-(const float scalar) const;
+        Vec2 operator*(const float scalar) const;
 
-        Vec2 operator-();
         Vec2 operator+(const Vec2& vec);
         Vec2 operator-(const Vec2& vec);
-        Vec2 operator*(const float scalar) const;
+        Vec2 operator*(const Vec2& vec);
 
         Vec2& operator+=(const Vec2& vec);
         Vec2& operator-=(const Vec2& vec);

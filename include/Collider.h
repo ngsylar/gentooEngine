@@ -9,6 +9,7 @@ class Collider: public Component {
 
     public:
         Rect box;
+        bool isTrigger;
 
         Collider(
             GameObject& associated,

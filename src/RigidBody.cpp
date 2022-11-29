@@ -86,9 +86,12 @@ void RigidBody::CancelForces (RigidBody::Axis axis) {
 
 void RigidBody::NotifyCollision (GameObject& other) {
     /*--------------------------------------------------------------------------------------------------*/
-    // check if a collision with the other already exists
+    // check if the other collider is trigger or if a collision with the other already exists
     /*--------------------------------------------------------------------------------------------------*/
 
+    Collider* otherCollider = (Collider*)other.GetComponent("Collider");
+    if (otherCollider->isTrigger) return;
+    
     for (int i=0; i < (int)collidingOthers.size(); i++)
         if (collidingOthers[i].first.lock().get() == &other)
             return;
@@ -123,7 +126,6 @@ void RigidBody::NotifyCollision (GameObject& other) {
     /*--------------------------------------------------------------------------------------------------*/
 
     Collider* collider = (Collider*)associated.GetComponent("Collider");
-    Collider* otherCollider = (Collider*)other.GetComponent("Collider");
     Vec2 position = associated.box.GetPosition();
 
     float halfBody[2] = {

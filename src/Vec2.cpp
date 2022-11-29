@@ -58,7 +58,11 @@ bool Vec2::operator== (const Vec2& vec) const {
 }
 
 bool Vec2::operator!= (const Vec2& vec) const {
-    return ((x!=vec.x) and (y!=vec.y));
+    return ((x!=vec.x) or (y!=vec.y));
+}
+
+Vec2 Vec2::operator- () {
+    return Vec2(-x, -y);
 }
 
 Vec2 Vec2::operator+ (const float scalar) const {
@@ -69,8 +73,8 @@ Vec2 Vec2::operator- (const float scalar) const {
     return Vec2(x-scalar, y-scalar);
 }
 
-Vec2 Vec2::operator- () {
-    return Vec2(-x, -y);
+Vec2 Vec2::operator* (const float scalar) const {
+    return Vec2(x*scalar, y*scalar);
 }
 
 Vec2 Vec2::operator+ (const Vec2& vec) {
@@ -81,8 +85,8 @@ Vec2 Vec2::operator- (const Vec2& vec) {
     return Vec2(x-vec.x, y-vec.y);
 }
 
-Vec2 Vec2::operator* (const float scalar) const {
-    return Vec2(x*scalar, y*scalar);
+Vec2 Vec2::operator* (const Vec2& vec) {
+    return Vec2(x*vec.x, y*vec.y);
 }
 
 Vec2& Vec2::operator+= (const Vec2& vec) {
