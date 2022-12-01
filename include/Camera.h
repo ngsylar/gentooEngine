@@ -22,7 +22,7 @@ class Camera {
 
     public:
         static Vec2 pos, velocity, offset, screenOffset;
-        static bool isLocked[2];
+        static std::array<bool, 2> isLocked;
 
         static Cinemachine cinemachine;
         static Player player;

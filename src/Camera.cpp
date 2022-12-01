@@ -3,7 +3,7 @@
 GameObject* Camera::focus = nullptr;
 Vec2 Camera::pos, Camera::velocity, Camera::offset;
 Vec2 Camera::posAdjustment, Camera::screenOffset;
-bool Camera::isLocked[2] = {true, true};
+std::array<bool, 2> Camera::isLocked = {true, true};
 
 Camera::Cinemachine Camera::cinemachine;
 Camera::Player Camera::player;
@@ -15,8 +15,7 @@ void Camera::Follow (GameObject* newFocus) {
 
     posAdjustment = (Game::GetInstance().GetWindowSize() * 0.5f);
     velocity = Vec2();
-    isLocked[HORIZONTAL] = false;
-    isLocked[VERTICAL] = false;
+    isLocked = {false, false};
     screenOffset = Vec2();
 
     cinemachine.length = Vec2(25,175); // editar
@@ -134,12 +133,13 @@ void Camera::Reset () {
     focus = nullptr;
     pos = Vec2();
     posAdjustment = (Game::GetInstance().GetWindowSize() * 0.5f);
+    velocity = Vec2();
+    isLocked = {true, true};
     offset = Vec2();
-
+    screenOffset = Vec2();
     cinemachine.length = Vec2();
     cinemachine.slices = {0, 0};
     cinemachine.deadSlices = {0, 0};
-    screenOffset = Vec2();
 }
 
 Vec2 Camera::GetPosition () {
