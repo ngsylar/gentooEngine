@@ -62,7 +62,7 @@ void TestScene::LoadAssets () {
     AddObject(rawSquare);
     square = GetObjectPtr(rawSquare);
     rawSquare->AddComponent(new Ball(*rawSquare));
-    rawSquare->box.SetPosition(512,300);
+    rawSquare->box.SetPosition(165,300);
 
     // rawSquare = new GameObject(4);
     // rawSquare->AddComponent(new LoopedBackground(*rawSquare, SPRITE_RED_SQUARE));
@@ -84,7 +84,7 @@ void TestScene::Update (float dt) {
 TestScene2::TestScene2 () {
     GameObject* bg = new GameObject(SCENE_TEST_LAYER, SCENE_TEST_LABEL);
     LoopedBackground* lbg = new LoopedBackground(*bg, SCENE_TEST_BACKGROUND);
-    lbg->parallaxFactor = 0.25f;
+    // lbg->parallaxFactor = 0.25f;
     bg->AddComponent(lbg);
     AddObject(bg);
 }
@@ -99,23 +99,23 @@ void TestScene2::LoadAssets () {
     rawPlat->box.SetPosition(512, 500);
     rawPlat->AddComponent(new Collider(*rawPlat));
 
-    GameObject* rawRun = new GameObject(LAYER_RUN_RIGHT);
-    Sprite* runSpr = new Sprite(*rawRun, SPRITE_RUN_RIGHT, 12, 0.02f);
-    rawRun->AddComponent(runSpr);
-    AddObject(rawRun);
-    rawRun->box.SetPosition(512, 300);
-    for (int i=0; i<30; i++)
-        runSpr->positionArray.push_back(Vec2(i*142,350));
+    // GameObject* rawRun = new GameObject(LAYER_RUN_RIGHT);
+    // Sprite* runSpr = new Sprite(*rawRun, SPRITE_RUN_RIGHT, 12, 0.02f);
+    // rawRun->AddComponent(runSpr);
+    // AddObject(rawRun);
+    // rawRun->box.SetPosition(512, 300);
+    // for (int i=0; i<30; i++)
+    //     runSpr->positionArray.push_back(Vec2(i*142,350));
 
-    rawRun = new GameObject(LAYER_RUN_LEFT);
-    runSpr = new Sprite(*rawRun, SPRITE_RUN_LEFT, 12, 0.02f);
-    rawRun->AddComponent(runSpr);
-    AddObject(rawRun);
-    rawRun->box.SetPosition(512, 200);
-    runSpr->SetScale(2);
-    runSpr->parallaxFactor = 0.25;
-    for (int i=0; i<30; i++)
-        runSpr->positionArray.push_back(Vec2(i*142,200));
+    // rawRun = new GameObject(LAYER_RUN_LEFT);
+    // runSpr = new Sprite(*rawRun, SPRITE_RUN_LEFT, 12, 0.02f);
+    // rawRun->AddComponent(runSpr);
+    // AddObject(rawRun);
+    // rawRun->box.SetPosition(512, 200);
+    // runSpr->SetScale(2);
+    // runSpr->parallaxFactor = 0.25;
+    // for (int i=0; i<30; i++)
+    //     runSpr->positionArray.push_back(Vec2(i*142,200));
     
     GameObject* rawSquare = new GameObject(LAYER_RED_SQUARE);
     rawSquare->AddComponent(new Sprite(*rawSquare, SPRITE_RED_SQUARE));
