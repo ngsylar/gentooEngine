@@ -36,6 +36,9 @@ void Camera::Follow (
     player.lastDirection = {LEFT, UP}; // editar
     player.lastVelocity = Vec2();
     player.isStopping = {false, false};
+
+    player.stopwatch[HORIZONTAL].SetResetTime(0.08);
+    player.stopwatch[VERTICAL].SetResetTime(0.08);
     
     float direction[2];
     direction[HORIZONTAL] = (player.lastDirection[HORIZONTAL] == LEFT) ? -1 : 1;
@@ -72,50 +75,53 @@ void Camera::Cinemachine::Decelerate (float* velocity, float focusVelocity, floa
 void Camera::Cinemachine::Chase (
     float* velocity, float* offset,
     float length, float centerDistance, float safeZone, float slicedLength,
-    float playerVelocity, float playerDirection
+    float playerVelocity,  int axis, float playerDirection
 ) {
+    player.stopwatch[axis].Reset();
     centerDistance *= playerDirection;
     
     // player is out of cinemachine length
     if (centerDistance < -(fabs(playerVelocity) + tolerance)) {
-        isLocked[HORIZONTAL] = false;
+        isLocked[axis] = false;
         Decelerate(velocity, playerVelocity, safeZone + slicedLength);
         *offset = playerDirection * (centerDistance + *velocity);
-        SDL_Log("1");
+        SDL_Log("1 %f", centerDistance);
     }
     // player is on center
     else if (centerDistance < tolerance) {
         *velocity = 0.0f;
         *offset = 0.0f;
-        SDL_Log("2");
+        SDL_Log("2 %f", centerDistance);
     }
     // player is on safe zone
     else if (centerDistance < safeZone) {
-        isLocked[HORIZONTAL] = false;
+        isLocked[axis] = false;
         Accelerate(velocity, playerVelocity, safeZone + slicedLength);
         *offset = playerDirection * (centerDistance + *velocity);
-        SDL_Log("3");
+        // SDL_Log("3");
     }
     // player is on dead zone
     else if (centerDistance > safeZone) {
-        isLocked[HORIZONTAL] = true;
-        SDL_Log("4");
+        isLocked[axis] = true;
+        // SDL_Log("4");
     }
 }
 
 // editar: incluir desaceleracao de camera
 void Camera::Cinemachine::StopChasing (
-    bool* flag, float* offset, float length, float centerDistance,
-    float playerVelocity, float playerDirection
+    float* offset, float length, float centerDistance,
+    float playerVelocity, int axis, float playerDirection, float dt
 ) {
-    if (not (*flag or (fabs(centerDistance) < (length - tolerance))))
+    player.stopwatch[axis].Update(dt);
+    bool flags = player.stopwatch[axis].IsOver() and player.isStopping[axis];
+    if (not (flags and (fabs(centerDistance) < (length - tolerance))))
         return;
-    *offset += playerVelocity;
 
+    *offset += playerVelocity;
     if (fabs(*offset) >= (length - tolerance)) {
         *offset = playerDirection * length;
-        *flag = false;
-    } else *flag = true;
+        player.isStopping[axis] = false;
+    } else player.isStopping[axis] = true;
 }
 
 void Camera::Cinemachine::Update (float dt) {
@@ -134,35 +140,29 @@ void Camera::Cinemachine::Update (float dt) {
 
     // player is going to the right
     if (playerVelocity.x > 0.0f) {
-        Chase(
-            &velocity.x, &offset.x, cinemachine.length.x, centerDistance, safeZoneX, slicedLengthX,
-            playerVelocity.x, 1
-        );
+        Chase(&velocity.x, &offset.x, cinemachine.length.x, centerDistance, safeZoneX, slicedLengthX,
+            playerVelocity.x, HORIZONTAL, 1);
         player.lastDirection[HORIZONTAL] = RIGHT;
         player.isStopping[HORIZONTAL] = false;
     }
     // player is going to the left
     else if (playerVelocity.x < 0.0f) {
-        Chase(
-            &velocity.x, &offset.x, cinemachine.length.x, centerDistance, safeZoneX, slicedLengthX,
-            playerVelocity.x, -1
-        );
+        Chase(&velocity.x, &offset.x, cinemachine.length.x, centerDistance, safeZoneX, slicedLengthX,
+            playerVelocity.x, HORIZONTAL, -1);
         player.lastDirection[HORIZONTAL] = LEFT;
         player.isStopping[HORIZONTAL] = false;
     }
     // player is facing right
     else if (player.lastDirection[HORIZONTAL] == RIGHT) {
-        StopChasing(
-            &player.isStopping[HORIZONTAL], &offset.x, cinemachine.length.x, centerDistance,
-            player.lastVelocity.x, 1
-        );
+        StopChasing(&offset.x, cinemachine.length.x, centerDistance,
+            player.lastVelocity.x, HORIZONTAL, 1, dt);
+        player.isStopping[HORIZONTAL] = true;
     }
     // player is facing left
     else {
-        StopChasing(
-            &player.isStopping[HORIZONTAL], &offset.x, cinemachine.length.x, centerDistance,
-            player.lastVelocity.x, -1
-        );
+        StopChasing(&offset.x, cinemachine.length.x, centerDistance,
+            player.lastVelocity.x, HORIZONTAL, -1, dt);
+        player.isStopping[HORIZONTAL] = true;
     }
 
     if (not player.isStopping[HORIZONTAL])

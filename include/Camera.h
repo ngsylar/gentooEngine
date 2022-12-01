@@ -19,6 +19,7 @@ class Camera {
             std::array<int, 2> lastDirection;
             Vec2 lastVelocity;
             std::array<bool, 2> isStopping;
+            std::array<Timer, 2> stopwatch;
         };
 
     public:
@@ -56,12 +57,11 @@ class Camera::Cinemachine {
             float* velocity, float* offset,
             float length, float centerDistance,
             float safeZone, float slicedLength,
-            float playerVelocity, float playerDirection
+            float playerVelocity, int axis, float playerDirection
         );
         void StopChasing(
-            bool* flag, float* offset,
-            float length, float centerDistance,
-            float playerVelocity, float playerDirection
+            float* offset, float length, float centerDistance,
+            float playerVelocity, int axis, float playerDirection, float dt
         );
         void Update(float dt);
 };
