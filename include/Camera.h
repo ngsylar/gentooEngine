@@ -10,13 +10,14 @@ class Camera {
         class Cinemachine;
 
         enum Axis {HORIZONTAL, VERTICAL};
+        enum FaceDirection {NONE, UP, DOWN, LEFT, RIGHT};
+
         static GameObject* focus;
         static Vec2 posAdjustment;
 
         struct Player {
-            enum FaceDirection {NONE, UP, DOWN, LEFT, RIGHT};
             Vec2 position, previousPosition;
-            Vec2 lastDirection;
+            std::array<int, 2> lastDirection;
         };
 
     public:
