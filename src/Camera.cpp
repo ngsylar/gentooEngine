@@ -4,11 +4,16 @@ GameObject* Camera::focus = nullptr;
 Vec2 Camera::pos, Camera::velocity, Camera::offset;
 Vec2 Camera::posAdjustment, Camera::screenOffset;
 std::array<bool, 2> Camera::isLocked = {true, true};
+float Camera::tolerance = 0.2f;
 
 Camera::Cinemachine Camera::cinemachine;
 Camera::Player Camera::player;
 
-void Camera::Follow (GameObject* newFocus) {
+void Camera::Follow (
+    GameObject* newFocus,
+    Vec2 cinemachineLength, int slicesX, int slicesY, int deadSlicesX, int deadSlicesY,
+    int focusDirectionX, int focusDirectionY
+) {
     /*--------------------------------------------------------------------------------------------------*/
     // camera attributes
     /*--------------------------------------------------------------------------------------------------*/
@@ -28,7 +33,9 @@ void Camera::Follow (GameObject* newFocus) {
 
     focus = newFocus;
     player.previousPosition = focus->box.GetPosition();
-    player.lastDirection = {RIGHT, UP}; // editar
+    player.lastDirection = {LEFT, UP}; // editar
+    player.lastVelocity = Vec2();
+    player.isStopping = {false, false};
     
     float direction[2];
     direction[HORIZONTAL] = (player.lastDirection[HORIZONTAL] == LEFT) ? -1 : 1;
@@ -44,49 +51,71 @@ void Camera::Unfollow () {
     focus = nullptr;
 }
 
-void Camera::Cinemachine::Accelerate (float focusVelocity, float displacement) {
+void Camera::Cinemachine::Accelerate (float* velocity, float focusVelocity, float displacement) {
     focusVelocity = fabs(focusVelocity);
     displacement = fabs(displacement);
 
-    velocity.x += (focusVelocity * focusVelocity) / (2.0f * displacement);
-    if (velocity.x >= focusVelocity)
-        velocity.x = 0.0f;
+    *velocity += (focusVelocity * focusVelocity) / (2.0f * displacement);
+    if (*velocity >= focusVelocity)
+        *velocity = 0.0f;
 }
 
-void Camera::Cinemachine::Decelerate (float focusVelocity, float displacement) {
+void Camera::Cinemachine::Decelerate (float* velocity, float focusVelocity, float displacement) {
     focusVelocity = fabs(focusVelocity);
     displacement = fabs(displacement);
 
-    velocity.x += (focusVelocity * focusVelocity) / (2.0f * displacement);
-    if (velocity.x < focusVelocity)
-        velocity.x = focusVelocity;
+    *velocity += (focusVelocity * focusVelocity) / (2.0f * displacement);
+    if (*velocity < focusVelocity)
+        *velocity = focusVelocity;
 }
 
 void Camera::Cinemachine::Chase (
+    float* velocity, float* offset,
     float length, float centerDistance, float safeZone, float slicedLength,
     float playerVelocity, float playerDirection
 ) {
+    centerDistance *= playerDirection;
+    
     // player is out of cinemachine length
-    if (centerDistance < -(fabs(playerVelocity) + 0.2f)) {
+    if (centerDistance < -(fabs(playerVelocity) + tolerance)) {
         isLocked[HORIZONTAL] = false;
-        Decelerate(playerVelocity, safeZone + slicedLength);
-        offset.x = playerDirection * (centerDistance + velocity.x);
+        Decelerate(velocity, playerVelocity, safeZone + slicedLength);
+        *offset = playerDirection * (centerDistance + *velocity);
+        SDL_Log("1");
     }
     // player is on center
-    else if (centerDistance < 0.2f) {
-        velocity.x = 0.0f;
-        offset.x = 0.0f;
+    else if (centerDistance < tolerance) {
+        *velocity = 0.0f;
+        *offset = 0.0f;
+        SDL_Log("2");
     }
     // player is on safe zone
     else if (centerDistance < safeZone) {
         isLocked[HORIZONTAL] = false;
-        Accelerate(playerVelocity, safeZone + slicedLength);
-        offset.x = playerDirection * (centerDistance + velocity.x);
+        Accelerate(velocity, playerVelocity, safeZone + slicedLength);
+        *offset = playerDirection * (centerDistance + *velocity);
+        SDL_Log("3");
     }
     // player is on dead zone
     else if (centerDistance > safeZone) {
         isLocked[HORIZONTAL] = true;
+        SDL_Log("4");
     }
+}
+
+// editar: incluir desaceleracao de camera
+void Camera::Cinemachine::StopChasing (
+    bool* flag, float* offset, float length, float centerDistance,
+    float playerVelocity, float playerDirection
+) {
+    if (not (*flag or (fabs(centerDistance) < (length - tolerance))))
+        return;
+    *offset += playerVelocity;
+
+    if (fabs(*offset) >= (length - tolerance)) {
+        *offset = playerDirection * length;
+        *flag = false;
+    } else *flag = true;
 }
 
 void Camera::Cinemachine::Update (float dt) {
@@ -97,26 +126,55 @@ void Camera::Cinemachine::Update (float dt) {
     Vec2 playerVelocity = playerCurrentPosition - player.previousPosition;
     player.previousPosition = focus->box.GetPosition();
 
-    float slicedLengthX = cinemachine.length.x / cinemachine.slices[HORIZONTAL];
+    float slicedLengthX = cinemachine.length.x / (float)cinemachine.slices[HORIZONTAL];
     float safeSlicesX = cinemachine.slices[HORIZONTAL] - cinemachine.deadSlices[HORIZONTAL];
     float safeZoneX = slicedLengthX * safeSlicesX;
 
+    float centerDistance = GetPosition().x - playerCurrentPosition.x;
+
     // player is going to the right
     if (playerVelocity.x > 0.0f) {
-        float centerDistance = GetPosition().x - playerCurrentPosition.x;
-        Chase(cinemachine.length.x, centerDistance, safeZoneX, slicedLengthX, playerVelocity.x, 1);
+        Chase(
+            &velocity.x, &offset.x, cinemachine.length.x, centerDistance, safeZoneX, slicedLengthX,
+            playerVelocity.x, 1
+        );
+        player.lastDirection[HORIZONTAL] = RIGHT;
+        player.isStopping[HORIZONTAL] = false;
     }
     // player is going to the left
     else if (playerVelocity.x < 0.0f) {
-        float centerDistance = playerCurrentPosition.x - GetPosition().x;
-        Chase(cinemachine.length.x, centerDistance, safeZoneX, slicedLengthX, playerVelocity.x, -1);
+        Chase(
+            &velocity.x, &offset.x, cinemachine.length.x, centerDistance, safeZoneX, slicedLengthX,
+            playerVelocity.x, -1
+        );
+        player.lastDirection[HORIZONTAL] = LEFT;
+        player.isStopping[HORIZONTAL] = false;
     }
     // player is facing right
+    else if (player.lastDirection[HORIZONTAL] == RIGHT) {
+        StopChasing(
+            &player.isStopping[HORIZONTAL], &offset.x, cinemachine.length.x, centerDistance,
+            player.lastVelocity.x, 1
+        );
+    }
+    // player is facing left
+    else {
+        StopChasing(
+            &player.isStopping[HORIZONTAL], &offset.x, cinemachine.length.x, centerDistance,
+            player.lastVelocity.x, -1
+        );
+    }
+
+    if (not player.isStopping[HORIZONTAL])
+        player.lastVelocity.x = playerVelocity.x;
 }
 
 void Camera::Update (float dt) {
-    if (not focus) return;
+    /*--------------------------------------------------------------------------------------------------*/
+    // follows a player in focus
+    /*--------------------------------------------------------------------------------------------------*/
 
+    if (not focus) return;
     pos -= screenOffset;
     cinemachine.Update(dt);
 
