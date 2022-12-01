@@ -21,11 +21,11 @@ void Camera::Follow (
     posAdjustment = (Game::GetInstance().GetWindowSize() * 0.5f);
     velocity = Vec2();
     isLocked = {false, false};
-    screenOffset = Vec2();
+    screenOffset = Vec2(0,25); // editar
 
     cinemachine.length = Vec2(25,175); // editar
-    cinemachine.slices = {8, 0}; // editar
-    cinemachine.deadSlices = {2, 0}; // editar
+    cinemachine.slices = {8, 32}; // editar
+    cinemachine.deadSlices = {2, 28}; // editar
 
     /*--------------------------------------------------------------------------------------------------*/
     // player attributes
@@ -37,16 +37,16 @@ void Camera::Follow (
     player.lastVelocity = Vec2();
     player.isStopping = {false, false};
 
-    player.stopwatch[HORIZONTAL].SetResetTime(0.08);
-    player.stopwatch[VERTICAL].SetResetTime(0.08);
+    player.stopwatch[X].SetResetTime(0.08);
+    player.stopwatch[Y].SetResetTime(0.08);
     
     float direction[2];
-    direction[HORIZONTAL] = (player.lastDirection[HORIZONTAL] == LEFT) ? -1 : 1;
-    direction[VERTICAL] = (player.lastDirection[HORIZONTAL] == DOWN) ? 1 : -1;
+    direction[X] = (player.lastDirection[X] == LEFT) ? -1 : 1;
+    direction[Y] = (player.lastDirection[X] == DOWN) ? 1 : -1;
 
     offset = Vec2(
-        direction[HORIZONTAL] * cinemachine.length.x,
-        direction[VERTICAL] * cinemachine.length.y
+        direction[X] * cinemachine.length.x,
+        direction[Y] * cinemachine.length.y
     );
 }
 
@@ -74,7 +74,7 @@ void Camera::Cinemachine::Decelerate (float* velocity, float focusVelocity, floa
 
 void Camera::Cinemachine::Chase (
     float* velocity, float* offset,
-    float length, float centerDistance, float safeZone, float slicedLength,
+    float length, float centerDistance, float undeadZone, float slicedLength,
     float playerVelocity,  int axis, float playerDirection
 ) {
     player.stopwatch[axis].Reset();
@@ -83,7 +83,7 @@ void Camera::Cinemachine::Chase (
     // player is out of cinemachine length
     if (centerDistance < -(fabs(playerVelocity) + tolerance)) {
         isLocked[axis] = false;
-        Decelerate(velocity, playerVelocity, safeZone + slicedLength);
+        Decelerate(velocity, playerVelocity, undeadZone + slicedLength);
         *offset = playerDirection * (centerDistance + *velocity);
         SDL_Log("1 %f", centerDistance);
     }
@@ -91,19 +91,19 @@ void Camera::Cinemachine::Chase (
     else if (centerDistance < tolerance) {
         *velocity = 0.0f;
         *offset = 0.0f;
-        SDL_Log("2 %f", centerDistance);
+        SDL_Log("2 %f %f", centerDistance, tolerance);
     }
-    // player is on safe zone
-    else if (centerDistance < safeZone) {
+    // player is on undeadZone zone
+    else if (centerDistance < undeadZone) {
         isLocked[axis] = false;
-        Accelerate(velocity, playerVelocity, safeZone + slicedLength);
+        Accelerate(velocity, playerVelocity, undeadZone + slicedLength);
         *offset = playerDirection * (centerDistance + *velocity);
-        // SDL_Log("3");
+        SDL_Log("3 %f %f", centerDistance, undeadZone);
     }
     // player is on dead zone
-    else if (centerDistance > safeZone) {
+    else if (centerDistance > undeadZone) {
         isLocked[axis] = true;
-        // SDL_Log("4");
+        SDL_Log("4 %f %f", centerDistance, undeadZone);
     }
 }
 
@@ -132,41 +132,80 @@ void Camera::Cinemachine::Update (float dt) {
     Vec2 playerVelocity = playerCurrentPosition - player.previousPosition;
     player.previousPosition = focus->box.GetPosition();
 
-    float slicedLengthX = cinemachine.length.x / (float)cinemachine.slices[HORIZONTAL];
-    float safeSlicesX = cinemachine.slices[HORIZONTAL] - cinemachine.deadSlices[HORIZONTAL];
-    float safeZoneX = slicedLengthX * safeSlicesX;
-
-    float centerDistance = GetPosition().x - playerCurrentPosition.x;
+    std::array<float, 2> slicedLength = {
+        cinemachine.length.x / (float)cinemachine.slices[X],
+        cinemachine.length.y / (float)cinemachine.slices[Y]
+    };
+    std::array<float, 2> undeadZoneSlices = {
+        (float)cinemachine.slices[X] - cinemachine.deadSlices[X],
+        (float)cinemachine.slices[Y] - cinemachine.deadSlices[Y]
+    };
+    std::array<float, 2> undeadZone = {
+        slicedLength[X] * undeadZoneSlices[X], slicedLength[Y] * undeadZoneSlices[Y]
+    };
+    std::array<float, 2> centerDistance = {
+        GetPosition().x - playerCurrentPosition.x,
+        GetPosition().y - playerCurrentPosition.y
+    };
 
     // player is going to the right
     if (playerVelocity.x > 0.0f) {
-        Chase(&velocity.x, &offset.x, cinemachine.length.x, centerDistance, safeZoneX, slicedLengthX,
-            playerVelocity.x, HORIZONTAL, 1);
-        player.lastDirection[HORIZONTAL] = RIGHT;
-        player.isStopping[HORIZONTAL] = false;
+        Chase(&velocity.x, &offset.x, cinemachine.length.x, centerDistance[X],
+            undeadZone[X], slicedLength[X], playerVelocity.x, X, 1);
+        player.lastDirection[X] = RIGHT;
+        player.isStopping[X] = false;
     }
     // player is going to the left
     else if (playerVelocity.x < 0.0f) {
-        Chase(&velocity.x, &offset.x, cinemachine.length.x, centerDistance, safeZoneX, slicedLengthX,
-            playerVelocity.x, HORIZONTAL, -1);
-        player.lastDirection[HORIZONTAL] = LEFT;
-        player.isStopping[HORIZONTAL] = false;
+        Chase(&velocity.x, &offset.x, cinemachine.length.x, centerDistance[X],
+            undeadZone[X], slicedLength[X], playerVelocity.x, X, -1);
+        player.lastDirection[X] = LEFT;
+        player.isStopping[X] = false;
     }
     // player is facing right
-    else if (player.lastDirection[HORIZONTAL] == RIGHT) {
-        StopChasing(&offset.x, cinemachine.length.x, centerDistance,
-            player.lastVelocity.x, HORIZONTAL, 1, dt);
-        player.isStopping[HORIZONTAL] = true;
+    else if (player.lastDirection[X] == RIGHT) {
+        StopChasing(&offset.x, cinemachine.length.x, centerDistance[X],
+            player.lastVelocity.x, X, 1, dt);
+        player.isStopping[X] = true;
     }
     // player is facing left
     else {
-        StopChasing(&offset.x, cinemachine.length.x, centerDistance,
-            player.lastVelocity.x, HORIZONTAL, -1, dt);
-        player.isStopping[HORIZONTAL] = true;
+        StopChasing(&offset.x, cinemachine.length.x, centerDistance[X],
+            player.lastVelocity.x, X, -1, dt);
+        player.isStopping[X] = true;
     }
 
-    if (not player.isStopping[HORIZONTAL])
+    // player is going down
+    if (playerVelocity.y > 0.0f) {
+        Chase(&velocity.y, &offset.y, cinemachine.length.y, centerDistance[Y],
+            undeadZone[Y], slicedLength[Y], playerVelocity.y, Y, 1);
+        player.lastDirection[Y] = DOWN;
+        player.isStopping[Y] = false;
+    }
+    // player is going up
+    else if (playerVelocity.y < 0.0f) {
+        Chase(&velocity.y, &offset.y, cinemachine.length.y, centerDistance[Y],
+            undeadZone[Y], slicedLength[Y], playerVelocity.y, Y, -1);
+        player.lastDirection[Y] = UP;
+        player.isStopping[Y] = false;
+    }
+    // player is facing down
+    else if (player.lastDirection[Y] == DOWN) {
+        StopChasing(&offset.y, cinemachine.length.y, centerDistance[Y],
+            player.lastVelocity.y, Y, 1, dt);
+        player.isStopping[Y] = true;
+    }
+    // player is facing up
+    else {
+        StopChasing(&offset.y, cinemachine.length.y, centerDistance[Y],
+            player.lastVelocity.y, Y, -1, dt);
+        player.isStopping[Y] = true;
+    }
+
+    if (not player.isStopping[X])
         player.lastVelocity.x = playerVelocity.x;
+    if (not player.isStopping[Y])
+        player.lastVelocity.y = playerVelocity.y;
 }
 
 void Camera::Update (float dt) {
@@ -178,9 +217,9 @@ void Camera::Update (float dt) {
     pos -= screenOffset;
     cinemachine.Update(dt);
 
-    if (not isLocked[HORIZONTAL])
+    if (not isLocked[X])
         player.position.x = focus->box.GetPosition().x;
-    if (not isLocked[VERTICAL])
+    if (not isLocked[Y])
         player.position.y = focus->box.GetPosition().y;
 
     pos = player.position + offset - posAdjustment;

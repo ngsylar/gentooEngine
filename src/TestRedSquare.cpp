@@ -30,10 +30,11 @@ void Ball::Update (float dt) {
         rigidBody->Translate(Vec2(runSpeed,0)*dt);
 
     // // editar: remover
+    // rigidBody->gravityEnabled = false;
     // if (input.IsKeyDown(KEY_ARROW_UP))
-    //     rigidBody->Translate(Vec2(0,-150)*dt);
+    //     rigidBody->Translate(Vec2(0,-runSpeed)*dt);
     // if (input.IsKeyDown(KEY_ARROW_DOWN))
-    //     rigidBody->Translate(Vec2(0,150)*dt);
+    //     rigidBody->Translate(Vec2(0,runSpeed)*dt);
 }
 
 void Ball::StartJump (float dt) {
