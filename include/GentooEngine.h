@@ -5,6 +5,7 @@
 #include <ctime>
 #include <cmath>
 #include <memory>
+#include <array>
 #include <stack>
 #include <vector>
 #include <utility>

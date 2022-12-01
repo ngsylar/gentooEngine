@@ -20,7 +20,7 @@ class Camera {
         };
 
     public:
-        static Vec2 pos, velocity, offset;
+        static Vec2 pos, velocity, offset, screenOffset;
         static bool isLocked[2];
 
         static Cinemachine cinemachine;
@@ -37,8 +37,10 @@ class Camera {
 
 class Camera::Cinemachine {
     public:
-        Vec2 length, slices, deadSlices;
+        Vec2 length;
+        std::array<int, 2> slices, deadSlices;
 
+        // void SetValues();
         void Accelerate(float focusVelocity, float displacement);
         void Decelerate(float focusVelocity, float displacement);
         void Chase(

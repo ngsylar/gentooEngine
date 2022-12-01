@@ -12,40 +12,19 @@ void Camera::Follow (GameObject* newFocus) {
     velocity = Vec2();
     isLocked[HORIZONTAL] = false;
     isLocked[VERTICAL] = false;
+    screenOffset = Vec2();
 
     focus = newFocus;
     player.previousPosition = focus->box.GetPosition();
 
     cinemachine.length = Vec2(25,175); // remover
-    cinemachine.slices = Vec2(8,0); // remover
-    cinemachine.deadSlices = Vec2(2,0); // remover
+    cinemachine.slices = {8, 0}; // remover
+    cinemachine.deadSlices = {2, 0}; // remover
     offset = Vec2(cinemachine.length.x, -cinemachine.length.y); // remover
 }
 
 void Camera::Unfollow () {
     focus = nullptr;
-}
-
-void Camera::Update (float dt) {
-    if (not focus)
-        return;
-    cinemachine.Update(dt);
-    if (not isLocked[HORIZONTAL])
-        player.position.x = focus->box.GetPosition().x;
-    if (not isLocked[VERTICAL])
-        player.position.y = focus->box.GetPosition().y;
-    pos = player.position + offset - posAdjustment;
-}
-
-void Camera::Reset () {
-    focus = nullptr;
-    pos = Vec2();
-    posAdjustment = (Game::GetInstance().GetWindowSize() * 0.5f);
-    offset = Vec2();
-}
-
-Vec2 Camera::GetPosition () {
-    return (pos + posAdjustment);
 }
 
 void Camera::Cinemachine::Accelerate (float focusVelocity, float displacement) {
@@ -81,7 +60,7 @@ void Camera::Cinemachine::Chase (
         velocity.x = 0.0f;
         offset.x = 0.0f;
 
-    // player is on undead zone
+    // player is on safe zone
     } else if (centerDistance < safeZone) {
         isLocked[HORIZONTAL] = false;
         Accelerate(playerVelocity, safeZone + slicedLength);
@@ -101,8 +80,9 @@ void Camera::Cinemachine::Update (float dt) {
     Vec2 playerVelocity = playerCurrentPosition - player.previousPosition;
     player.previousPosition = focus->box.GetPosition();
 
-    float slicedLengthX = cinemachine.length.x / cinemachine.slices.x;
-    float safeZoneX = slicedLengthX * (cinemachine.slices.x - cinemachine.deadSlices.x);
+    float slicedLengthX = cinemachine.length.x / cinemachine.slices[HORIZONTAL];
+    float safeSlicesX = cinemachine.slices[HORIZONTAL] - cinemachine.deadSlices[HORIZONTAL];
+    float safeZoneX = slicedLengthX * safeSlicesX;
 
     // player is going to the right
     if (playerVelocity.x > 0.0f) {
@@ -114,4 +94,35 @@ void Camera::Cinemachine::Update (float dt) {
         float centerDistance = playerCurrentPosition.x - GetPosition().x;
         Chase(cinemachine.length.x, centerDistance, safeZoneX, slicedLengthX, playerVelocity.x, -1);
     }
+}
+
+void Camera::Update (float dt) {
+    if (not focus) return;
+
+    pos -= screenOffset;
+    cinemachine.Update(dt);
+
+    if (not isLocked[HORIZONTAL])
+        player.position.x = focus->box.GetPosition().x;
+    if (not isLocked[VERTICAL])
+        player.position.y = focus->box.GetPosition().y;
+
+    pos = player.position + offset - posAdjustment;
+    pos += screenOffset;
+}
+
+void Camera::Reset () {
+    focus = nullptr;
+    pos = Vec2();
+    posAdjustment = (Game::GetInstance().GetWindowSize() * 0.5f);
+    offset = Vec2();
+
+    cinemachine.length = Vec2();
+    cinemachine.slices = {0, 0};
+    cinemachine.deadSlices = {0, 0};
+    screenOffset = Vec2();
+}
+
+Vec2 Camera::GetPosition () {
+    return (pos + posAdjustment);
 }
