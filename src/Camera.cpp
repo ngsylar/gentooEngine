@@ -26,6 +26,7 @@ void Camera::Follow (
     cinemachine.length = Vec2(25,175); // editar
     cinemachine.slices = {8, 32}; // editar
     cinemachine.deadSlices = {2, 28}; // editar
+    cinemachine.Setup(true, true, true, false, true, true, false, false); // remover
 
     /*--------------------------------------------------------------------------------------------------*/
     // player attributes
@@ -52,6 +53,14 @@ void Camera::Follow (
 
 void Camera::Unfollow () {
     focus = nullptr;
+}
+
+void Camera::Cinemachine::Setup (
+    bool enableLeft, bool enableRight, bool enableUp, bool enableDown,
+    bool resetLeft, bool resetRight, bool resetUp, bool resetDown
+) {
+    isAxisEnabled = {enableLeft, enableRight, enableUp, enableDown};
+    isAxisResettable = {resetLeft, resetRight, resetUp, resetDown};
 }
 
 void Camera::Cinemachine::Accelerate (float* velocity, float focusVelocity, float displacement) {
@@ -85,25 +94,25 @@ void Camera::Cinemachine::Chase (
         isLocked[axis] = false;
         Decelerate(velocity, playerVelocity, undeadZone + slicedLength);
         *offset = playerDirection * (centerDistance + *velocity);
-        SDL_Log("1 %f", centerDistance);
+        // SDL_Log("1 %f", centerDistance);
     }
     // player is on center
     else if (centerDistance < tolerance) {
         *velocity = 0.0f;
         *offset = 0.0f;
-        SDL_Log("2 %f %f", centerDistance, tolerance);
+        // SDL_Log("2 %f %f", centerDistance, tolerance);
     }
     // player is on undeadZone zone
     else if (centerDistance < undeadZone) {
         isLocked[axis] = false;
         Accelerate(velocity, playerVelocity, undeadZone + slicedLength);
         *offset = playerDirection * (centerDistance + *velocity);
-        SDL_Log("3 %f %f", centerDistance, undeadZone);
+        // SDL_Log("3 %f %f", centerDistance, undeadZone);
     }
     // player is on dead zone
     else if (centerDistance > undeadZone) {
         isLocked[axis] = true;
-        SDL_Log("4 %f %f", centerDistance, undeadZone);
+        // SDL_Log("4 %f %f", centerDistance, undeadZone);
     }
 }
 
@@ -149,54 +158,54 @@ void Camera::Cinemachine::Update (float dt) {
     };
 
     // player is going to the right
-    if (playerVelocity.x > 0.0f) {
+    if (isAxisEnabled[RIGHT] and (playerVelocity.x > 0.0f)) {
         Chase(&velocity.x, &offset.x, cinemachine.length.x, centerDistance[X],
             undeadZone[X], slicedLength[X], playerVelocity.x, X, 1);
         player.lastDirection[X] = RIGHT;
         player.isStopping[X] = false;
     }
     // player is going to the left
-    else if (playerVelocity.x < 0.0f) {
+    else if (isAxisEnabled[LEFT] and (playerVelocity.x < 0.0f)) {
         Chase(&velocity.x, &offset.x, cinemachine.length.x, centerDistance[X],
             undeadZone[X], slicedLength[X], playerVelocity.x, X, -1);
         player.lastDirection[X] = LEFT;
         player.isStopping[X] = false;
     }
     // player is facing right
-    else if (player.lastDirection[X] == RIGHT) {
+    else if (isAxisResettable[RIGHT] and (player.lastDirection[X] == RIGHT)) {
         StopChasing(&offset.x, cinemachine.length.x, centerDistance[X],
             player.lastVelocity.x, X, 1, dt);
         player.isStopping[X] = true;
     }
     // player is facing left
-    else {
+    else if (isAxisResettable[LEFT]) {
         StopChasing(&offset.x, cinemachine.length.x, centerDistance[X],
             player.lastVelocity.x, X, -1, dt);
         player.isStopping[X] = true;
     }
 
     // player is going down
-    if (playerVelocity.y > 0.0f) {
+    if (isAxisEnabled[DOWN] and (playerVelocity.y > 0.0f)) {
         Chase(&velocity.y, &offset.y, cinemachine.length.y, centerDistance[Y],
             undeadZone[Y], slicedLength[Y], playerVelocity.y, Y, 1);
         player.lastDirection[Y] = DOWN;
         player.isStopping[Y] = false;
     }
     // player is going up
-    else if (playerVelocity.y < 0.0f) {
+    else if (isAxisEnabled[UP] and (playerVelocity.y < 0.0f)) {
         Chase(&velocity.y, &offset.y, cinemachine.length.y, centerDistance[Y],
             undeadZone[Y], slicedLength[Y], playerVelocity.y, Y, -1);
         player.lastDirection[Y] = UP;
         player.isStopping[Y] = false;
     }
     // player is facing down
-    else if (player.lastDirection[Y] == DOWN) {
+    else if (isAxisResettable[DOWN] and (player.lastDirection[Y] == DOWN)) {
         StopChasing(&offset.y, cinemachine.length.y, centerDistance[Y],
             player.lastVelocity.y, Y, 1, dt);
         player.isStopping[Y] = true;
     }
     // player is facing up
-    else {
+    else if (isAxisResettable[UP]) {
         StopChasing(&offset.y, cinemachine.length.y, centerDistance[Y],
             player.lastVelocity.y, Y, -1, dt);
         player.isStopping[Y] = true;

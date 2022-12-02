@@ -47,12 +47,13 @@ class Camera::Cinemachine {
     public:
         Vec2 length;
         std::array<int, 2> slices, deadSlices;
-        std::array<bool, 4> isIgnored;
+        std::array<bool, 4> isAxisEnabled;
+        std::array<bool, 4> isAxisResettable;
 
-        // void SetUp(
-        //     bool isIgnoredLeft, bool isIgnoredRight,
-        //     bool isIgnoredUp, bool isIgnoredDown
-        // );
+        void Setup(
+            bool enableLeft, bool enableRight, bool enableUp, bool enableDown,
+            bool resetLeft, bool resetRight, bool resetUp, bool resetDown
+        );
         void Accelerate(float* velocity, float focusVelocity, float displacement);
         void Decelerate(float* velocity, float focusVelocity, float displacement);
         void Chase(
