@@ -29,6 +29,8 @@ void Ball::Start () {
 
 void Ball::Update (float dt) {
     InputManager& input = InputManager::GetInstance();
+    
+    HandleFall();
     CheckTracking();
 
     if (isJumping)
@@ -82,6 +84,13 @@ void Ball::HandleJump (bool isKeyDown, float dt) {
     }
 }
 
+// editar: subir a camera um pouco (provavelmente usar screenOffset)
+// editar: colocar desaceleracao no fim da subida / inicio da queda (estudar em que parte do codigo colocar isso, se na camera ou em jump)
+void Ball::HandleFall () {
+    if (not rigidBody->IsGrounded())
+        Camera::offset.y = 0.0f;
+}
+
 void Ball::CheckTracking () {
     Vec2 cameraDistance = (associated.box.GetPosition() - Camera::GetPosition());
     if ((fabs(cameraDistance.x) > 332.0f) or (fabs(cameraDistance.y) > 332.0f)) {
@@ -90,4 +99,6 @@ void Ball::CheckTracking () {
             Camera::RIGHT, Camera::UP, Vec2(CINEMACHINE_OFFSET)
         ); Camera::cinemachine.Setup(true, true, true, false, true, true, false, false);
     }
+    // SDL_Log("ofst %f", fabs(Camera::offset.y));
+    // SDL_Log("dist %f", fabs(cameraDistance.y));
 }

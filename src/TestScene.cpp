@@ -55,7 +55,8 @@ void TestScene::LoadAssets () {
     AddObject(rawPlat);
     mini_platform = GetObjectPtr(rawPlat);
     platSpr->SetScale(3.0f, 1.0f);
-    rawPlat->box.SetPosition(300, 300);
+    // rawPlat->box.SetPosition(300, 300);
+    rawPlat->box.SetPosition(300, 325);
     rawPlat->AddComponent(new Collider(*rawPlat));
 
     GameObject* rawSquare = new GameObject(LAYER_RED_SQUARE);

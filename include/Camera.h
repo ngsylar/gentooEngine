@@ -39,7 +39,7 @@ class Camera {
             GameObject* newFocus, Vec2 cinemachineLength=Vec2(),
             int slicesX=8, int slicesY=8, int deadSlicesX=2, int deadSlicesY=2,
             FocusDirection focusDirectionX=NONE, FocusDirection focusDirectionY=NONE,
-            Vec2 focus=Vec2()
+            Vec2 focusOffset=Vec2()
         );
         static void Unfollow();
         static void Update(float dt);
