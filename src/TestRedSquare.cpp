@@ -2,6 +2,7 @@
 #include "TestObjects.h"
 
 Ball::Ball (GameObject& associated): Component(associated) {
+    associated.label = "Player";
     runSpeed = 300.0f;
     jumpForce = 400.0f;
     jumpHeightMax = 140.0f;
@@ -35,6 +36,11 @@ void Ball::Update (float dt) {
     //     rigidBody->Translate(Vec2(0,-runSpeed)*dt);
     // if (input.IsKeyDown(KEY_ARROW_DOWN))
     //     rigidBody->Translate(Vec2(0,runSpeed)*dt);
+
+    // // editar: melhorar esse codigo ridiculo
+    // if (not rigidBody->IsColliding(RigidBody::DOWN))
+    //     Camera::cinemachine.Setup(false, false, true, false, false, false, false, false);
+    // else Camera::cinemachine.Setup(true, true, true, false, true, true, false, false);
 }
 
 void Ball::StartJump (float dt) {

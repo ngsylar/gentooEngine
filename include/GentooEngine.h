@@ -1,10 +1,11 @@
 // C++ Library
+#include <functional>
+#include <memory>
 #include <fstream>
 #include <cstdlib>
 #include <algorithm>
 #include <ctime>
 #include <cmath>
-#include <memory>
 #include <array>
 #include <stack>
 #include <vector>

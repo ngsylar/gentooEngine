@@ -1,5 +1,6 @@
 #include "GentooEngine.h"
 
+std::vector<std::pair<Component*, std::function<void*()>>> Camera::foreignMethods;
 GameObject* Camera::focus = nullptr;
 Vec2 Camera::pos, Camera::velocity, Camera::offset;
 Vec2 Camera::posAdjustment, Camera::screenOffset;
@@ -8,6 +9,16 @@ float Camera::tolerance = 0.2f;
 
 Camera::Cinemachine Camera::cinemachine;
 Camera::Player Camera::player;
+
+void Camera::AddMethod(Component* component, std::function<void*()> method) {
+    foreignMethods.push_back(std::make_pair(component, method));
+}
+
+void Camera::RemoveMethod(Component* component) {
+    for (int i=(int)foreignMethods.size()-1; i >= 0; i--)
+        if (foreignMethods[i].first == component)
+            foreignMethods.erase(foreignMethods.begin()+i);
+}
 
 void Camera::Follow (
     GameObject* newFocus,
@@ -233,6 +244,9 @@ void Camera::Update (float dt) {
 
     pos = player.position + offset - posAdjustment;
     pos += screenOffset;
+
+    for (int i=0; i < (int)foreignMethods.size(); i++)
+        foreignMethods[i].second();
 }
 
 void Camera::Reset () {

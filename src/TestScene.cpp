@@ -18,6 +18,7 @@ void TestScene::LoadAssets () {
     platSpr->SetScale(15.0f, 1.0f);
     rawPlat->box.SetPosition(512, 500);
     rawPlat->AddComponent(new Collider(*rawPlat));
+    rawPlat->AddComponent(new Ground(*rawPlat));
 
     rawPlat = new GameObject(LAYER_BLACK_SQUARE);
     platSpr = new Sprite(*rawPlat, SPRITE_BLACK_SQUARE);
@@ -98,6 +99,7 @@ void TestScene2::LoadAssets () {
     platSpr->SetScale(90.0f, 1.0f);
     rawPlat->box.SetPosition(512, 500);
     rawPlat->AddComponent(new Collider(*rawPlat));
+    rawPlat->AddComponent(new Ground(*rawPlat));
 
     // GameObject* rawRun = new GameObject(LAYER_RUN_RIGHT);
     // Sprite* runSpr = new Sprite(*rawRun, SPRITE_RUN_RIGHT, 12, 0.02f);
@@ -139,8 +141,11 @@ void TestScene2::Update (float dt) {
 TestScene3::TestScene3 () {
     // fazer o bg loop dps
     GameObject* bg = new GameObject(SCENE_TEST_LAYER, SCENE_TEST_LABEL);
-    bg->AddComponent(new Sprite(*bg, SCENE_TEST_BACKGROUND));
-    bg->AddComponent(new CameraFollower(*bg));
+    // bg->AddComponent(new Sprite(*bg, SCENE_TEST_BACKGROUND));
+    // bg->AddComponent(new CameraFollower(*bg));
+    LoopedBackground* lbg = new LoopedBackground(*bg, SCENE_TEST_BACKGROUND);
+    lbg->parallaxFactor = 0.25f;
+    bg->AddComponent(lbg);
     AddObject(bg);
 }
 

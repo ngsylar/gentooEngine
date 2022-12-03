@@ -10,6 +10,7 @@ class Camera {
         enum Axis {X, Y};
         enum FaceDirection {LEFT, RIGHT, UP, DOWN, NONE};
 
+        static std::vector<std::pair<Component*, std::function<void*()>>> foreignMethods;
         static GameObject* focus;
         static Vec2 posAdjustment;
 
@@ -18,6 +19,7 @@ class Camera {
             Vec2 position, previousPosition;
             std::array<int, 2> lastDirection;
             Vec2 lastVelocity;
+            
             std::array<bool, 2> isStopping;
             std::array<Timer, 2> stopwatch;
         };
@@ -30,11 +32,11 @@ class Camera {
         static Cinemachine cinemachine;
         static Player player;
 
+        static void AddMethod(Component* component, std::function<void*()> method);
+        static void RemoveMethod(Component* component);
         static void Follow(
-            GameObject* newFocus,
-            Vec2 cinemachineLength=Vec2(),
-            int slicesX=8, int slicesY=32,
-            int deadSlicesX=2, int deadSlicesY=28,
+            GameObject* newFocus, Vec2 cinemachineLength=Vec2(),
+            int slicesX=8, int slicesY=8, int deadSlicesX=2, int deadSlicesY=2,
             int focusDirectionX=NONE, int focusDirectionY=NONE
         );
         static void Unfollow();
@@ -58,8 +60,7 @@ class Camera::Cinemachine {
         void Decelerate(float* velocity, float focusVelocity, float displacement);
         void Chase(
             float* velocity, float* offset,
-            float length, float centerDistance,
-            float undeadZone, float slicedLength,
+            float length, float centerDistance, float undeadZone, float slicedLength,
             float playerVelocity, int axis, float playerDirection
         );
         void StopChasing(

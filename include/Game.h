@@ -10,7 +10,7 @@
 #include "State.h"
 
 #define WINDOW_TITLE_DEF    "Gentoo Engine"
-#define WINDOW_SIZE_DEF     1024, 600
+#define WINDOW_SIZE_DEF     1024, 576
 #define WINDOW_FLAGS        0
 #define MIXER_CHANNELS      32
 #define MIXER_CHUNK_SIZE    1024
