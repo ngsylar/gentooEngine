@@ -64,8 +64,8 @@ class Camera::Cinemachine {
             float playerVelocity, int axis, float playerDirection
         );
         void StopChasing(
-            float* offset, float length, float centerDistance,
-            float playerVelocity, int axis, float playerDirection, float dt
+            float* velocity, float* offset, float length, float centerDistance,
+            int axis, float playerDirection, float dt
         );
         void Update(float dt);
 };

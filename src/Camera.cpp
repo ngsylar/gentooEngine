@@ -129,15 +129,17 @@ void Camera::Cinemachine::Chase (
 
 // editar: incluir desaceleracao de camera
 void Camera::Cinemachine::StopChasing (
-    float* offset, float length, float centerDistance,
-    float playerVelocity, int axis, float playerDirection, float dt
+    float* velocity, float* offset, float length, float centerDistance,
+    int axis, float playerDirection, float dt
 ) {
     player.stopwatch[axis].Update(dt);
     bool flags = player.stopwatch[axis].IsOver() and player.isStopping[axis];
     if (not (flags and (fabs(centerDistance) < (length - tolerance))))
         return;
 
-    *offset += playerVelocity;
+    *velocity -= playerDirection * (((*velocity) * (*velocity)) / (2.0f * length));
+    *offset += (*velocity);
+
     if (fabs(*offset) >= (length - tolerance)) {
         *offset = playerDirection * length;
         player.isStopping[axis] = false;
@@ -184,14 +186,14 @@ void Camera::Cinemachine::Update (float dt) {
     }
     // player is facing right
     else if (isAxisResettable[RIGHT] and (player.lastDirection[X] == RIGHT)) {
-        StopChasing(&offset.x, cinemachine.length.x, centerDistance[X],
-            player.lastVelocity.x, X, 1, dt);
+        StopChasing(&player.lastVelocity.x, &offset.x, cinemachine.length.x,
+            centerDistance[X], X, 1, dt);
         player.isStopping[X] = true;
     }
     // player is facing left
     else if (isAxisResettable[LEFT]) {
-        StopChasing(&offset.x, cinemachine.length.x, centerDistance[X],
-            player.lastVelocity.x, X, -1, dt);
+        StopChasing(&player.lastVelocity.x, &offset.x, cinemachine.length.x,
+            centerDistance[X], X, -1, dt);
         player.isStopping[X] = true;
     }
 
@@ -211,14 +213,14 @@ void Camera::Cinemachine::Update (float dt) {
     }
     // player is facing down
     else if (isAxisResettable[DOWN] and (player.lastDirection[Y] == DOWN)) {
-        StopChasing(&offset.y, cinemachine.length.y, centerDistance[Y],
-            player.lastVelocity.y, Y, 1, dt);
+        StopChasing(&player.lastVelocity.y, &offset.y, cinemachine.length.y,
+            centerDistance[Y], Y, 1, dt);
         player.isStopping[Y] = true;
     }
     // player is facing up
     else if (isAxisResettable[UP]) {
-        StopChasing(&offset.y, cinemachine.length.y, centerDistance[Y],
-            player.lastVelocity.y, Y, -1, dt);
+        StopChasing(&player.lastVelocity.y, &offset.y, cinemachine.length.y,
+            centerDistance[Y], Y, -1, dt);
         player.isStopping[Y] = true;
     }
 
