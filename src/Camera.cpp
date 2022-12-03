@@ -23,7 +23,7 @@ void Camera::RemoveMethod(Component* component) {
 void Camera::Follow (
     GameObject* newFocus,
     Vec2 cinemachineLength, int slicesX, int slicesY, int deadSlicesX, int deadSlicesY,
-    int focusDirectionX, int focusDirectionY
+    FocusDirection focusDirectionX, FocusDirection focusDirectionY, Vec2 focusOffset
 ) {
     /*--------------------------------------------------------------------------------------------------*/
     // camera attributes
@@ -32,12 +32,12 @@ void Camera::Follow (
     posAdjustment = (Game::GetInstance().GetWindowSize() * 0.5f);
     velocity = Vec2();
     isLocked = {false, false};
-    screenOffset = Vec2(0,25); // editar
+    screenOffset = focusOffset;
 
-    cinemachine.length = Vec2(25,175); // editar
-    cinemachine.slices = {8, 32}; // editar
-    cinemachine.deadSlices = {2, 28}; // editar
-    cinemachine.Setup(true, true, true, false, true, true, false, false); // remover
+    cinemachine.length = cinemachineLength;
+    cinemachine.slices = {slicesX, slicesY};
+    cinemachine.deadSlices = {deadSlicesX, deadSlicesY};
+    cinemachine.Setup(true, true, true, true, true, true, true, true);
 
     /*--------------------------------------------------------------------------------------------------*/
     // player attributes
@@ -45,7 +45,7 @@ void Camera::Follow (
 
     focus = newFocus;
     player.previousPosition = focus->box.GetPosition();
-    player.lastDirection = {LEFT, UP}; // editar
+    player.lastDirection = {focusDirectionX, focusDirectionY};
     player.lastVelocity = Vec2();
     player.isStopping = {false, false};
 

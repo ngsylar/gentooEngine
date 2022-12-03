@@ -17,6 +17,7 @@ class Ball: public Component {
         void Update(float dt);
         void StartJump(float dt);
         void HandleJump(bool isKeyDown, float dt);
+        void CheckTracking();
 };
 
 class Ground: public Component {

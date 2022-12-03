@@ -8,7 +8,6 @@
 class Camera {
     private:
         enum Axis {X, Y};
-        enum FaceDirection {LEFT, RIGHT, UP, DOWN, NONE};
 
         static std::vector<std::pair<Component*, std::function<void*()>>> foreignMethods;
         static GameObject* focus;
@@ -25,6 +24,8 @@ class Camera {
         };
 
     public:
+        enum FocusDirection {LEFT, RIGHT, UP, DOWN, NONE};
+
         static float tolerance;
         static Vec2 pos, velocity, offset, screenOffset;
         static std::array<bool, 2> isLocked;
@@ -37,7 +38,8 @@ class Camera {
         static void Follow(
             GameObject* newFocus, Vec2 cinemachineLength=Vec2(),
             int slicesX=8, int slicesY=8, int deadSlicesX=2, int deadSlicesY=2,
-            int focusDirectionX=NONE, int focusDirectionY=NONE
+            FocusDirection focusDirectionX=NONE, FocusDirection focusDirectionY=NONE,
+            Vec2 focus=Vec2()
         );
         static void Unfollow();
         static void Update(float dt);

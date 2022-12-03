@@ -72,7 +72,7 @@ void TestScene::LoadAssets () {
 }
 
 void TestScene::Start () {
-    Camera::Follow(square.lock().get());
+    // Camera::Follow(square.lock().get());
 }
 
 void TestScene::Update (float dt) {
@@ -128,7 +128,7 @@ void TestScene2::LoadAssets () {
 }
 
 void TestScene2::Start () {
-    Camera::Follow(square.lock().get());
+    // Camera::Follow(square.lock().get());
 }
 
 void TestScene2::Update (float dt) {
@@ -177,11 +177,12 @@ void TestScene3::LoadAssets () {
 }
 
 void TestScene3::Start () {
-    Camera::Follow(square.lock().get());
+    // Camera::Follow(square.lock().get());
 }
 
 void TestScene3::Update (float dt) {
     if (InputManager::GetInstance().KeyPress(KEY_ESCAPE)) {
+        Game::GetInstance().AddState(new TestScene());
         popRequested = true;
     }
 }
