@@ -54,19 +54,26 @@ void Ball::Update (float dt) {
     if (input.IsKeyDown(KEY_ARROW_RIGHT))
         rigidBody->Translate(Vec2(runSpeed,0)*dt);
 
-    // // editar: remover
+    // // remover
     // rigidBody->gravityEnabled = false;
     // if (input.IsKeyDown(KEY_ARROW_UP))
     //     rigidBody->Translate(Vec2(0,-runSpeed)*dt);
     // if (input.IsKeyDown(KEY_ARROW_DOWN))
     //     rigidBody->Translate(Vec2(0,runSpeed)*dt);
+
+    // // remover
+    // if (input.KeyPress(KEY_SPACE)) {
+    //     SDL_Log("camera %f", Camera::pos.y);
+    //     SDL_Log("offset %f", Camera::screenOffset.y);
+    //     SDL_Log("distan %f", Camera::GetPosition().y - associated.box.GetPosition().y);
+    // }
 }
 
 void Ball::StartJump (float dt) {
     cameraOffset = cameraDistance.y;
     float jumpDisplacement = jumpForce * dt;
     rigidBody->Translate(Vec2(0,-jumpDisplacement));
-    jumpHeight += jumpDisplacement;
+    jumpHeight = jumpDisplacement;
     rigidBody->gravityEnabled = false;
     isJumping = true;
 }
@@ -86,53 +93,54 @@ void Ball::HandleJump (bool isKeyDown, float dt) {
         rigidBody->gravityEnabled = true;
         if (cameraOffset > 0.0f)
             isFalling = true;
-        else jumpHeight = 0.0f;
         isJumping = false;
     }
     // if it hits the ceiling cancels the jump or the force applied in previous conditions
     if (rigidBody->IsColliding(RigidBody::UP)) {
         rigidBody->CancelForces(RigidBody::VERTICAL);
         rigidBody->gravityEnabled = true;
-        jumpHeight = 0.0f;
         isJumping = false;
     }
 }
 
 void Ball::CameraHandleFall (float dt) {
-    // if the jump height is less than 0.67 of the max jump height, disables camera acceleration
-    if (jumpHeight < (jumpHeightMax * 0.67f)) {
-        jumpHeight = 0.0f;
+    // if the jump height is less than 0.5 of the max jump height, disables camera acceleration
+    if (jumpHeight < (jumpHeightMax * 0.5f)) {
         isFalling = false;
         return;
     }
     // else slows down the camera climb
-    cameraAcceleration += (jumpForce * jumpForce) / ASSISTANT_OFFSET_Y_CUBIC;
+    float jumpFactor = jumpHeight / jumpHeightMax;
+    cameraAcceleration += jumpFactor * ((jumpForce * jumpForce) / ASSISTANT_OFFSET_Y_CUBIC);
     Camera::screenOffset.y -= cameraAcceleration * dt;
-    if (Camera::screenOffset.y <= 0.0f) {
-        Camera::screenOffset.y = 0.0f;
+    float offsetLimit = ASSISTANT_OFFSET_Y - (ASSISTANT_OFFSET_Y * jumpFactor);
+    if (Camera::screenOffset.y <= offsetLimit) {
+        Camera::screenOffset.y = offsetLimit;
         cameraAcceleration = 0.0f;
-        jumpHeight = 0.0f;
         isFalling = false;
     }
 }
 
 void Ball::CameraCheckTracking (float dt) {
     if (not isFalling and (Camera::screenOffset.y < ASSISTANT_OFFSET_Y)) {
+        float jumpFactor = jumpHeightMax / jumpHeight;
         
         // if it is falling speeds up the camera drop after some delay
-        cameraDelay.Update(dt);
         if (cameraDelay.IsOver()) {
-            cameraAcceleration += (jumpForce * jumpForce) / ASSISTANT_OFFSET_Y_CUBIC;
+            cameraAcceleration += 6.0f * jumpFactor * ((jumpForce * jumpForce) / ASSISTANT_OFFSET_Y_CUBIC);
             Camera::screenOffset.y += cameraAcceleration * dt;
-        }
+        } else cameraDelay.Update(dt * jumpFactor);
+
         // if it hits the ground adjusts the camera offset value
-        if (rigidBody->IsGrounded() and (Camera::screenOffset.y < ASSISTANT_OFFSET_Y)) {
-            Camera::pos.y += ASSISTANT_OFFSET_Y - Camera::screenOffset.y;
+        if (rigidBody->IsGrounded()) {
+            Camera::pos.y += ASSISTANT_OFFSET_Y - Camera::screenOffset.y - Camera::offset.y;
             Camera::screenOffset.y = ASSISTANT_OFFSET_Y;
+            Camera::offset.y = 0.0f;
+            cameraAcceleration = 0.0f;
             cameraDelay.Reset();
         }
         // limits the camera offset value
-        else if (Camera::screenOffset.y >= ASSISTANT_OFFSET_Y) {
+        if (Camera::screenOffset.y >= ASSISTANT_OFFSET_Y) {
             Camera::screenOffset.y = ASSISTANT_OFFSET_Y;
             cameraAcceleration = 0.0f;
             cameraDelay.Reset();

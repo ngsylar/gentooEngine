@@ -83,7 +83,7 @@ void Sprite::SetFrame (int frame) {
 }
 
 void Sprite::SetFrameTime (float frameTime) {
-    frameTimer = Timer(frameTime, frameTimer.Get());
+    frameTimer = Timer(frameTime, frameTimer.GetTime());
 }
 
 void Sprite::SetFrameCount (int frameCount) {

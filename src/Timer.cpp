@@ -17,8 +17,12 @@ void Timer::Reset () {
     currentTime = 0.0f;
 }
 
-float Timer::Get () {
+float Timer::GetTime () {
     return currentTime;
+}
+
+float Timer::GetResetTime () {
+    return resetTime;
 }
 
 bool Timer::HasResetTime () {

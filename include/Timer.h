@@ -10,7 +10,8 @@ class Timer {
         void SetResetTime(float time);
         void Update(float dt);
         void Reset();
-        float Get();
+        float GetTime();
+        float GetResetTime();
         bool HasResetTime();
         bool IsOver();
 };
