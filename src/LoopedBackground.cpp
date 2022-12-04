@@ -1,14 +1,14 @@
 #include "GentooEngine.h"
 
 LoopedBackground::LoopedBackground (
-    GameObject& associated, std::string fileName, int layerCount
+    GameObject& associated, std::string fileName, int layerCount, float parallaxFactor
 ): Component(associated) {
     sprite = new Sprite(associated, fileName);
     renderingCount = (layerCount * 2) - 1;
     middlePositionId = renderingCount >> 1;
     halfSizes[HORIZONTAL] = ((layerCount - 1) * (int)associated.box.w) >> 1;
     halfSizes[VERTICAL] = ((layerCount - 1) * (int)associated.box.h) >> 1;
-    parallaxFactor = 1.0f;
+    this->parallaxFactor = parallaxFactor;
 }
 
 LoopedBackground::~LoopedBackground () {

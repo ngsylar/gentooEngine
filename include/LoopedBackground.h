@@ -17,7 +17,8 @@ class LoopedBackground: public Component {
         LoopedBackground(
             GameObject& associated,
             std::string fileName,
-            int layerCount=2
+            int layerCount=2,
+            float parallaxFactor=1.0f
         );
         ~LoopedBackground();
         void SetLayerCount(int layerCount);

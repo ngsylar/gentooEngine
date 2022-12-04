@@ -144,8 +144,7 @@ TestScene3::TestScene3 () {
     GameObject* bg = new GameObject(SCENE_TEST_LAYER, SCENE_TEST_LABEL);
     // bg->AddComponent(new Sprite(*bg, SCENE_TEST_BACKGROUND));
     // bg->AddComponent(new CameraFollower(*bg));
-    LoopedBackground* lbg = new LoopedBackground(*bg, SCENE_TEST_BACKGROUND);
-    lbg->parallaxFactor = 0.25f;
+    LoopedBackground* lbg = new LoopedBackground(*bg, SCENE_TEST_BACKGROUND, 2, 0.25f);
     bg->AddComponent(lbg);
     AddObject(bg);
 }

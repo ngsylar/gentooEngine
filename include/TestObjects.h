@@ -9,7 +9,11 @@ class Ball: public Component {
     private:
         RigidBody* rigidBody;
         float runSpeed, jumpForce, jumpHeight, jumpHeightMax;
-        bool isJumping;
+        bool isJumping, isFalling;
+
+        Timer cameraDelay;
+        Vec2 cameraDistance;
+        float cameraAcceleration, cameraOffset;
 
     public:
         Ball(GameObject& associated);
@@ -17,8 +21,10 @@ class Ball: public Component {
         void Update(float dt);
         void StartJump(float dt);
         void HandleJump(bool isKeyDown, float dt);
-        void HandleFall();
-        void CheckTracking();
+
+        // cinemachine assistant
+        void CameraHandleFall(float dt);
+        void CameraCheckTracking(float dt);
 };
 
 class Ground: public Component {

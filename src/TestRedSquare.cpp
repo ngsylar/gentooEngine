@@ -1,10 +1,16 @@
 #include "GentooEngine.h"
 #include "TestObjects.h"
 
-#define CINEMACHINE_LENGTH      25.0f, 175.0f
-#define CINEMACHINE_SLICES      8, 32
-#define CINEMACHINE_DEADSLICES  2, 28
-#define CINEMACHINE_OFFSET      0.0f, 25.0f
+#define RIGIDBODY_GRAVITY_MAX       800.0f
+
+#define CINEMACHINE_LENGTH          25.0f, 175.0f
+#define CINEMACHINE_SLICES          8, 32
+#define CINEMACHINE_DEADSLICES      2, 28
+#define CINEMACHINE_OFFSET          0.0f, 25.0f
+#define CINEMACHINE_SETUP           true, true, true, false, true, true, false, false
+
+#define ASSISTANT_OFFSET_Y          25.0f
+#define ASSISTANT_OFFSET_Y_CUBIC    15625.0f
 
 Ball::Ball (GameObject& associated): Component(associated) {
     associated.label = "Player";
@@ -13,26 +19,31 @@ Ball::Ball (GameObject& associated): Component(associated) {
     jumpHeightMax = 140.0f;
     jumpHeight = 0.0f;
     isJumping = false;
+    isFalling = false;
+    cameraDelay.SetResetTime(0.25f);
+    cameraAcceleration = 0.0f;
+    cameraOffset = 0.0f;
 }
 
 void Ball::Start () {
     Camera::Follow(
         &associated, Vec2(CINEMACHINE_LENGTH), CINEMACHINE_SLICES, CINEMACHINE_DEADSLICES,
         Camera::RIGHT, Camera::UP, Vec2(CINEMACHINE_OFFSET)
-    ); Camera::cinemachine.Setup(true, true, true, false, true, true, false, false);
+    ); Camera::cinemachine.Setup(CINEMACHINE_SETUP);
+    Camera::offset.y = 0.0f;
 
     rigidBody = new RigidBody(associated);
     associated.AddComponent(rigidBody);
     associated.AddComponent(new Collider(associated));
-    rigidBody->velocityMax.y = 800.0f;
+    rigidBody->velocityMax.y = RIGIDBODY_GRAVITY_MAX;
 }
 
 void Ball::Update (float dt) {
     InputManager& input = InputManager::GetInstance();
-    
-    HandleFall();
-    CheckTracking();
+    CameraCheckTracking(dt);
 
+    if (isFalling)
+        CameraHandleFall(dt);
     if (isJumping)
         HandleJump(input.IsKeyDown(KEY_ARROW_UP), dt);
 
@@ -52,6 +63,7 @@ void Ball::Update (float dt) {
 }
 
 void Ball::StartJump (float dt) {
+    cameraOffset = cameraDistance.y;
     float jumpDisplacement = jumpForce * dt;
     rigidBody->Translate(Vec2(0,-jumpDisplacement));
     jumpHeight += jumpDisplacement;
@@ -72,7 +84,9 @@ void Ball::HandleJump (bool isKeyDown, float dt) {
     else {
         rigidBody->AddForce(Vec2(0,-((jumpForce*jumpHeight)/jumpHeightMax)));
         rigidBody->gravityEnabled = true;
-        jumpHeight = 0.0f;
+        if (cameraOffset > 0.0f)
+            isFalling = true;
+        else jumpHeight = 0.0f;
         isJumping = false;
     }
     // if it hits the ceiling cancels the jump or the force applied in previous conditions
@@ -84,21 +98,52 @@ void Ball::HandleJump (bool isKeyDown, float dt) {
     }
 }
 
-// editar: subir a camera um pouco (provavelmente usar screenOffset)
-// editar: colocar desaceleracao no fim da subida / inicio da queda (estudar em que parte do codigo colocar isso, se na camera ou em jump)
-void Ball::HandleFall () {
-    if (not rigidBody->IsGrounded())
-        Camera::offset.y = 0.0f;
+void Ball::CameraHandleFall (float dt) {
+    // if the jump height is less than 0.67 of the max jump height, disables camera acceleration
+    if (jumpHeight < (jumpHeightMax * 0.67f)) {
+        jumpHeight = 0.0f;
+        isFalling = false;
+        return;
+    }
+    // else slows down the camera climb
+    cameraAcceleration += (jumpForce * jumpForce) / ASSISTANT_OFFSET_Y_CUBIC;
+    Camera::screenOffset.y -= cameraAcceleration * dt;
+    if (Camera::screenOffset.y <= 0.0f) {
+        Camera::screenOffset.y = 0.0f;
+        cameraAcceleration = 0.0f;
+        jumpHeight = 0.0f;
+        isFalling = false;
+    }
 }
 
-void Ball::CheckTracking () {
-    Vec2 cameraDistance = (associated.box.GetPosition() - Camera::GetPosition());
-    if ((fabs(cameraDistance.x) > 332.0f) or (fabs(cameraDistance.y) > 332.0f)) {
+void Ball::CameraCheckTracking (float dt) {
+    if (not isFalling and (Camera::screenOffset.y < ASSISTANT_OFFSET_Y)) {
+        
+        // if it is falling speeds up the camera drop after some delay
+        cameraDelay.Update(dt);
+        if (cameraDelay.IsOver()) {
+            cameraAcceleration += (jumpForce * jumpForce) / ASSISTANT_OFFSET_Y_CUBIC;
+            Camera::screenOffset.y += cameraAcceleration * dt;
+        }
+        // if it hits the ground adjusts the camera offset value
+        if (rigidBody->IsGrounded() and (Camera::screenOffset.y < ASSISTANT_OFFSET_Y)) {
+            Camera::pos.y += ASSISTANT_OFFSET_Y - Camera::screenOffset.y;
+            Camera::screenOffset.y = ASSISTANT_OFFSET_Y;
+            cameraDelay.Reset();
+        }
+        // limits the camera offset value
+        else if (Camera::screenOffset.y >= ASSISTANT_OFFSET_Y) {
+            Camera::screenOffset.y = ASSISTANT_OFFSET_Y;
+            cameraAcceleration = 0.0f;
+            cameraDelay.Reset();
+        }
+    } // resets to default setting if camera loses the track of it
+    Vec2 windowHalfSize = Game::GetInstance().GetWindowSize();
+    cameraDistance = Camera::GetPosition() - associated.box.GetPosition();
+    if ((fabs(cameraDistance.x) > windowHalfSize.x) or (fabs(cameraDistance.y) > windowHalfSize.y)) {
         Camera::Follow(
             &associated, Vec2(CINEMACHINE_LENGTH), CINEMACHINE_SLICES, CINEMACHINE_DEADSLICES,
             Camera::RIGHT, Camera::UP, Vec2(CINEMACHINE_OFFSET)
-        ); Camera::cinemachine.Setup(true, true, true, false, true, true, false, false);
+        ); Camera::cinemachine.Setup(CINEMACHINE_SETUP);
     }
-    // SDL_Log("ofst %f", fabs(Camera::offset.y));
-    // SDL_Log("dist %f", fabs(cameraDistance.y));
 }
