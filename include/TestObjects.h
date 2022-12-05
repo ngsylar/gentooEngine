@@ -1,6 +1,8 @@
 #ifndef TEST_OBJECTS_H
 #define TEST_OBJECTS_H
 
+#include <queue>
+
 #include "Timer.h"
 #include "InputManager.h"
 #include "Component.h"
@@ -9,8 +11,10 @@ class Ball: public Component {
     private:
         RigidBody* rigidBody;
         float runSpeed, jumpForce, jumpHeight, jumpHeightMax;
-        bool isJumping, isFalling;
+        bool isJumping;
 
+        // cinemachine assistant
+        bool isFalling;
         Timer cameraDelay;
         Vec2 cameraDistance;
         float cameraAcceleration, cameraOffset;
@@ -21,21 +25,22 @@ class Ball: public Component {
         void Update(float dt);
         void StartJump(float dt);
         void HandleJump(bool isKeyDown, float dt);
+        void CameraCheckTracking(float dt);
 
         // cinemachine assistant
         void CameraHandleFall(float dt);
-        void CameraCheckTracking(float dt);
 };
 
-class Ground: public Component {
-    private:
-        Timer delay;
-
+class Platform: public Component {
     public:
-        // float relativeOffset;
+        enum Direction {LEFT, RIGHT, UP, DOWN, NONE};
+        Direction direction;
+        float positionLimit;
+        bool bodied;
 
-        Ground(GameObject& associated, float relativeOffset=0.0f);
-        ~Ground();
+        Platform(GameObject& associated);
+        Platform(GameObject& associated, Direction direction, float positionLimit, bool bodied=false);
+        ~Platform();
         void Start();
         void* HandleCamera();
 };

@@ -1,9 +1,9 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#include "GameObject.h"
+#include <array>
 
-#define CAMERA_SPEED 200.0f
+#include "GameObject.h"
 
 class Camera {
     private:
@@ -54,6 +54,11 @@ class Camera::Cinemachine {
         std::array<bool, 4> isAxisEnabled;
         std::array<bool, 4> isAxisResettable;
 
+        void Setup(
+            bool enableLeft, bool enableRight, bool enableUp, bool enableDown,
+            bool resetLeft, bool resetRight, bool resetUp, bool resetDown,
+            int slicesX, int slicesY, int deadSlicesX, int deadSlicesY
+        );
         void Setup(
             bool enableLeft, bool enableRight, bool enableUp, bool enableDown,
             bool resetLeft, bool resetRight, bool resetUp, bool resetDown

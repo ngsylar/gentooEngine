@@ -4,13 +4,9 @@
 #define RIGIDBODY_GRAVITY_MAX       800.0f
 
 #define CINEMACHINE_LENGTH          25.0f, 175.0f
-#define CINEMACHINE_SLICES          8, 32
-#define CINEMACHINE_DEADSLICES      2, 28
+#define CINEMACHINE_SLICES          8, 32, 2, 24
 #define CINEMACHINE_OFFSET          0.0f, 25.0f
 #define CINEMACHINE_SETUP           true, true, true, false, true, true, false, false
-
-#define ASSISTANT_OFFSET_Y          25.0f
-#define ASSISTANT_OFFSET_Y_CUBIC    15625.0f
 
 Ball::Ball (GameObject& associated): Component(associated) {
     associated.label = "Player";
@@ -19,6 +15,8 @@ Ball::Ball (GameObject& associated): Component(associated) {
     jumpHeightMax = 140.0f;
     jumpHeight = 0.0f;
     isJumping = false;
+
+    // cinemachine assistant
     isFalling = false;
     cameraDelay.SetResetTime(0.25f);
     cameraAcceleration = 0.0f;
@@ -27,9 +25,9 @@ Ball::Ball (GameObject& associated): Component(associated) {
 
 void Ball::Start () {
     Camera::Follow(
-        &associated, Vec2(CINEMACHINE_LENGTH), CINEMACHINE_SLICES, CINEMACHINE_DEADSLICES,
-        Camera::RIGHT, Camera::UP, Vec2(CINEMACHINE_OFFSET)
-    ); Camera::cinemachine.Setup(CINEMACHINE_SETUP);
+        &associated, Vec2(CINEMACHINE_LENGTH), CINEMACHINE_SLICES,
+        Camera::RIGHT, Camera::UP, Vec2(CINEMACHINE_OFFSET));
+    Camera::cinemachine.Setup(CINEMACHINE_SETUP);
     Camera::offset.y = 0.0f;
 
     rigidBody = new RigidBody(associated);
@@ -42,8 +40,10 @@ void Ball::Update (float dt) {
     InputManager& input = InputManager::GetInstance();
     CameraCheckTracking(dt);
 
+    // cinemachine assistant
     if (isFalling)
         CameraHandleFall(dt);
+
     if (isJumping)
         HandleJump(input.IsKeyDown(KEY_ARROW_UP), dt);
 
@@ -60,22 +60,17 @@ void Ball::Update (float dt) {
     //     rigidBody->Translate(Vec2(0,-runSpeed)*dt);
     // if (input.IsKeyDown(KEY_ARROW_DOWN))
     //     rigidBody->Translate(Vec2(0,runSpeed)*dt);
-
-    // // remover
-    // if (input.KeyPress(KEY_SPACE)) {
-    //     SDL_Log("camera %f", Camera::pos.y);
-    //     SDL_Log("offset %f", Camera::screenOffset.y);
-    //     SDL_Log("distan %f", Camera::GetPosition().y - associated.box.GetPosition().y);
-    // }
 }
 
 void Ball::StartJump (float dt) {
-    cameraOffset = cameraDistance.y;
     float jumpDisplacement = jumpForce * dt;
     rigidBody->Translate(Vec2(0,-jumpDisplacement));
     jumpHeight = jumpDisplacement;
     rigidBody->gravityEnabled = false;
     isJumping = true;
+
+    // cinemachine assistant
+    cameraOffset = cameraDistance.y;
 }
 
 void Ball::HandleJump (bool isKeyDown, float dt) {
@@ -91,9 +86,11 @@ void Ball::HandleJump (bool isKeyDown, float dt) {
     else {
         rigidBody->AddForce(Vec2(0,-((jumpForce*jumpHeight)/jumpHeightMax)));
         rigidBody->gravityEnabled = true;
+        isJumping = false;
+
+        // cinemachine assistant
         if (cameraOffset > 0.0f)
             isFalling = true;
-        isJumping = false;
     }
     // if it hits the ceiling cancels the jump or the force applied in previous conditions
     if (rigidBody->IsColliding(RigidBody::UP)) {
@@ -102,6 +99,21 @@ void Ball::HandleJump (bool isKeyDown, float dt) {
         isJumping = false;
     }
 }
+
+// void Ball::CameraCheckTracking (float dt) {
+//     // resets to default setting if camera loses the track of it
+//     Vec2 windowHalfSize = Game::GetInstance().GetWindowSize();
+//     Vec2 cameraDistance = Camera::GetPosition() - associated.box.GetPosition();
+//     if ((fabs(cameraDistance.x) > windowHalfSize.x) or (fabs(cameraDistance.y) > windowHalfSize.y)) {
+//         Camera::Follow(
+//             &associated, Vec2(CINEMACHINE_LENGTH), CINEMACHINE_SLICES,
+//             Camera::RIGHT, Camera::UP, Vec2(CINEMACHINE_OFFSET));
+//         Camera::cinemachine.Setup(CINEMACHINE_SETUP);
+//     }
+// }
+
+#define ASSISTANT_OFFSET_Y          25.0f
+#define ASSISTANT_OFFSET_Y_CUBIC    15625.0f
 
 void Ball::CameraHandleFall (float dt) {
     // if the jump height is less than 0.5 of the max jump height, disables camera acceleration
@@ -150,8 +162,8 @@ void Ball::CameraCheckTracking (float dt) {
     cameraDistance = Camera::GetPosition() - associated.box.GetPosition();
     if ((fabs(cameraDistance.x) > windowHalfSize.x) or (fabs(cameraDistance.y) > windowHalfSize.y)) {
         Camera::Follow(
-            &associated, Vec2(CINEMACHINE_LENGTH), CINEMACHINE_SLICES, CINEMACHINE_DEADSLICES,
-            Camera::RIGHT, Camera::UP, Vec2(CINEMACHINE_OFFSET)
-        ); Camera::cinemachine.Setup(CINEMACHINE_SETUP);
+            &associated, Vec2(CINEMACHINE_LENGTH), CINEMACHINE_SLICES,
+            Camera::RIGHT, Camera::UP, Vec2(CINEMACHINE_OFFSET));
+        Camera::cinemachine.Setup(CINEMACHINE_SETUP);
     }
 }

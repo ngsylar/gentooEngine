@@ -17,15 +17,15 @@ RigidBody::~RigidBody () {
 
 void RigidBody::Start () {
     Vec2 position = associated.box.GetPosition();
-    previousPosition.emplace(position);
-    previousPosition.emplace(position);
-    previousPosition.emplace(position);
+    previousPosition.push(position);
+    previousPosition.push(position);
+    previousPosition.push(position);
 }
 
 void RigidBody::Update (float dt) {
     Vec2 position = associated.box.GetPosition();
     movementDirection = position - previousPosition.front();
-    previousPosition.emplace(position);
+    previousPosition.push(position);
     previousPosition.pop();
     
     if (gravityEnabled)

@@ -68,6 +68,17 @@ void Camera::Unfollow () {
 
 void Camera::Cinemachine::Setup (
     bool enableLeft, bool enableRight, bool enableUp, bool enableDown,
+    bool resetLeft, bool resetRight, bool resetUp, bool resetDown,
+    int slicesX, int slicesY, int deadSlicesX, int deadSlicesY
+) {
+    isAxisEnabled = {enableLeft, enableRight, enableUp, enableDown};
+    isAxisResettable = {resetLeft, resetRight, resetUp, resetDown};
+    slices = {slicesX, slicesY};
+    deadSlices = {deadSlicesX, deadSlicesY};
+}
+
+void Camera::Cinemachine::Setup (
+    bool enableLeft, bool enableRight, bool enableUp, bool enableDown,
     bool resetLeft, bool resetRight, bool resetUp, bool resetDown
 ) {
     isAxisEnabled = {enableLeft, enableRight, enableUp, enableDown};
@@ -245,10 +256,11 @@ void Camera::Update (float dt) {
         player.position.y = focus->box.GetPosition().y;
 
     pos = player.position + offset - posAdjustment;
-    pos += screenOffset;
 
     for (int i=0; i < (int)foreignMethods.size(); i++)
         foreignMethods[i].second();
+    
+    pos += screenOffset;
 }
 
 void Camera::Reset () {
