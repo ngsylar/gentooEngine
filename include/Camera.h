@@ -27,7 +27,7 @@ class Camera {
         enum FocusDirection {LEFT, RIGHT, UP, DOWN, NONE};
 
         static float tolerance;
-        static Vec2 pos, velocity, offset, screenOffset;
+        static Vec2 pos, velocity, offset, screenOffset, masterOffset;
         static std::array<bool, 2> isLocked;
 
         static Cinemachine cinemachine;

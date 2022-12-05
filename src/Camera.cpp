@@ -3,7 +3,7 @@
 std::vector<std::pair<Component*, std::function<void*()>>> Camera::foreignMethods;
 GameObject* Camera::focus = nullptr;
 Vec2 Camera::pos, Camera::velocity, Camera::offset;
-Vec2 Camera::posAdjustment, Camera::screenOffset;
+Vec2 Camera::posAdjustment, Camera::screenOffset, Camera::masterOffset;
 std::array<bool, 2> Camera::isLocked = {true, true};
 float Camera::tolerance = 0.2f;
 

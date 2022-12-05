@@ -165,7 +165,13 @@ void Ball::CameraCheckTracking (float dt) {
             cameraAcceleration = 0.0f;
             cameraDelay.Reset();
         }
-    } // resets to default setting if camera loses the track of it
+    // if it is falling with maximum gravity limit velocity lowers the camera
+    } else if ((rigidBody->GetVelocity().y == rigidBody->velocityMax.y) and (Camera::offset.y < 0.0f)) {
+        Camera::offset.y += ASSISTANT_OFFSET_Y * dt;
+        if (Camera::offset.y > 0.0f)
+            Camera::offset.y = 0.0f;
+    }
+    // resets to default setting if camera loses the track of it
     Vec2 windowHalfSize = Game::GetInstance().GetWindowSize();
     cameraDistance = Camera::GetPosition() - associated.box.GetPosition();
     if ((fabs(cameraDistance.x) > windowHalfSize.x) or (fabs(cameraDistance.y) > windowHalfSize.y)) {

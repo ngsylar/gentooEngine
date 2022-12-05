@@ -14,7 +14,7 @@ class Ball: public Component {
         bool isJumping;
 
         // cinemachine assistant
-        bool isFalling;
+        bool isFalling, isClimbing;
         Timer cameraDelay;
         Vec2 cameraDistance;
         float cameraAcceleration, cameraOffset;
@@ -32,16 +32,23 @@ class Ball: public Component {
 };
 
 class Platform: public Component {
+    private:
+        bool bodied, isActive;
+        Vec2 displacement;
+    
     public:
         enum Direction {LEFT, RIGHT, UP, DOWN, NONE};
         Direction direction;
         float positionLimit;
-        bool bodied;
 
         Platform(GameObject& associated);
         Platform(GameObject& associated, Direction direction, float positionLimit, bool bodied=false);
         ~Platform();
+        void SetBody(bool body);
         void Start();
+        void NotifyCollision(GameObject& other);
+        void NotifyNoCollision(GameObject& other);
+        void* HandleCameraWithBody();
         void* HandleCamera();
 };
 

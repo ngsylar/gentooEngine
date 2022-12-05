@@ -159,10 +159,10 @@ void TestScene2::Update (float dt) {
 TestScene3::TestScene3 () {
     // fazer o bg loop dps
     GameObject* bg = new GameObject(SCENE_TEST_LAYER, SCENE_TEST_LABEL);
-    // bg->AddComponent(new Sprite(*bg, SCENE_TEST_BACKGROUND));
-    // bg->AddComponent(new CameraFollower(*bg));
-    LoopedBackground* lbg = new LoopedBackground(*bg, SCENE_TEST_BACKGROUND, 2, 0.25f);
-    bg->AddComponent(lbg);
+    bg->AddComponent(new Sprite(*bg, SCENE_TEST_BACKGROUND));
+    bg->AddComponent(new CameraFollower(*bg));
+    // LoopedBackground* lbg = new LoopedBackground(*bg, SCENE_TEST_BACKGROUND, 2, 0.25f);
+    // bg->AddComponent(lbg);
     AddObject(bg);
 }
 
@@ -222,7 +222,7 @@ void TestScene4::LoadAssets () {
     platSpr->SetScale(3.0f, 1.0f);
     rawPlat->box.SetPosition(100, 325);
     rawPlat->AddComponent(new Collider(*rawPlat));
-    rawPlat->AddComponent(new Platform(*rawPlat, Platform::DOWN, -11.0f));
+    rawPlat->AddComponent(new Platform(*rawPlat, Platform::DOWN, rawPlat->box.GetPosition().y-511.0f, true));
 
     rawPlat = new GameObject(LAYER_BLACK_SQUARE, LABEL_GROUND);
     platSpr = new Sprite(*rawPlat, SPRITE_BLACK_SQUARE);
@@ -231,6 +231,7 @@ void TestScene4::LoadAssets () {
     platSpr->SetScale(3.0f, 1.0f);
     rawPlat->box.SetPosition(500, 500);
     rawPlat->AddComponent(new Collider(*rawPlat));
+    rawPlat->AddComponent(new Platform(*rawPlat, Platform::DOWN, rawPlat->box.GetPosition().y-511.0f));
 
     for (int i=1; i < 25; i++) {
         GameObject* rawPlat = new GameObject(LAYER_BLACK_SQUARE, LABEL_PLATFORM);

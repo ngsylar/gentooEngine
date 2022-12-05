@@ -23,6 +23,8 @@ void State::StartBase () {
 
 void State::UpdateBase (float dt) {
     InputManager& input = InputManager::GetInstance();
+    Camera::pos -= Camera::masterOffset;
+    stateDt = dt;
     
     if (input.QuitRequested()) {
         quitRequested = true;
@@ -45,6 +47,7 @@ void State::UpdateBase (float dt) {
             objectArray.erase(objectArray.begin()+i);
 
     Camera::Update(dt);
+    Camera::pos += Camera::masterOffset;
 
     for (int i=0; i < (int)objectArray.size(); i++)
         objectArray[i]->LateUpdate(dt);

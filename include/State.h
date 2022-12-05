@@ -13,6 +13,8 @@ class State {
         bool scheduleSortingLayer;
     
     public:
+        float stateDt;
+
         State();
         virtual ~State();
         virtual void LoadAssets();
