@@ -8,6 +8,10 @@
 #define CINEMACHINE_OFFSET          0.0f, 25.0f
 #define CINEMACHINE_SETUP           true, true, true, false, true, true, false, false
 
+// cinemachine assistant
+#define ASSISTANT_OFFSET_Y          25.0f
+#define ASSISTANT_OFFSET_Y_CUBIC    15625.0f
+
 Ball::Ball (GameObject& associated): Component(associated) {
     associated.label = "Player";
     runSpeed = 300.0f;
@@ -60,6 +64,14 @@ void Ball::Update (float dt) {
     //     rigidBody->Translate(Vec2(0,-runSpeed)*dt);
     // if (input.IsKeyDown(KEY_ARROW_DOWN))
     //     rigidBody->Translate(Vec2(0,runSpeed)*dt);
+
+    // remover
+    if (input.KeyPress(KEY_SPACE)) {
+        SDL_Log("camera %f", Camera::pos.y);
+        SDL_Log("offset %f", Camera::offset.y);
+        SDL_Log("scroff %f", Camera::screenOffset.y);
+        SDL_Log("distan %f", Camera::GetPosition().y - associated.box.GetPosition().y);
+    }
 }
 
 void Ball::StartJump (float dt) {
@@ -112,9 +124,6 @@ void Ball::HandleJump (bool isKeyDown, float dt) {
 //     }
 // }
 
-#define ASSISTANT_OFFSET_Y          25.0f
-#define ASSISTANT_OFFSET_Y_CUBIC    15625.0f
-
 void Ball::CameraHandleFall (float dt) {
     // if the jump height is less than 0.5 of the max jump height, disables camera acceleration
     if (jumpHeight < (jumpHeightMax * 0.5f)) {
@@ -145,9 +154,8 @@ void Ball::CameraCheckTracking (float dt) {
 
         // if it hits the ground adjusts the camera offset value
         if (rigidBody->IsGrounded()) {
-            Camera::pos.y += ASSISTANT_OFFSET_Y - Camera::screenOffset.y - Camera::offset.y;
+            Camera::offset.y += Camera::screenOffset.y - ASSISTANT_OFFSET_Y;
             Camera::screenOffset.y = ASSISTANT_OFFSET_Y;
-            Camera::offset.y = 0.0f;
             cameraAcceleration = 0.0f;
             cameraDelay.Reset();
         }

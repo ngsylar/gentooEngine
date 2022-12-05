@@ -256,11 +256,10 @@ void Camera::Update (float dt) {
         player.position.y = focus->box.GetPosition().y;
 
     pos = player.position + offset - posAdjustment;
+    pos += screenOffset;
 
     for (int i=0; i < (int)foreignMethods.size(); i++)
         foreignMethods[i].second();
-    
-    pos += screenOffset;
 }
 
 void Camera::Reset () {
