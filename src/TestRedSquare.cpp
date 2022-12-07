@@ -68,9 +68,10 @@ void Ball::Update (float dt) {
     // remover
     if (input.KeyPress(KEY_SPACE)) {
         SDL_Log("camera %f", Camera::pos.y);
-        SDL_Log("offset %f", Camera::offset.y);
-        SDL_Log("scroff %f", Camera::screenOffset.y);
-        SDL_Log("distan %f", Camera::GetPosition().y - associated.box.GetPosition().y);
+        // SDL_Log("offset %f", Camera::offset.y);
+        // SDL_Log("scroff %f", Camera::screenOffset.y);
+        // SDL_Log("mstoff %f", Camera::masterOffset.y);
+        // SDL_Log("distan %f", Camera::GetPosition().y - associated.box.GetPosition().y);
     }
 }
 

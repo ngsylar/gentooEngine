@@ -1,6 +1,7 @@
 #ifndef TEST_OBJECTS_H
 #define TEST_OBJECTS_H
 
+#include <array>
 #include <queue>
 
 #include "Timer.h"
@@ -33,23 +34,28 @@ class Ball: public Component {
 
 class Platform: public Component {
     private:
-        bool bodied, isActive;
         Vec2 displacement;
-    
+        float relativeOffset;
+        
     public:
-        enum Direction {LEFT, RIGHT, UP, DOWN, NONE};
+        enum TriggerAction {MOVE, UNDO};
+        TriggerAction activeRect;
+        std::array<Rect, 2> colliderRects;
+        
+        enum Direction {LEFT, RIGHT, UP, DOWN};
         Direction direction;
         float positionLimit;
+        bool movementIsOver;
+        bool bodied;
 
-        Platform(GameObject& associated);
-        Platform(GameObject& associated, Direction direction, float positionLimit, bool bodied=false);
+        Platform(GameObject& associated, Direction direction, float positionLimit, bool body=false);
         ~Platform();
-        void SetBody(bool body);
+        void SetTrigger(int rectId);
         void Start();
         void NotifyCollision(GameObject& other);
-        void NotifyNoCollision(GameObject& other);
-        void* HandleCameraWithBody();
-        void* HandleCamera();
+        void* MoveCamera();
+        void* UndoCameraMovement();
+        void* LimitCamera();
 };
 
 #endif

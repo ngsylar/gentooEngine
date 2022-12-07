@@ -138,6 +138,9 @@ void Game::Run () {
     stateStack.top()->StartBase();
     while (not GetCurrentState().QuitRequested()) {
         CalculateDeltaTime();
+        inputManager.Update();
+        GetCurrentState().UpdateBase(dt);
+        GetCurrentState().RenderBase();
 
         if (stateStack.top()->PopRequested()) {
             stateStack.pop();
@@ -154,10 +157,7 @@ void Game::Run () {
         }
         if (stateStack.empty())
             break;
-        
-        inputManager.Update();
-        GetCurrentState().UpdateBase(dt);
-        GetCurrentState().RenderBase();
+
         SDL_RenderPresent(renderer);
         SDL_Delay(GAME_DELAY);
     }

@@ -13,7 +13,7 @@ int main (int argc, char* argv[]) {
     // Game::GetInstance().Run();
 
     // add and run the game states here
-    Game::GetInstance().AddState(new TestScene());
+    Game::GetInstance().AddState(new TestScene5());
     Game::GetInstance().Run();
 
     Game::DeleteInstance();

@@ -47,4 +47,11 @@ class TestScene4: public State {
         void Update(float dt);
 };
 
+class TestScene5: public State {
+    public:
+        TestScene5();
+        void LoadAssets();
+        void Update(float dt);
+};
+
 #endif

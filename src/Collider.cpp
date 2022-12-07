@@ -1,9 +1,11 @@
 #include "GentooEngine.h"
 
-Collider::Collider (GameObject& associated, Vec2 scale, Vec2 offset): Component(associated) {
+Collider::Collider (
+    GameObject& associated, Vec2 scale, Vec2 offset, bool trigger
+): Component(associated) {
     this->scale = scale;
     this->offset = offset;
-    isTrigger = false;
+    isTrigger = trigger;
 }
 
 void Collider::Start () {

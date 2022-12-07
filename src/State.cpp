@@ -10,6 +10,8 @@ State::State () {
 State::~State () {
     renderingArray.clear();
     objectArray.clear();
+    Camera::ClearMethods();
+    Camera::masterOffset = Vec2();
 }
 
 void State::StartBase () {

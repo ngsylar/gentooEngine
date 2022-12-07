@@ -262,6 +262,10 @@ void Camera::Update (float dt) {
         foreignMethods[i].second();
 }
 
+Vec2 Camera::GetPosition () {
+    return (pos + posAdjustment);
+}
+
 void Camera::Reset () {
     focus = nullptr;
     pos = Vec2();
@@ -275,6 +279,6 @@ void Camera::Reset () {
     cinemachine.deadSlices = {0, 0};
 }
 
-Vec2 Camera::GetPosition () {
-    return (pos + posAdjustment);
+void Camera::ClearMethods () {
+    foreignMethods.clear();
 }

@@ -14,7 +14,8 @@ class Collider: public Component {
         Collider(
             GameObject& associated,
             Vec2 scale=Vec2(1, 1),
-            Vec2 offset=Vec2(0, 0)
+            Vec2 offset=Vec2(0, 0),
+            bool trigger=false
         );
         void Start();
         void Update(float dt);

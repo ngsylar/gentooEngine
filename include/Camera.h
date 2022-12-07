@@ -43,8 +43,9 @@ class Camera {
         );
         static void Unfollow();
         static void Update(float dt);
-        static void Reset();
         static Vec2 GetPosition();
+        static void Reset();
+        static void ClearMethods();
 };
 
 class Camera::Cinemachine {

@@ -222,7 +222,6 @@ void TestScene4::LoadAssets () {
     platSpr->SetScale(3.0f, 1.0f);
     rawPlat->box.SetPosition(100, 325);
     rawPlat->AddComponent(new Collider(*rawPlat));
-    rawPlat->AddComponent(new Platform(*rawPlat, Platform::DOWN, rawPlat->box.GetPosition().y-511.0f, true));
 
     rawPlat = new GameObject(LAYER_BLACK_SQUARE, LABEL_GROUND);
     platSpr = new Sprite(*rawPlat, SPRITE_BLACK_SQUARE);
@@ -254,12 +253,66 @@ void TestScene4::LoadAssets () {
     GameObject* rawSquare = new GameObject(LAYER_RED_SQUARE);
     rawSquare->AddComponent(new Sprite(*rawSquare, SPRITE_RED_SQUARE));
     AddObject(rawSquare);
-    square = GetObjectPtr(rawSquare);
     rawSquare->AddComponent(new Ball(*rawSquare));
     rawSquare->box.SetPosition(512,300);
 }
 
 void TestScene4::Update (float dt) {
+    if (InputManager::GetInstance().KeyPress(KEY_ESCAPE)) {
+        Game::GetInstance().AddState(new TestScene5());
+        popRequested = true;
+    }
+}
+
+TestScene5::TestScene5 () {
+    // fazer o bg loop dps
+    GameObject* bg = new GameObject(SCENE_TEST_LAYER, SCENE_TEST_LABEL);
+    bg->AddComponent(new Sprite(*bg, SCENE_TEST_BACKGROUND));
+    bg->AddComponent(new CameraFollower(*bg));
+    // LoopedBackground* lbg = new LoopedBackground(*bg, SCENE_TEST_BACKGROUND, 2, 0.25f);
+    // bg->AddComponent(lbg);
+    AddObject(bg);
+}
+
+void TestScene5::LoadAssets () {
+    GameObject* rawPlat = new GameObject(LAYER_BLACK_SQUARE, LABEL_PLATFORM);
+    Sprite* platSpr = new Sprite(*rawPlat, SPRITE_BLACK_SQUARE);
+    rawPlat->AddComponent(platSpr);
+    AddObject(rawPlat);
+    platSpr->SetScale(15.0f, 1.0f);
+    rawPlat->box.SetPosition(0, 325);
+    rawPlat->AddComponent(new Collider(*rawPlat));
+
+    rawPlat = new GameObject(LAYER_BLACK_SQUARE, LABEL_GROUND);
+    platSpr = new Sprite(*rawPlat, SPRITE_BLACK_SQUARE);
+    rawPlat->AddComponent(platSpr);
+    AddObject(rawPlat);
+    platSpr->SetScale(15.0f, 1.0f);
+    rawPlat->box.SetPosition(500, 500);
+    rawPlat->AddComponent(new Collider(*rawPlat));
+
+    rawPlat = new GameObject(LAYER_BLACK_SQUARE);
+    AddObject(rawPlat);
+    platSpr->SetScale(15.0f, 1.0f);
+    rawPlat->box.SetPosition(0, 225);
+    rawPlat->box.w = 60;
+    rawPlat->box.h = 60;
+    Collider* coolider = new Collider(*rawPlat,Vec2(1,1),Vec2(),true);
+    rawPlat->AddComponent(coolider);
+    Platform* realplat = new Platform(*rawPlat, Platform::DOWN, 325-441, true);
+    Rect req1 = Rect(0,225,60,60);
+    Rect req2 = Rect(150,225,60,60);
+    realplat->colliderRects = {req1, req2};
+    rawPlat->AddComponent(realplat);
+    
+    GameObject* rawSquare = new GameObject(LAYER_RED_SQUARE);
+    rawSquare->AddComponent(new Sprite(*rawSquare, SPRITE_RED_SQUARE));
+    AddObject(rawSquare);
+    rawSquare->AddComponent(new Ball(*rawSquare));
+    rawSquare->box.SetPosition(512,300);
+}
+
+void TestScene5::Update (float dt) {
     if (InputManager::GetInstance().KeyPress(KEY_ESCAPE)) {
         Game::GetInstance().AddState(new TestScene());
         popRequested = true;
