@@ -36,6 +36,7 @@ class Platform: public Component {
     private:
         Vec2 displacement;
         float relativeOffset;
+        bool bodied;
         
     public:
         enum TriggerAction {MOVE, UNDO};
@@ -46,11 +47,10 @@ class Platform: public Component {
         Direction direction;
         float positionLimit;
         bool movementIsOver;
-        bool bodied;
 
-        Platform(GameObject& associated, Direction direction, float positionLimit, bool body=false);
+        Platform(GameObject& associated, Direction direction, float positionLimit);
         ~Platform();
-        void SetTrigger(int rectId);
+        void SetTrigger(Rect rectToMove, Rect rectToUndo);
         void Start();
         void NotifyCollision(GameObject& other);
         void* MoveCamera();

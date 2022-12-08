@@ -297,12 +297,8 @@ void TestScene5::LoadAssets () {
     rawPlat->box.SetPosition(0, 225);
     rawPlat->box.w = 60;
     rawPlat->box.h = 60;
-    Collider* coolider = new Collider(*rawPlat,Vec2(1,1),Vec2(),true);
-    rawPlat->AddComponent(coolider);
-    Platform* realplat = new Platform(*rawPlat, Platform::DOWN, 325-441, true);
-    Rect req1 = Rect(0,225,60,60);
-    Rect req2 = Rect(150,225,60,60);
-    realplat->colliderRects = {req1, req2};
+    Platform* realplat = new Platform(*rawPlat, Platform::DOWN, 325-511);
+    realplat->SetTrigger(Rect(0,225,60,60), Rect(150,225,60,60));
     rawPlat->AddComponent(realplat);
     
     GameObject* rawSquare = new GameObject(LAYER_RED_SQUARE);
