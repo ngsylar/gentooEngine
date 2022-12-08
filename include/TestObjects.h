@@ -1,9 +1,6 @@
 #ifndef TEST_OBJECTS_H
 #define TEST_OBJECTS_H
 
-#include <array>
-#include <queue>
-
 #include "Timer.h"
 #include "InputManager.h"
 #include "Component.h"
@@ -30,32 +27,6 @@ class Ball: public Component {
 
         // cinemachine assistant
         void CameraHandleFall(float dt);
-};
-
-class Platform: public Component {
-    private:
-        Vec2 displacement;
-        float relativeOffset;
-        bool bodied;
-        
-    public:
-        enum TriggerAction {MOVE, UNDO};
-        TriggerAction activeRect;
-        std::array<Rect, 2> colliderRects;
-        
-        enum Direction {LEFT, RIGHT, UP, DOWN};
-        Direction direction;
-        float positionLimit;
-        bool movementIsOver;
-
-        Platform(GameObject& associated, Direction direction, float positionLimit);
-        ~Platform();
-        void SetTrigger(Rect rectToMove, Rect rectToUndo);
-        void Start();
-        void NotifyCollision(GameObject& other);
-        void* MoveCamera();
-        void* UndoCameraMovement();
-        void* LimitCamera();
 };
 
 #endif

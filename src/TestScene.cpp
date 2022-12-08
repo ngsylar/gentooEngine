@@ -1,6 +1,7 @@
 #include "GentooEngine.h"
 #include "TestScene.h"
 #include "TestObjects.h"
+#include "PlatformCamera.h"
 
 #define SCENE_TEST_LABEL "TestScene"
 #define SCENE_TEST_BACKGROUND "assets/img/test_area.png"
@@ -35,7 +36,7 @@ void TestScene::LoadAssets () {
     platSpr->SetScale(15.0f, 1.0f);
     rawPlat->box.SetPosition(512, 500);
     rawPlat->AddComponent(new Collider(*rawPlat));
-    rawPlat->AddComponent(new Platform(*rawPlat, Platform::DOWN, -11.0f));
+    rawPlat->AddComponent(new PlatformCamera(*rawPlat, PlatformCamera::DOWN, -11.0f));
 
     rawPlat = new GameObject(LAYER_BLACK_SQUARE);
     platSpr = new Sprite(*rawPlat, SPRITE_BLACK_SQUARE);
@@ -117,7 +118,7 @@ void TestScene2::LoadAssets () {
     platSpr->SetScale(90.0f, 1.0f);
     rawPlat->box.SetPosition(512, 500);
     rawPlat->AddComponent(new Collider(*rawPlat));
-    rawPlat->AddComponent(new Platform(*rawPlat, Platform::DOWN, -11.0f));
+    rawPlat->AddComponent(new PlatformCamera(*rawPlat, PlatformCamera::DOWN, -11.0f));
 
     // GameObject* rawRun = new GameObject(LAYER_RUN_RIGHT);
     // Sprite* runSpr = new Sprite(*rawRun, SPRITE_RUN_RIGHT, 12, 0.02f);
@@ -230,7 +231,7 @@ void TestScene4::LoadAssets () {
     platSpr->SetScale(3.0f, 1.0f);
     rawPlat->box.SetPosition(500, 500);
     rawPlat->AddComponent(new Collider(*rawPlat));
-    rawPlat->AddComponent(new Platform(*rawPlat, Platform::DOWN, rawPlat->box.GetPosition().y-511.0f));
+    rawPlat->AddComponent(new PlatformCamera(*rawPlat, PlatformCamera::DOWN, rawPlat->box.GetPosition().y-511.0f));
 
     for (int i=1; i < 25; i++) {
         GameObject* rawPlat = new GameObject(LAYER_BLACK_SQUARE, LABEL_PLATFORM);
@@ -297,7 +298,7 @@ void TestScene5::LoadAssets () {
     rawPlat->box.SetPosition(0, 225);
     rawPlat->box.w = 60;
     rawPlat->box.h = 60;
-    Platform* realplat = new Platform(*rawPlat, Platform::DOWN, 325-511);
+    PlatformCamera* realplat = new PlatformCamera(*rawPlat, PlatformCamera::DOWN, 325-511);
     realplat->SetTrigger(Rect(0,225,60,60), Rect(150,225,60,60));
     rawPlat->AddComponent(realplat);
     

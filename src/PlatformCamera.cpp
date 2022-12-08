@@ -1,23 +1,21 @@
 #include "GentooEngine.h"
-#include "TestObjects.h"
+#include "PlatformCamera.h"
 
-Platform::Platform (
+PlatformCamera::PlatformCamera (
     GameObject& associated, Direction direction, float positionLimit
 ): Component(associated) {
     this->direction = direction;
     this->positionLimit = positionLimit;
-    bodied = false;
-
-    relativeOffset = 0.0f;
-    movementIsOver = false;
     activeRect = MOVE;
+    bodied = false;
+    isMoved = false;
 }
 
-Platform::~Platform () {
+PlatformCamera::~PlatformCamera () {
     Camera::RemoveMethod(this);
 }
 
-void Platform::SetTrigger (Rect rectToMove, Rect rectToUndo) {
+void PlatformCamera::SetTrigger (Rect rectToMove, Rect rectToUndo) {
     Collider* collider = (Collider*)associated.GetComponent("Collider");
     colliderRects = {rectToMove, rectToUndo};
     associated.box = rectToMove;
@@ -28,33 +26,33 @@ void Platform::SetTrigger (Rect rectToMove, Rect rectToUndo) {
     bodied = true;
 }
 
-void Platform::Start () {
+void PlatformCamera::Start () {
     if (not bodied)
         Camera::AddMethod(this, std::bind(&LimitCamera, this));
 }
 
-void Platform::NotifyCollision (GameObject& other) {
+void PlatformCamera::NotifyCollision (GameObject& other) {
     if ((not bodied) or (other.label != "Player"))
         return;
 
     if (activeRect == MOVE) {
-        displacement = -(other.box.GetPosition() - positionLimit);
+        targetDisplacement = -(other.box.GetPosition() - positionLimit);
         associated.box = colliderRects[UNDO];
         Camera::RemoveMethod(this);
         Camera::AddMethod(this, std::bind(&MoveCamera, this));
         activeRect = UNDO;
     } else {
-        displacement = other.box.GetPosition() - positionLimit;
+        targetDisplacement = other.box.GetPosition() - positionLimit;
         associated.box = colliderRects[MOVE];
         Camera::RemoveMethod(this);
-        Camera::masterOffset.y += relativeOffset; // editar: so considera o eixo Y
         Camera::AddMethod(this, std::bind(&UndoCameraMovement, this));
+        Camera::masterOffset += relativeOffset;
         activeRect = MOVE;
     }
 }
 
-void* Platform::MoveCamera () {
-    if (movementIsOver) {
+void* PlatformCamera::MoveCamera () {
+    if (isMoved) {
         LimitCamera();
         return nullptr;
     }
@@ -62,51 +60,51 @@ void* Platform::MoveCamera () {
     float currentDisplacement, currentPosition;
     switch (direction) {
         case DOWN:
-            currentDisplacement = displacement.y * 1.5f * dt;
-            relativeOffset += currentDisplacement;
-            currentPosition = Camera::pos.y + relativeOffset;
+            currentDisplacement = targetDisplacement.y * 1.5f * dt;
+            relativeOffset.y += currentDisplacement;
+            currentPosition = Camera::pos.y + relativeOffset.y;
             if (currentPosition > positionLimit) {
                 Camera::masterOffset.y += currentDisplacement;
             } else {
-                Camera::masterOffset.y -= relativeOffset - currentDisplacement;
-                relativeOffset -= currentPosition - positionLimit;
-                movementIsOver = true;
+                Camera::masterOffset.y -= relativeOffset.y - currentDisplacement;
+                relativeOffset.y -= currentPosition - positionLimit;
+                isMoved = true;
                 // SDL_Log("pos %f", Camera::pos.y);
                 // SDL_Log("rel %f", relativeOffset);
                 // SDL_Log("mas %f", Camera::masterOffset.y);
             } break;
         default: break;
     }
-    if (movementIsOver)
+    if (isMoved)
         LimitCamera();
     return nullptr;
 }
 
-void* Platform::UndoCameraMovement () {
+void* PlatformCamera::UndoCameraMovement () {
     float dt = Game::GetInstance().GetCurrentState().stateDt;
     float currentDisplacement;
     switch (direction) {
         case DOWN:
-            currentDisplacement = displacement.y * 1.5f * dt;
-            relativeOffset += currentDisplacement;
-            if (relativeOffset < 0.0f) {
+            currentDisplacement = targetDisplacement.y * 1.5f * dt;
+            relativeOffset.y += currentDisplacement;
+            if (relativeOffset.y < 0.0f) {
                 Camera::masterOffset.y += currentDisplacement;
             } else {
-                Camera::masterOffset.y += currentDisplacement - relativeOffset;
-                relativeOffset = 0.0f;
+                Camera::masterOffset.y += currentDisplacement - relativeOffset.y;
+                relativeOffset.y = 0.0f;
                 // SDL_Log("pos %f", Camera::pos.y);
                 // SDL_Log("rel %f", relativeOffset);
                 // SDL_Log("mas %f", Camera::masterOffset.y);
-                movementIsOver = false;
+                isMoved = false;
             } break;
         default: break;
     }
-    if (not movementIsOver)
+    if (not isMoved)
         Camera::RemoveMethod(this);
     return nullptr;
 }
 
-void* Platform::LimitCamera () {
+void* PlatformCamera::LimitCamera () {
     // SDL_Log("camera: %f", Camera::pos.y);
     // SDL_Log("offset: %f", Camera::offset.y);
 
