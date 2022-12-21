@@ -28,23 +28,24 @@ class Game {
         State* storedState;
         std::string title;
         int width, height;
+        Vec2 resolution;
         int frameStart;
         float dt;
 
-        Game(std::string title, int width, int height);
+        Game(
+            std::string title, int width, int height,
+            int logicalWidth=0, int logicalHeight=0);
         void CalculateDeltaTime();
 
     public:
         ~Game();
         float GetDeltaTime();
         static Game& GetInstance(
-            std::string title,
-            int width,
-            int height
-        );
+            std::string title, int width, int height,
+            int logicalWidth=0, int logicalHeight=0);
         static Game& GetInstance();
         SDL_Renderer* GetRenderer();
-        Vec2 GetWindowSize();
+        Vec2 GetResolution();
         void AddState(State* state);
         State& GetCurrentState();
         void Run();

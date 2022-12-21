@@ -2,7 +2,7 @@
 
 Game* Game::instance = nullptr;
 
-Game::Game (std::string title, int width, int height) {
+Game::Game (std::string title, int width, int height, int logicalWidth, int logicalHeight) {
     int flags, opaudio;
 
     // Game instance
@@ -64,6 +64,15 @@ Game::Game (std::string title, int width, int height) {
         SDL_Log("Unable to start renderer: %s", SDL_GetError());
     }
 
+    // resolution
+    resolution = Vec2(logicalWidth, logicalHeight);
+    if (resolution != Vec2()) {
+        SDL_RenderSetLogicalSize(renderer, logicalWidth, logicalHeight);
+        SDL_RenderSetIntegerScale(renderer, SDL_TRUE);
+    } else {
+        resolution = Vec2(width, height);
+    }
+
     srand(time(NULL));
     storedState = nullptr;
     frameStart = 0;
@@ -97,9 +106,11 @@ float Game::GetDeltaTime () {
     return dt;
 }
 
-Game& Game::GetInstance (std::string title, int width, int height) {
+Game& Game::GetInstance (
+    std::string title, int width, int height, int logicalWidth, int logicalHeight
+) {
     if (instance == nullptr)
-        instance = new Game(title, width, height);
+        instance = new Game(title, width, height, logicalWidth, logicalHeight);
     return *instance;
 }
 
@@ -113,8 +124,8 @@ SDL_Renderer* Game::GetRenderer () {
     return renderer;
 }
 
-Vec2 Game::GetWindowSize () {
-    return Vec2(width, height);
+Vec2 Game::GetResolution () {
+    return resolution;
 }
 
 void Game::AddState (State* state) {

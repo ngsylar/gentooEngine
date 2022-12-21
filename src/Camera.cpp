@@ -29,7 +29,7 @@ void Camera::Follow (
     // camera attributes
     /*--------------------------------------------------------------------------------------------------*/
 
-    posAdjustment = (Game::GetInstance().GetWindowSize() * 0.5f);
+    posAdjustment = (Game::GetInstance().GetResolution() * 0.5f);
     velocity = Vec2();
     isLocked = {false, false};
     screenOffset = focusOffset;
@@ -269,7 +269,7 @@ Vec2 Camera::GetPosition () {
 void Camera::Reset () {
     focus = nullptr;
     pos = Vec2();
-    posAdjustment = (Game::GetInstance().GetWindowSize() * 0.5f);
+    posAdjustment = (Game::GetInstance().GetResolution() * 0.5f);
     velocity = Vec2();
     isLocked = {true, true};
     offset = Vec2();

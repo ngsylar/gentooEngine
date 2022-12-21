@@ -1,9 +1,9 @@
 #include "GentooEngine.h"
 
-RigidBody::RigidBody (GameObject& associated): Component(associated) {
+RigidBody::RigidBody (GameObject& associated, float gravityValue): Component(associated) {
     // bodyType = DYNAMIC;
     gravityEnabled = true;
-    gravityValue = 40.0f;
+    this->gravityValue = gravityValue;
 
     collidingFaces[UP] = false;
     collidingFaces[DOWN] = false;
@@ -29,13 +29,13 @@ void RigidBody::Update (float dt) {
     previousPosition.pop();
     
     if (gravityEnabled)
-        HandleGravity();
+        HandleGravity(dt);
     
     Translate(velocity * dt);
     CheckDeletedColliders();
 }
 
-void RigidBody::HandleGravity () {
+void RigidBody::HandleGravity (float dt) {
     float gravitationalAcceleration = 0.0f;
 
     if (collidingFaces[DOWN])
@@ -46,7 +46,7 @@ void RigidBody::HandleGravity () {
     if ((velocityMax.y > 0.0f) and (velocity.y >= velocityMax.y))
         velocity.y = velocityMax.y;
     else
-        velocity.y += gravitationalAcceleration;
+        velocity.y += gravitationalAcceleration * dt;
 }
 
 bool RigidBody::IsGrounded () {

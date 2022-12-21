@@ -4,11 +4,12 @@
 // include the game states here
 #include "TestScene.h"
 
-#define WINDOW_TITLE    "Game Title"
-#define WINDOW_SIZE     1072, 603
+#define WINDOW_TITLE        "Game Title"
+#define WINDOW_SIZE         1024, 576
+#define GAME_RESOLUTION     512, 288
 
 int main (int argc, char* argv[]) {
-    Game::GetInstance(WINDOW_TITLE, WINDOW_SIZE);
+    Game::GetInstance(WINDOW_TITLE, WINDOW_SIZE, GAME_RESOLUTION);
     // Game::GetInstance().AddState(new EngineScreen());
     // Game::GetInstance().Run();
 

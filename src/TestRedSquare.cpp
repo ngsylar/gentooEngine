@@ -1,30 +1,30 @@
 #include "GentooEngine.h"
 #include "TestObjects.h"
 
-#define RIGIDBODY_GRAVITY_MAX       800.0f
+#define RIGIDBODY_VELOCITY_MAX      400.0f
 
-#define CINEMACHINE_LENGTH          25.0f, 175.0f
+#define CINEMACHINE_LENGTH          14.0f, 86.0f
 #define CINEMACHINE_SLICES          8, 32, 2, 24
-#define CINEMACHINE_OFFSET          0.0f, 25.0f
+#define CINEMACHINE_OFFSET          0.0f, 12.0f
 #define CINEMACHINE_SETUP           true, true, true, false, true, true, false, false
 
 // cinemachine assistant
-#define ASSISTANT_OFFSET_Y          25.0f
-#define ASSISTANT_OFFSET_Y_CUBIC    15625.0f
+#define ASSISTANT_OFFSET_Y          12.5f
+#define ASSISTANT_OFFSET_Y_CUBIC    1953.125f
 
 Ball::Ball (GameObject& associated): Component(associated) {
     associated.label = "Player";
-    runSpeed = 300.0f;
-    jumpForce = 400.0f;
-    jumpHeightMax = 140.0f;
+    runSpeed = 150.0f;
+    jumpForce = 200.0f;
+    jumpHeightMax = 70.0f;
     jumpHeight = 0.0f;
     isJumping = false;
 
-    // cinemachine assistant
-    isFalling = false;
-    cameraDelay.SetResetTime(0.25f);
-    cameraAcceleration = 0.0f;
-    cameraOffset = 0.0f;
+    // // cinemachine assistant
+    // isFalling = false;
+    // cameraDelay.SetResetTime(0.25f);
+    // cameraAcceleration = 0.0f;
+    // cameraOffset = 0.0f;
 }
 
 void Ball::Start () {
@@ -37,16 +37,16 @@ void Ball::Start () {
     rigidBody = new RigidBody(associated);
     associated.AddComponent(rigidBody);
     associated.AddComponent(new Collider(associated));
-    rigidBody->velocityMax.y = RIGIDBODY_GRAVITY_MAX;
+    rigidBody->velocityMax.y = RIGIDBODY_VELOCITY_MAX;
 }
 
 void Ball::Update (float dt) {
     InputManager& input = InputManager::GetInstance();
     CameraCheckTracking(dt);
 
-    // cinemachine assistant
-    if (isFalling)
-        CameraHandleFall(dt);
+    // // cinemachine assistant
+    // if (isFalling)
+    //     CameraHandleFall(dt);
 
     if (isJumping)
         HandleJump(input.IsKeyDown(KEY_ARROW_UP), dt);
@@ -101,9 +101,9 @@ void Ball::HandleJump (bool isKeyDown, float dt) {
         rigidBody->gravityEnabled = true;
         isJumping = false;
 
-        // cinemachine assistant
-        if (cameraOffset > 0.0f)
-            isFalling = true;
+        // // cinemachine assistant
+        // if (cameraOffset > 0.0f)
+        //     isFalling = true;
     }
     // if it hits the ceiling cancels the jump or the force applied in previous conditions
     if (rigidBody->IsColliding(RigidBody::UP)) {
@@ -115,7 +115,7 @@ void Ball::HandleJump (bool isKeyDown, float dt) {
 
 // void Ball::CameraCheckTracking (float dt) {
 //     // resets to default setting if camera loses the track of it
-//     Vec2 windowHalfSize = Game::GetInstance().GetWindowSize();
+//     Vec2 windowHalfSize = Game::GetInstance().GetResolution();
 //     Vec2 cameraDistance = Camera::GetPosition() - associated.box.GetPosition();
 //     if ((fabs(cameraDistance.x) > windowHalfSize.x) or (fabs(cameraDistance.y) > windowHalfSize.y)) {
 //         Camera::Follow(
@@ -144,36 +144,36 @@ void Ball::CameraHandleFall (float dt) {
 }
 
 void Ball::CameraCheckTracking (float dt) {
-    if (not isFalling and (Camera::screenOffset.y < ASSISTANT_OFFSET_Y)) {
-        float jumpFactor = jumpHeightMax / jumpHeight;
+    // if (not isFalling and (Camera::screenOffset.y < ASSISTANT_OFFSET_Y)) {
+    //     float jumpFactor = jumpHeightMax / jumpHeight;
         
-        // if it is falling speeds up the camera drop after some delay
-        if (cameraDelay.IsOver()) {
-            cameraAcceleration += 6.0f * jumpFactor * ((jumpForce * jumpForce) / ASSISTANT_OFFSET_Y_CUBIC);
-            Camera::screenOffset.y += cameraAcceleration * dt;
-        } else cameraDelay.Update(dt * jumpFactor);
+    //     // if it is falling speeds up the camera drop after some delay
+    //     if (cameraDelay.IsOver()) {
+    //         cameraAcceleration += 6.0f * jumpFactor * ((jumpForce * jumpForce) / ASSISTANT_OFFSET_Y_CUBIC);
+    //         Camera::screenOffset.y += cameraAcceleration * dt;
+    //     } else cameraDelay.Update(dt * jumpFactor);
 
-        // if it hits the ground adjusts the camera offset value
-        if (rigidBody->IsGrounded()) {
-            Camera::offset.y += Camera::screenOffset.y - ASSISTANT_OFFSET_Y;
-            Camera::screenOffset.y = ASSISTANT_OFFSET_Y;
-            cameraAcceleration = 0.0f;
-            cameraDelay.Reset();
-        }
-        // limits the camera offset value
-        if (Camera::screenOffset.y >= ASSISTANT_OFFSET_Y) {
-            Camera::screenOffset.y = ASSISTANT_OFFSET_Y;
-            cameraAcceleration = 0.0f;
-            cameraDelay.Reset();
-        }
-    // if it is falling with maximum gravity limit velocity lowers the camera
-    } else if ((rigidBody->GetVelocity().y == rigidBody->velocityMax.y) and (Camera::offset.y < 0.0f)) {
-        Camera::offset.y += ASSISTANT_OFFSET_Y * dt;
-        if (Camera::offset.y > 0.0f)
-            Camera::offset.y = 0.0f;
-    }
+    //     // if it hits the ground adjusts the camera offset value
+    //     if (rigidBody->IsGrounded()) {
+    //         Camera::offset.y += Camera::screenOffset.y - ASSISTANT_OFFSET_Y;
+    //         Camera::screenOffset.y = ASSISTANT_OFFSET_Y;
+    //         cameraAcceleration = 0.0f;
+    //         cameraDelay.Reset();
+    //     }
+    //     // limits the camera offset value
+    //     if (Camera::screenOffset.y >= ASSISTANT_OFFSET_Y) {
+    //         Camera::screenOffset.y = ASSISTANT_OFFSET_Y;
+    //         cameraAcceleration = 0.0f;
+    //         cameraDelay.Reset();
+    //     }
+    // // if it is falling with maximum gravity limit velocity lowers the camera
+    // } else if ((rigidBody->GetVelocity().y == rigidBody->velocityMax.y) and (Camera::offset.y < 0.0f)) {
+    //     Camera::offset.y += ASSISTANT_OFFSET_Y * dt;
+    //     if (Camera::offset.y > 0.0f)
+    //         Camera::offset.y = 0.0f;
+    // }
     // resets to default setting if camera loses the track of it
-    Vec2 windowHalfSize = Game::GetInstance().GetWindowSize();
+    Vec2 windowHalfSize = Game::GetInstance().GetResolution();
     cameraDistance = Camera::GetPosition() - associated.box.GetPosition();
     if ((fabs(cameraDistance.x) > windowHalfSize.x) or (fabs(cameraDistance.y) > windowHalfSize.y)) {
         Camera::Follow(

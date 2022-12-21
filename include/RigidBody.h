@@ -13,11 +13,11 @@ class RigidBody: public Component {
         enum Axis {HORIZONTAL, VERTICAL, ALL};
         enum ColliderFace {UP, DOWN, LEFT, RIGHT};
 
-        float gravityValue;
         bool gravityEnabled;
+        float gravityValue;
         Vec2 velocityMax;
 
-        RigidBody(GameObject& associated);
+        RigidBody(GameObject& associated, float gravityValue=570.0f);
         ~RigidBody();
         void Start();
         void Update(float dt);
@@ -38,7 +38,7 @@ class RigidBody: public Component {
         std::vector<std::pair<std::weak_ptr<GameObject>, ColliderFace>> collidingOthers;
         bool collidingFaces[4];
     
-        void HandleGravity();
+        void HandleGravity(float dt);
         void CheckDeletedColliders();
 };
 
