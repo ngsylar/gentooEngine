@@ -1,6 +1,7 @@
 #include "GentooEngine.h"
 #include "TestScene.h"
 #include "TestObjects.h"
+#include "Kid.h"
 #include "PlatformCamera.h"
 
 #define SCENE_TEST_LABEL "TestScene"
@@ -58,7 +59,8 @@ void TestScene::LoadAssets () {
     mini_platform = GetObjectPtr(rawPlat);
     platSpr->SetScale(0.5f, 3.5f);
     rawPlat->box.SetPosition(50, 150);
-    rawPlat->AddComponent(new Collider(*rawPlat));
+    Collider* platcoll = new Collider(*rawPlat);
+    rawPlat->AddComponent(platcoll);
 
     rawPlat = new GameObject(LAYER_BLACK_SQUARE);
     platSpr = new Sprite(*rawPlat, SPRITE_BLACK_SQUARE);
@@ -67,8 +69,9 @@ void TestScene::LoadAssets () {
     mini_platform = GetObjectPtr(rawPlat);
     platSpr->SetScale(0.5f, 3.5f);
     rawPlat->box.SetPosition(450, 150);
-    Collider* platcoll = new Collider(*rawPlat);
+    platcoll = new Collider(*rawPlat);
     rawPlat->AddComponent(platcoll);
+    platcoll->offset.x -= 3;
     // platcoll->isTrigger = true;
 
     rawPlat = new GameObject(LAYER_BLACK_SQUARE);
@@ -82,11 +85,9 @@ void TestScene::LoadAssets () {
     rawPlat->AddComponent(new Collider(*rawPlat));
 
     GameObject* rawSquare = new GameObject(LAYER_RED_SQUARE);
-    Sprite* spirte = new Sprite(*rawSquare, SPRITE_78);
-    rawSquare->AddComponent(spirte);
     AddObject(rawSquare);
     square = GetObjectPtr(rawSquare);
-    rawSquare->AddComponent(new Ball(*rawSquare));
+    rawSquare->AddComponent(new Kid(*rawSquare));
     rawSquare->box.SetPosition(82.5f,100);
 
     // rawSquare = new GameObject(4);

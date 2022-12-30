@@ -1,27 +1,27 @@
 #include "GentooEngine.h"
 
-Collider::Collider (
-    GameObject& associated, Vec2 scale, Vec2 offset, bool trigger
-): Component(associated) {
-    this->scale = scale;
+Collider::Collider (GameObject& associated, Vec2 offset, bool trigger): Component(associated) {
     this->offset = offset;
     isTrigger = trigger;
+    started = false;
+}
+
+void Collider::SetBox (Vec2 offset, Vec2 boxSize) {
+    this->offset = offset;
+    box.SetSize(boxSize.x, boxSize.y);
+    started = true;
 }
 
 void Collider::Start () {
-    box.SetSize(associated.box.w * scale.x, associated.box.h * scale.y);
+    if (started) return;
+    box.SetSize(associated.box.w, associated.box.h);
 }
 
 void Collider::Update (float dt) {
-    float angle = Deg2Rad(associated.angleDeg);
-
-    // // idj's original positioning
-    // box.SetPosition(associated.box.GetGlobalCenter() + offset.Rotate(angle));
-    // box.SetSize(associated.box.w * scale.x, associated.box.h * scale.y);
-
-    // sylar's extra positioning
     Vec2 offsetDifference = offset - associated.box.offset;
-    box.SetPosition(associated.box.GetPosition() + offsetDifference.Rotate(angle));
+    if (associated.angleDeg)
+        offsetDifference = offsetDifference.Rotate(Deg2Rad(associated.angleDeg));
+    box.SetPosition(associated.box.GetPosition() + offsetDifference);
 }
 
 // DEBUG
@@ -51,14 +51,6 @@ void Collider::Render () {
 
     SDL_SetRenderDrawColor(Game::GetInstance().GetRenderer(), 255, 0, 0, SDL_ALPHA_OPAQUE);
     SDL_RenderDrawLines(Game::GetInstance().GetRenderer(), points, 5);
-}
-
-void Collider::SetScale (Vec2 scale) {
-    this->scale = scale;
-}
-
-void Collider::SetOffset (Vec2 offset) {
-    this->offset = offset;
 }
 
 bool Collider::Is (std::string type) {

@@ -128,8 +128,9 @@ void RigidBody::NotifyCollision (GameObject& other) {
     Collider* collider = (Collider*)associated.GetComponent("Collider");
     Vec2 position = associated.box.GetPosition();
 
-    float halfBody[2] = {
-        collider->box.w*0.5f, collider->box.h*0.5f
+    float halfBody[4] = {
+        (collider->box.h*0.5f)-collider->offset.y, (collider->box.h*0.5f)+collider->offset.y,
+        (collider->box.w*0.5f)-collider->offset.x, (collider->box.w*0.5f)+collider->offset.x
     };
     float faces[4] = {
         collider->box.y, collider->box.y+collider->box.h,
@@ -177,25 +178,25 @@ void RigidBody::NotifyCollision (GameObject& other) {
     /*--------------------------------------------------------------------------------------------------*/
 
     if (isColliding[UP]) {
-        associated.box.SetPosition(position.x, otherFaces[DOWN]+halfBody[VERTICAL]);
+        associated.box.SetPosition(position.x, otherFaces[DOWN]+halfBody[UP]);
         collidingOthers.push_back(std::make_pair(otherPtr, UP));
         collidingFaces[UP] = true;
         velocity.y = 0.0f;
     }
     if (isColliding[DOWN]) {
-        associated.box.SetPosition(position.x, otherFaces[UP]-halfBody[VERTICAL]);
+        associated.box.SetPosition(position.x, otherFaces[UP]-halfBody[DOWN]);
         collidingOthers.push_back(std::make_pair(otherPtr, DOWN));
         collidingFaces[DOWN] = true;
         velocity.y = 0.0f;
     }
     if (isColliding[LEFT]) {
-        associated.box.SetPosition(otherFaces[RIGHT]+halfBody[HORIZONTAL], position.y);
+        associated.box.SetPosition(otherFaces[RIGHT]+halfBody[LEFT], position.y);
         collidingOthers.push_back(std::make_pair(otherPtr, LEFT));
         collidingFaces[LEFT] = true;
         velocity.x = 0.0f;
     }
     if (isColliding[RIGHT]) {
-        associated.box.SetPosition(otherFaces[LEFT]-halfBody[HORIZONTAL], position.y);
+        associated.box.SetPosition(otherFaces[LEFT]-halfBody[RIGHT], position.y);
         collidingOthers.push_back(std::make_pair(otherPtr, RIGHT));
         collidingFaces[RIGHT] = true;
         velocity.x = 0.0f;

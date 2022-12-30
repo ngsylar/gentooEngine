@@ -1,5 +1,5 @@
-#ifndef TEST_OBJECTS_H
-#define TEST_OBJECTS_H
+#ifndef TEST_REDSQUARE_H
+#define TEST_REDSQUARE_H
 
 #include "Timer.h"
 #include "InputManager.h"
