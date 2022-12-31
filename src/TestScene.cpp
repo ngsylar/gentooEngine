@@ -71,7 +71,6 @@ void TestScene::LoadAssets () {
     rawPlat->box.SetPosition(450, 150);
     platcoll = new Collider(*rawPlat);
     rawPlat->AddComponent(platcoll);
-    platcoll->offset.x -= 3;
     // platcoll->isTrigger = true;
 
     rawPlat = new GameObject(LAYER_BLACK_SQUARE);

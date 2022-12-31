@@ -13,10 +13,12 @@
 
 Kid::Kid (GameObject& associated): Component(associated) {
     associated.label = "Player";
-    runSpeed = 150.0f;
+    runSpeedMax = 150.0f;
+    runAcceleration = 800.0f;
     jumpForce = 200.0f;
     jumpHeightMax = 70.0f;
-    jumpHeight = 0.0f;
+    runSpeedNow = 0.0f;
+    jumpHeightNow = 0.0f;
     isJumping = false;
 }
 
@@ -38,7 +40,7 @@ void Kid::Start () {
     
     collider = new Collider(associated);
     associated.AddComponent(collider);
-    collider->SetBox(Vec2(-1, 8), Vec2(14, 30));
+    collider->SetBox(Vec2(0, 9), Vec2(16, 28));
 }
 
 void Kid::Update (float dt) {
@@ -49,35 +51,28 @@ void Kid::Update (float dt) {
     if (isJumping)
         HandleJump(input.IsKeyDown(KEY_ARROW_UP), dt);
     if (input.KeyPress(KEY_ARROW_UP) and rigidBody->IsGrounded())
-        StartJump(dt);
+        StartJump(jumpForce*dt);
 
     if (input.IsKeyDown(KEY_ARROW_LEFT)) {
-        rigidBody->Translate(Vec2(-runSpeed,0)*dt);
-        sprite->textureFlip = SDL_FLIP_HORIZONTAL;
-        collider->offset.x = -2;
-        if (sprite->GetActiveTexture() == IDLE)
-            sprite->SetTexture(RUN);
-        isRunning = true;
+        runSpeedNow = (runSpeedNow < runSpeedMax) ? (runSpeedNow+runAcceleration*dt) : runSpeedMax;
+        isRunning = Run(-runSpeedNow*dt, SDL_FLIP_HORIZONTAL);
     }
     if (input.IsKeyDown(KEY_ARROW_RIGHT)) {
-        rigidBody->Translate(Vec2(runSpeed,0)*dt);
-        sprite->textureFlip = SDL_FLIP_NONE;
-        collider->offset.x = -1;
-        if (sprite->GetActiveTexture() == IDLE)
-            sprite->SetTexture(RUN);
-        isRunning = true;
+        runSpeedNow = (runSpeedNow < runSpeedMax) ? (runSpeedNow+runAcceleration*dt) : runSpeedMax;
+        isRunning = Run(runSpeedNow*dt, SDL_FLIP_NONE);
     }
 
     if ((sprite->GetActiveTexture() == RUN) and (not isRunning)) {
         sprite->SetTexture(IDLE);
+        runSpeedNow = 0.0f;
     }
 
     // // remover
     // rigidBody->gravityEnabled = false;
     // if (input.IsKeyDown(KEY_ARROW_UP))
-    //     rigidBody->Translate(Vec2(0,-runSpeed)*dt);
+    //     rigidBody->Translate(Vec2(0,-runSpeedMax)*dt);
     // if (input.IsKeyDown(KEY_ARROW_DOWN))
-    //     rigidBody->Translate(Vec2(0,runSpeed)*dt);
+    //     rigidBody->Translate(Vec2(0,runSpeedMax)*dt);
 
     // remover
     if (input.KeyPress(KEY_SPACE)) {
@@ -89,26 +84,33 @@ void Kid::Update (float dt) {
     }
 }
 
-void Kid::StartJump (float dt) {
-    float jumpDisplacement = jumpForce * dt;
-    rigidBody->Translate(Vec2(0,-jumpDisplacement));
-    jumpHeight = jumpDisplacement;
+bool Kid::Run (float displacement, SDL_RendererFlip flip) {
+    rigidBody->Translate(Vec2(displacement,0));
+    sprite->textureFlip = flip;
+    if (sprite->GetActiveTexture() == IDLE)
+        sprite->SetTexture(RUN);
+    return true;
+}
+
+void Kid::StartJump (float displacement) {
+    rigidBody->Translate(Vec2(0,-displacement));
+    jumpHeightNow = displacement;
     rigidBody->gravityEnabled = false;
     isJumping = true;
 }
 
 void Kid::HandleJump (bool isKeyDown, float dt) {
     // if the button continues to be pressed increases the vertical jump height
-    if (isKeyDown and (jumpHeight < jumpHeightMax)) {
+    if (isKeyDown and (jumpHeightNow < jumpHeightMax)) {
         float jumpDisplacement = jumpForce * dt;
         rigidBody->Translate(Vec2(0,-jumpDisplacement));
-        jumpHeight += jumpDisplacement;
-        if (jumpHeight > jumpHeightMax)
-            jumpHeight = jumpHeightMax;
+        jumpHeightNow += jumpDisplacement;
+        if (jumpHeightNow > jumpHeightMax)
+            jumpHeightNow = jumpHeightMax;
     }
     // applies a constant force that gradually decreases due to the gravity force
     else {
-        rigidBody->AddForce(Vec2(0,-((jumpForce*jumpHeight)/jumpHeightMax)));
+        rigidBody->AddForce(Vec2(0,-((jumpForce*jumpHeightNow)/jumpHeightMax)));
         rigidBody->gravityEnabled = true;
         isJumping = false;
     }
