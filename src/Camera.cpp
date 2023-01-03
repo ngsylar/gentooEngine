@@ -144,8 +144,10 @@ void Camera::Cinemachine::StopChasing (
     int axis, float playerDirection, float dt
 ) {
     player.stopwatch[axis].Update(dt);
-    bool flags = player.stopwatch[axis].IsOver() and player.isStopping[axis];
-    if (not (flags and (fabs(centerDistance) < (length - tolerance))))
+    bool flags1 = player.stopwatch[axis].IsOver() and player.isStopping[axis];
+    bool flags2 = ((int)ceil(-centerDistance) ^ (int)playerDirection) >> 31;
+    centerDistance = -1.0f * playerDirection * centerDistance;
+    if ((not (flags1 and (centerDistance < (length - tolerance)))) and flags2)
         return;
 
     *velocity -= playerDirection * (((*velocity) * (*velocity)) / (2.0f * length));
