@@ -30,9 +30,10 @@ void Camera::Follow (
     /*--------------------------------------------------------------------------------------------------*/
 
     posAdjustment = (Game::GetInstance().GetResolution() * 0.5f);
-    velocity = Vec2();
-    isLocked = {false, false};
+    focus = newFocus;
     screenOffset = focusOffset;
+    isLocked = {false, false};
+    velocity = Vec2();
 
     cinemachine.length = cinemachineLength;
     cinemachine.slices = {slicesX, slicesY};
@@ -43,7 +44,6 @@ void Camera::Follow (
     // player attributes
     /*--------------------------------------------------------------------------------------------------*/
 
-    focus = newFocus;
     player.previousPosition = focus->box.GetPosition();
     player.lastDirection = {focusDirectionX, focusDirectionY};
     player.lastVelocity = Vec2();
@@ -165,7 +165,7 @@ void Camera::Cinemachine::Update (float dt) {
 
     Vec2 playerCurrentPosition = focus->box.GetPosition();
     Vec2 playerVelocity = playerCurrentPosition - player.previousPosition;
-    player.previousPosition = focus->box.GetPosition();
+    player.previousPosition = playerCurrentPosition;
 
     std::array<float, 2> slicedLength = {
         cinemachine.length.x / (float)cinemachine.slices[X],

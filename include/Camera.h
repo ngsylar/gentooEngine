@@ -10,8 +10,8 @@ class Camera {
         enum Axis {X, Y};
 
         static std::vector<std::pair<Component*, std::function<void*()>>> foreignMethods;
-        static GameObject* focus;
         static Vec2 posAdjustment;
+        static GameObject* focus;
 
         class Cinemachine;
         struct Player {

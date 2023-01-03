@@ -87,7 +87,14 @@ void TestScene::LoadAssets () {
     AddObject(rawSquare);
     square = GetObjectPtr(rawSquare);
     rawSquare->AddComponent(new Kid(*rawSquare));
-    rawSquare->box.SetPosition(82.5f,100);
+    rawSquare->box.SetPosition(62,100);
+    // Sprite* piss = new Sprite(*rawSquare, SPRITE_RED_SQUARE);
+    // piss->SetScale(0.5f);
+    // rawSquare->AddComponent(piss);
+    // AddObject(rawSquare);
+    // square = GetObjectPtr(rawSquare);
+    // rawSquare->AddComponent(new Ball(*rawSquare));
+    // rawSquare->box.SetPosition(85.5f,100);
 
     // rawSquare = new GameObject(4);
     // rawSquare->AddComponent(new LoopedBackground(*rawSquare, SPRITE_RED_SQUARE));

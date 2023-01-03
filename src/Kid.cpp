@@ -23,16 +23,16 @@ Kid::Kid (GameObject& associated): Component(associated) {
 }
 
 void Kid::Start () {
+    sprite = new Sprite(associated, SPRITE_IDLE);
+    sprite->AddTexture(SPRITE_RUN, 8, 0.05f);
+    sprite->SetTexture(IDLE);
+    associated.AddComponent(sprite);
+
     Camera::Follow(
         &associated, Vec2(CINEMACHINE_LENGTH), CINEMACHINE_SLICES,
         Camera::RIGHT, Camera::UP, Vec2(CINEMACHINE_OFFSET));
     Camera::cinemachine.Setup(CINEMACHINE_SETUP);
     Camera::offset.y = 0.0f;
-
-    sprite = new Sprite(associated, SPRITE_IDLE);
-    sprite->AddTexture(SPRITE_RUN, 8, 0.05f);
-    sprite->SetTexture(IDLE);
-    associated.AddComponent(sprite);
     
     rigidBody = new RigidBody(associated);
     associated.AddComponent(rigidBody);
@@ -45,7 +45,7 @@ void Kid::Start () {
 
 void Kid::Update (float dt) {
     InputManager& input = InputManager::GetInstance();
-    CameraCheckTracking(dt);
+    // CameraCheckTracking(dt);
     bool isRunning = false;
 
     if (isJumping)
