@@ -8,6 +8,7 @@
 #include <cmath>
 #include <array>
 #include <stack>
+#include <queue>
 #include <vector>
 #include <utility>
 #include <unordered_map>
@@ -45,6 +46,7 @@
 
 // Engine Auxiliary Components
 #include "CameraFollower.h"
+#include "CameraSquare.h"
 #include "LoopedBackground.h"
 
 // Engine Control Core

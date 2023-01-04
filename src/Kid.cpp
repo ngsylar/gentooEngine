@@ -28,11 +28,11 @@ void Kid::Start () {
     sprite->SetTexture(IDLE);
     associated.AddComponent(sprite);
 
-    Camera::Follow(
-        &associated, Vec2(CINEMACHINE_LENGTH), CINEMACHINE_SLICES,
-        Camera::RIGHT, Camera::UP, Vec2(CINEMACHINE_OFFSET));
-    Camera::cinemachine.Setup(CINEMACHINE_SETUP);
-    Camera::offset.y = 0.0f;
+    // Camera::Follow(
+    //     &associated, Vec2(CINEMACHINE_LENGTH), CINEMACHINE_SLICES,
+    //     Camera::RIGHT, Camera::UP, Vec2(CINEMACHINE_OFFSET));
+    // Camera::cinemachine.Setup(CINEMACHINE_SETUP);
+    // Camera::offset.y = 0.0f;
     
     rigidBody = new RigidBody(associated);
     associated.AddComponent(rigidBody);
@@ -69,6 +69,10 @@ void Kid::Update (float dt) {
 
     // // remover
     // rigidBody->gravityEnabled = false;
+    // if (input.IsKeyDown(KEY_ARROW_LEFT))
+    //     rigidBody->Translate(Vec2(-runSpeedMax,0)*dt);
+    // if (input.IsKeyDown(KEY_ARROW_RIGHT))
+    //     rigidBody->Translate(Vec2(runSpeedMax,0)*dt);
     // if (input.IsKeyDown(KEY_ARROW_UP))
     //     rigidBody->Translate(Vec2(0,-runSpeedMax)*dt);
     // if (input.IsKeyDown(KEY_ARROW_DOWN))

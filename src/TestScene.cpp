@@ -2,6 +2,7 @@
 #include "TestScene.h"
 #include "TestObjects.h"
 #include "Kid.h"
+#include "CameraSquare.h"
 #include "PlatformCamera.h"
 
 #define SCENE_TEST_LABEL "TestScene"
@@ -41,7 +42,7 @@ void TestScene::LoadAssets () {
     platSpr->SetScale(7.5f, 0.5f);
     rawPlat->box.SetPosition(256, 250);
     rawPlat->AddComponent(new Collider(*rawPlat));
-    rawPlat->AddComponent(new PlatformCamera(*rawPlat, PlatformCamera::DOWN, 0.0f));
+    // rawPlat->AddComponent(new PlatformCamera(*rawPlat, PlatformCamera::DOWN, 0.0f));
 
     rawPlat = new GameObject(LAYER_BLACK_SQUARE);
     platSpr = new Sprite(*rawPlat, SPRITE_BLACK_SQUARE);
@@ -100,6 +101,10 @@ void TestScene::LoadAssets () {
     // rawSquare->AddComponent(new LoopedBackground(*rawSquare, SPRITE_RED_SQUARE));
     // rawSquare->box.SetPosition(512,300);
     // AddObject(rawSquare);
+
+    rawPlat = new GameObject(LAYER_BLACK_SQUARE);
+    rawPlat->AddComponent(new CameraSquare(*rawPlat, rawSquare, 0, 10));
+    AddObject(rawPlat);
 }
 
 void TestScene::Start () {

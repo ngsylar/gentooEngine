@@ -15,11 +15,11 @@ Rect::Rect (float x, float y, float w, float h) {
 }
 
 Vec2 Rect::GetLocalCenter () {
-    return Vec2(w/2.0f, h/2.0f);
+    return Vec2(w*0.5f, h*0.5f);
 }
 
 Vec2 Rect::GetGlobalCenter () {
-    return Vec2(x+w/2.0f, y+h/2.0f);
+    return Vec2(x+w*0.5f, y+h*0.5f);
 }
 
 void Rect::SetSize (float w, float h) {
@@ -28,13 +28,13 @@ void Rect::SetSize (float w, float h) {
 }
 
 void Rect::SetPosition (float pX, float pY) {
-    x = (pX - w/2.0f) - offset.x;
-    y = (pY - h/2.0f) - offset.y;
+    x = (pX - w*0.5f) - offset.x;
+    y = (pY - h*0.5f) - offset.y;
 }
 
 void Rect::SetPosition (Vec2 point) {
-    x = (point.x - w/2.0f) - offset.x;
-    y = (point.y - h/2.0f) - offset.y;
+    x = (point.x - w*0.5f) - offset.x;
+    y = (point.y - h*0.5f) - offset.y;
 }
 
 void Rect::Translate (float dX, float dY) {
