@@ -102,7 +102,7 @@ void TestScene::LoadAssets () {
     // AddObject(rawSquare);
 
     rawPlat = new GameObject(LAYER_BLACK_SQUARE);
-    rawPlat->AddComponent(new CameraBox(*rawPlat, rawSquare, 0, 10, true));
+    rawPlat->AddComponent(new CameraBox(*rawPlat, rawSquare, 0, 10));
     AddObject(rawPlat);
 }
 

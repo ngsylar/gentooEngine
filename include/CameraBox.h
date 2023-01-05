@@ -14,6 +14,11 @@ class CameraBox: public Component {
             float focusPoint, float focusSize,
             float selfPoint, float selfSize
         );
+        void MoveDynamically(
+            float& focusPoint, float& focusSize, float& selfSize,
+            float& selfPoint, float& dynamicPoint,
+            float& lastDisplacement, float& destination
+        );
 
     public:
         bool isDynamic;

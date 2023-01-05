@@ -41,56 +41,23 @@ void CameraBox::Update (float dt) {
 
     Collider* focusCollider = (Collider*)focus.lock()->GetComponent("Collider");
     Rect focusBox = focusCollider ? focusCollider->box : focus.lock()->box;
-    std::pair<bool, float> collision;    
 
     if (isDynamic) {
-        std::pair<bool, float> collDyn;
         Vec2 position = Vec2(associated.box.x, associated.box.y);
-        Vec2 posDyn = position + lastDisplacement;
-        float displacement;
+        Vec2 positionDR = position + lastDisplacement;
 
-        collision = DetectCollision(focusBox.x, focusBox.w, position.x, associated.box.w);
-        collDyn = DetectCollision(focusBox.x, focusBox.w, posDyn.x, associated.box.w);
-        displacement = collision.second - position.x;
-        
-        if (collision.first) {
-            if ((displacement < 0.0f) and (lastDisplacement.x < 0.0f)) {
-                float collDynPos = (collDyn.first) ? collDyn.second : posDyn.x;
-                associated.box.x = (lastDisplacement.x < displacement) ? collDynPos : collision.second;
-            } else if ((displacement > 0.0f) and (lastDisplacement.x > 0.0f)) {
-                float collDynPos = (collDyn.first) ? collDyn.second : posDyn.x;
-                associated.box.x = (lastDisplacement.x > displacement) ? collDynPos : collision.second;
-            } else if (not collDyn.first) {
-                associated.box.x = posDyn.x;
-            } else {
-                associated.box.x = collision.second;
-            }
-        } else if (collDyn.first)
-            associated.box.x = collDyn.second;
-        else associated.box.x = posDyn.x;
+        MoveDynamically(
+            focusBox.x, focusBox.w, associated.box.w, position.x,
+            positionDR.x, lastDisplacement.x, associated.box.x);
+        MoveDynamically(
+            focusBox.y, focusBox.h, associated.box.h, position.y,
+            positionDR.y, lastDisplacement.y, associated.box.y);
 
-        collision = DetectCollision(focusBox.y, focusBox.h, position.y, associated.box.h);
-        collDyn = DetectCollision(focusBox.y, focusBox.h, posDyn.y, associated.box.h);
-        displacement = collision.second - position.y;
-        
-        if (collision.first) {
-            if ((displacement < 0.0f) and (lastDisplacement.y < 0.0f)) {
-                float collDynPos = (collDyn.first) ? collDyn.second : posDyn.y;
-                associated.box.y = (lastDisplacement.y < displacement) ? collDynPos : collision.second;
-            } else if ((displacement > 0.0f) and (lastDisplacement.y > 0.0f)) {
-                float collDynPos = (collDyn.first) ? collDyn.second : posDyn.y;
-                associated.box.y = (lastDisplacement.y > displacement) ? collDynPos : collision.second;
-            } else if (not collDyn.first) {
-                associated.box.y = posDyn.y;
-            } else {
-                associated.box.y = collision.second;
-            }
-        } else if (collDyn.first)
-            associated.box.y = collDyn.second;
-        else associated.box.y = posDyn.y;
+        lastDisplacement = (Vec2(associated.box.x, associated.box.y) - position);
+    }
+    else {
+        std::pair<bool, float> collision;
 
-        lastDisplacement = Vec2(associated.box.x, associated.box.y) - position;
-    } else {
         collision = DetectCollision(focusBox.x, focusBox.w, associated.box.x, associated.box.w);
         if (collision.first) associated.box.x = collision.second;
         collision = DetectCollision(focusBox.y, focusBox.h, associated.box.y, associated.box.h);
@@ -109,30 +76,47 @@ std::pair<bool, float> CameraBox::DetectCollision (
         return std::make_pair(false, 0.0f);
 }
 
+void CameraBox::MoveDynamically (
+    float& focusPoint, float& focusSize, float& selfSize,
+    float& selfPoint, float& pointDR, float& lastDisp, float& destPoint
+) {
+    std::pair<bool, float> collision, collisionD;
+    float displacement;
+
+    collision = DetectCollision(focusPoint, focusSize, selfPoint, selfSize);
+    collisionD = DetectCollision(focusPoint, focusSize, pointDR, selfSize);
+    displacement = collision.second - selfPoint;
+    
+    if (collision.first) {
+        if ((displacement < 0.0f) and (lastDisp < 0.0f)) {
+            float pointDA = (collisionD.first) ? collisionD.second : pointDR;
+            destPoint = (lastDisp < displacement) ? pointDA : collision.second;
+        } else if ((displacement > 0.0f) and (lastDisp > 0.0f)) {
+            float pointDA = (collisionD.first) ? collisionD.second : pointDR;
+            destPoint = (lastDisp > displacement) ? pointDA : collision.second;
+        } else destPoint = (collisionD.first) ? collision.second : pointDR;
+    } else destPoint = (collisionD.first) ? collisionD.second : pointDR;
+}
+
 // DEBUG
 void CameraBox::Render () {
-    if (not Game::GetInstance().GetCurrentState().Debugging())
-        return;
+    if (not Game::GetInstance().GetCurrentState().Debugging()) return;
 
     Rect box( associated.box );
     Vec2 center( box.GetPosition() );
     SDL_Point points[5];
 
-    Vec2 point = (Vec2(box.x, box.y) - center).Rotate( associated.angleDeg/(180/PI) )
-                    + center - Camera::pos;
+    Vec2 point = Vec2(box.x, box.y) - Camera::pos;
     points[0] = {(int)point.x, (int)point.y};
     points[4] = {(int)point.x, (int)point.y};
-    
-    point = (Vec2(box.x + box.w, box.y) - center).Rotate( associated.angleDeg/(180/PI) )
-                    + center - Camera::pos;
+
+    point = Vec2(box.x + box.w, box.y) - Camera::pos;
     points[1] = {(int)point.x, (int)point.y};
     
-    point = (Vec2(box.x + box.w, box.y + box.h) - center).Rotate( associated.angleDeg/(180/PI) )
-                    + center - Camera::pos;
+    point = Vec2(box.x + box.w, box.y + box.h) - Camera::pos;
     points[2] = {(int)point.x, (int)point.y};
     
-    point = (Vec2(box.x, box.y + box.h) - center).Rotate( associated.angleDeg/(180/PI) )
-                    + center - Camera::pos;
+    point = Vec2(box.x, box.y + box.h) - Camera::pos;
     points[3] = {(int)point.x, (int)point.y};
 
     SDL_SetRenderDrawColor(Game::GetInstance().GetRenderer(), 0, 0, 255, SDL_ALPHA_OPAQUE);
