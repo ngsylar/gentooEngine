@@ -2,7 +2,6 @@
 #include "TestScene.h"
 #include "TestObjects.h"
 #include "Kid.h"
-#include "CameraSquare.h"
 #include "PlatformCamera.h"
 
 #define SCENE_TEST_LABEL "TestScene"
@@ -103,7 +102,7 @@ void TestScene::LoadAssets () {
     // AddObject(rawSquare);
 
     rawPlat = new GameObject(LAYER_BLACK_SQUARE);
-    rawPlat->AddComponent(new CameraSquare(*rawPlat, rawSquare, 0, 10));
+    rawPlat->AddComponent(new CameraBox(*rawPlat, rawSquare, 0, 10, true));
     AddObject(rawPlat);
 }
 

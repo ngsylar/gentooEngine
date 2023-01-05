@@ -46,7 +46,7 @@
 
 // Engine Auxiliary Components
 #include "CameraFollower.h"
-#include "CameraSquare.h"
+#include "CameraBox.h"
 #include "LoopedBackground.h"
 
 // Engine Control Core
