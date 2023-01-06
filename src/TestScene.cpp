@@ -101,9 +101,9 @@ void TestScene::LoadAssets () {
     // rawSquare->box.SetPosition(512,300);
     // AddObject(rawSquare);
 
-    rawPlat = new GameObject(LAYER_BLACK_SQUARE);
-    rawPlat->AddComponent(new CameraBox(*rawPlat, rawSquare, 0, 10));
-    AddObject(rawPlat);
+    // rawPlat = new GameObject(LAYER_BLACK_SQUARE);
+    // rawPlat->AddComponent(new CameraBox(*rawPlat, rawSquare, 0, 10));
+    // AddObject(rawPlat);
 }
 
 void TestScene::Start () {

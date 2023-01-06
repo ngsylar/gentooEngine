@@ -93,6 +93,10 @@ Vec2 Vec2::operator* (const Vec2& vec) {
     return Vec2(x*vec.x, y*vec.y);
 }
 
+Vec2 Vec2::operator/ (const Vec2& vec) {
+    return Vec2(x/vec.x, y/vec.y);
+}
+
 Vec2& Vec2::operator+= (const Vec2& vec) {
     x += vec.x;
     y += vec.y;
@@ -108,5 +112,11 @@ Vec2& Vec2::operator-= (const Vec2& vec) {
 Vec2& Vec2::operator*= (const float& scalar) {
     x *= scalar;
     y *= scalar;
+    return *this;
+}
+
+Vec2& Vec2::operator/= (const float& scalar) {
+    x /= scalar;
+    y /= scalar;
     return *this;
 }

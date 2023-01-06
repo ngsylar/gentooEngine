@@ -150,7 +150,7 @@ void Game::Run () {
     while (not GetCurrentState().QuitRequested()) {
         CalculateDeltaTime();
         inputManager.Update();
-        GetCurrentState().UpdateBase(dt*0.5f);
+        GetCurrentState().UpdateBase(dt);
         GetCurrentState().RenderBase();
 
         if (stateStack.top()->PopRequested()) {

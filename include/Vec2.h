@@ -34,10 +34,12 @@ class Vec2 {
         Vec2 operator+(const Vec2& vec);
         Vec2 operator-(const Vec2& vec);
         Vec2 operator*(const Vec2& vec);
+        Vec2 operator/(const Vec2& vec);
 
         Vec2& operator+=(const Vec2& vec);
         Vec2& operator-=(const Vec2& vec);
         Vec2& operator*=(const float& scalar);
+        Vec2& operator/=(const float& scalar);
 };
 
 #endif
