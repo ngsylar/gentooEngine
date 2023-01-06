@@ -11,19 +11,20 @@ CameraBox::CameraBox (
     dynamicFactor = Vec2(1.0f, 1.0f);
 }
 
-void CameraBox::Follow (GameObject* focus, float spacingX, float spacingY) {
-    this->focus = Game::GetInstance().GetCurrentState().GetObjectPtr(focus);
-
-    Collider* focusCollider = (Collider*)focus->GetComponent("Collider");
-    Rect focusBox = focusCollider ? focusCollider->box : focus->box;
-    associated.box.SetSize(focusBox.w+fabs(spacingX), focusBox.h+fabs(spacingY));
+void CameraBox::Start () {
+    focusBox = Rect(
+        focus.lock()->box.x+focusBoxOffset.x, focus.lock()->box.y+focusBoxOffset.y,
+        focusBoxOffset.w, focusBoxOffset.h);
+    associated.box.w += focusBox.w; associated.box.h += focusBox.h;
     associated.box.SetPosition(focusBox.GetPosition());
 }
 
-void CameraBox::Start () {
-    Collider* focusCollider = (Collider*)focus.lock()->GetComponent("Collider");
-    Rect focusBox = focusCollider ? focusCollider->box : focus.lock()->box;
-    associated.box.w += focusBox.w; associated.box.h += focusBox.h;
+void CameraBox::Follow (GameObject* focus, float spacingX, float spacingY) {
+    this->focus = Game::GetInstance().GetCurrentState().GetObjectPtr(focus);
+    focusBox = Rect(
+        focus->box.x+focusBoxOffset.x, focus->box.y+focusBoxOffset.y,
+        focusBoxOffset.w, focusBoxOffset.h);
+    associated.box.SetSize(focusBox.w+fabs(spacingX), focusBox.h+fabs(spacingY));
     associated.box.SetPosition(focusBox.GetPosition());
 }
 
@@ -33,9 +34,9 @@ void CameraBox::Update (float dt) {
         return;
     }
 
-    Collider* focusCollider = (Collider*)focus.lock()->GetComponent("Collider");
-    Rect focusBox = focusCollider ? focusCollider->box : focus.lock()->box;
-    std::pair<ContactSide, float> motion;
+    focusBox.x = (int)focus.lock()->box.x+focusBoxOffset.x;
+    focusBox.y = (int)focus.lock()->box.y+focusBoxOffset.y;
+    std::pair<ContactSide, float> contact;
 
     if (isDynamic) {
         Vec2 position = Vec2(associated.box.x, associated.box.y);
@@ -51,22 +52,22 @@ void CameraBox::Update (float dt) {
         lastDisplacement = (Vec2(associated.box.x, associated.box.y) - position);
     }
     else {
-        motion = DetectMotion(focusBox.x, focusBox.w, associated.box.x, associated.box.w);
-        if (motion.first != NONE)
-            associated.box.x = motion.second;
-        contacts[X] = motion.first;
+        contact = DetectContact(focusBox.x, focusBox.w, associated.box.x, associated.box.w);
+        if (contact.first != NONE)
+            associated.box.x = contact.second;
+        contacts[X] = contact.first;
 
-        motion = DetectMotion(focusBox.y, focusBox.h, associated.box.y, associated.box.h);
-        if (motion.first != NONE)
-            associated.box.y = motion.second;
-        contacts[Y] = motion.first;
+        contact = DetectContact(focusBox.y, focusBox.h, associated.box.y, associated.box.h);
+        if (contact.first != NONE)
+            associated.box.y = contact.second;
+        contacts[Y] = contact.first;
     }
 
     for (int i=0; i < (int)foreignMethods.size(); i++)
         foreignMethods[i].second();
 }
 
-std::pair<CameraBox::ContactSide, float> CameraBox::DetectMotion (
+std::pair<CameraBox::ContactSide, float> CameraBox::DetectContact (
     float focusPoint, float focusSize, float selfPoint, float selfSize
 ) {
     if (focusPoint < selfPoint)
@@ -81,22 +82,26 @@ void CameraBox::MoveDynamically (
     float& focusPoint, float& focusSize, float& selfSize,
     float& selfPoint, float& pointDR, float& lastDisp, float& destPoint
 ) {
-    std::pair<bool, float> motion, motionD;
+    std::pair<bool, float> contact, contactD;
     float displacement;
 
-    motion = DetectMotion(focusPoint, focusSize, selfPoint, selfSize);
-    motionD = DetectMotion(focusPoint, focusSize, pointDR, selfSize);
-    displacement = motion.second - selfPoint;
+    contact = DetectContact(focusPoint, focusSize, selfPoint, selfSize);
+    contactD = DetectContact(focusPoint, focusSize, pointDR, selfSize);
+    displacement = contact.second - selfPoint;
     
-    if (motion.first) {
+    if (contact.first) {
         if ((displacement < 0.0f) and (lastDisp < 0.0f)) {
-            float pointDA = (motionD.first) ? motionD.second : pointDR;
-            destPoint = (lastDisp < displacement) ? pointDA : motion.second;
+            float pointDA = (contactD.first) ? contactD.second : pointDR;
+            destPoint = (lastDisp < displacement) ? pointDA : contact.second;
         } else if ((displacement > 0.0f) and (lastDisp > 0.0f)) {
-            float pointDA = (motionD.first) ? motionD.second : pointDR;
-            destPoint = (lastDisp > displacement) ? pointDA : motion.second;
-        } else destPoint = (motionD.first) ? motion.second : pointDR;
-    } else destPoint = (motionD.first) ? motionD.second : pointDR;
+            float pointDA = (contactD.first) ? contactD.second : pointDR;
+            destPoint = (lastDisp > displacement) ? pointDA : contact.second;
+        } else destPoint = (contactD.first) ? contact.second : pointDR;
+    } else destPoint = (contactD.first) ? contactD.second : pointDR;
+}
+
+CameraBox::ContactSide CameraBox::GetContact (CameraBox::Axis axis) {
+    return contacts[axis];
 }
 
 // DEBUG

@@ -5,7 +5,7 @@
 
 #define CINEMACHINE_LENGTH          14.0f, 86.0f
 #define CINEMACHINE_SLICES          8, 32, 2, 24
-#define CINEMACHINE_OFFSET          0.0f, 12.0f
+#define CINEMACHINE_OFFSET          0.0f, -12.0f
 #define CINEMACHINE_SETUP           true, true, true, false, true, true, false, false
 
 // cinemachine assistant
@@ -28,16 +28,19 @@ Ball::Ball (GameObject& associated): Component(associated) {
 }
 
 void Ball::Start () {
-    Camera::Follow(
-        &associated, Vec2(CINEMACHINE_LENGTH), CINEMACHINE_SLICES,
-        Camera::RIGHT, Camera::UP, Vec2(CINEMACHINE_OFFSET));
-    Camera::cinemachine.Setup(CINEMACHINE_SETUP);
-    Camera::offset.y = 0.0f;
-
     rigidBody = new RigidBody(associated);
     associated.AddComponent(rigidBody);
     associated.AddComponent(new Collider(associated));
     rigidBody->velocityMax.y = RIGIDBODY_VELOCITY_MAX;
+
+    GameObject* cameraBox = new GameObject(associated.layer);
+    cameraBox->AddComponent(new CameraBox(*cameraBox, &associated, 0, 12));
+    Game::GetInstance().GetCurrentState().AddObject(cameraBox);
+    
+    Camera::Follow(
+        cameraBox, Vec2(CINEMACHINE_LENGTH), CINEMACHINE_SLICES,
+        Camera::RIGHT, Camera::UP, Vec2(CINEMACHINE_OFFSET));
+    Camera::cinemachine.Setup(CINEMACHINE_SETUP);
 }
 
 void Ball::Update (float dt) {

@@ -38,6 +38,7 @@ void Kid::Start () {
 
     cameraBox = new GameObject(associated.layer);
     CameraBox* boxComponent = new CameraBox(*cameraBox, &associated, 0, 12);
+    boxComponent->focusBoxOffset = Rect(16.0f, 19.0f, 16.0f, 28.0f);
     cameraBox->AddComponent(boxComponent);
     boxComponent->AddMethod(this, std::bind(&CameraCheckGrounded, this));
     Game::GetInstance().GetCurrentState().AddObject(cameraBox);

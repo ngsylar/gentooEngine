@@ -10,9 +10,8 @@ class CameraBox: public Component {
     public:
         enum Axis {X, Y};
         enum ContactSide {NONE, NEGATIVE, POSITIVE};
-        std::array<ContactSide, 2> contacts;
+        Rect focusBoxOffset;
         bool isDynamic;
-        Vec2 lastDisplacement;
         Vec2 dynamicFactor;
 
         CameraBox(
@@ -21,14 +20,14 @@ class CameraBox: public Component {
             float spacingX=20.0f,
             float spacingY=20.0f
         );
+        void Start();
         void Follow(
             GameObject* focus,
             float spacingX=20.0f,
             float spacingY=20.0f
         );
-        void Setup();
-        void Start();
         void Update(float dt);
+        ContactSide GetContact(Axis axis);
         void Render();
         bool Is(std::string type); 
         void AddMethod(Component* component, std::function<void*()> method);
@@ -37,10 +36,13 @@ class CameraBox: public Component {
         ~CameraBox();
 
     private:
-        std::weak_ptr<GameObject> focus;
         std::vector<std::pair<Component*, std::function<void*()>>> foreignMethods;
+        std::weak_ptr<GameObject> focus;
+        Rect focusBox;
+        std::array<ContactSide, 2> contacts;
+        Vec2 lastDisplacement;
 
-        std::pair<ContactSide, float> DetectMotion(
+        std::pair<ContactSide, float> DetectContact(
             float focusPoint, float focusSize,
             float selfPoint, float selfSize
         );
