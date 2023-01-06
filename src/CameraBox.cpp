@@ -12,18 +12,20 @@ CameraBox::CameraBox (
 }
 
 void CameraBox::Start () {
-    focusBox = Rect(
-        focus.lock()->box.x+focusBoxOffset.x, focus.lock()->box.y+focusBoxOffset.y,
-        focusBoxOffset.w, focusBoxOffset.h);
+    focusBox.x = focus.lock()->box.x + focusBoxOffset.x;
+    focusBox.y = focus.lock()->box.y + focusBoxOffset.y;
+    focusBox.w = (focusBoxOffset.w > 0.0f) ? focusBoxOffset.w : focus.lock()->box.w;
+    focusBox.h = (focusBoxOffset.h > 0.0f) ? focusBoxOffset.h : focus.lock()->box.h;
     associated.box.w += focusBox.w; associated.box.h += focusBox.h;
     associated.box.SetPosition(focusBox.GetPosition());
 }
 
 void CameraBox::Follow (GameObject* focus, float spacingX, float spacingY) {
     this->focus = Game::GetInstance().GetCurrentState().GetObjectPtr(focus);
-    focusBox = Rect(
-        focus->box.x+focusBoxOffset.x, focus->box.y+focusBoxOffset.y,
-        focusBoxOffset.w, focusBoxOffset.h);
+    focusBox.x = focus->box.x + focusBoxOffset.x;
+    focusBox.y = focus->box.y + focusBoxOffset.y;
+    focusBox.w = (focusBoxOffset.w > 0.0f) ? focusBoxOffset.w : focus->box.w;
+    focusBox.h = (focusBoxOffset.h > 0.0f) ? focusBoxOffset.h : focus->box.h;
     associated.box.SetSize(focusBox.w+fabs(spacingX), focusBox.h+fabs(spacingY));
     associated.box.SetPosition(focusBox.GetPosition());
 }
