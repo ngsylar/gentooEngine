@@ -42,8 +42,23 @@ void Sound::Stop () {
 }
 
 void Sound::Update (float dt) {
-    if ((not Mix_Playing(channel)) and selfDestruction)
-        associated.RequestDelete();
+    
+    if(Mix_Playing(channel)) {
+        if(audioPan) {
+            float SoundPos = associated.box.GetGlobalCenter().x - Camera::GetPosition().x; //Game::GetInstance().GetState().Cam.Position.x;
+            int Location = (SoundPos/Vec2(GAMEX_RESOLUTION).x * 400.f);
+            (Location < 0 ? Location = 0 : (Location > 400 ? Location = 400 : Location));
+            Location-=200;
+            int R = 255 + Location;
+            R>255?R=255:R;
+            int L = 255 - Location;            
+            L>255?L=255:L;
+            Mix_SetPanning(channel, L, R);
+        }
+    } else {
+        if(selfDestruction)
+            associated.RequestDelete();
+    }
 }
 
 void Sound::Render () {}

@@ -1,10 +1,19 @@
 #include "GentooEngine.h"
 
+#define FONT_LED "./assets/font/led_real.ttf"
+
 State::State () {
     debugMode = false;
     started = false;
     popRequested = false;
     quitRequested = false;
+    
+    //FPS Counter
+    Text * FPSText = new Text(FPSObj, " ", FONT_LED, 24, Text::SHADED, Color("#00FF00").ColorSDL());
+    CameraFollower* FPSFollow = new CameraFollower(FPSObj);
+    FPSFollow->offset = Vec2(20,20);
+    FPSObj.AddComponent(FPSText);
+    FPSObj.AddComponent(FPSFollow);
 }
 
 State::~State () {
@@ -53,6 +62,13 @@ void State::UpdateBase (float dt) {
 
     for (int i=0; i < (int)objectArray.size(); i++)
         objectArray[i]->LateUpdate(dt);
+    
+    //FPS Counter
+    if (Game::GetInstance().GetCurrentState().Debugging()) {
+        Text* UpdateFPS =(Text*)FPSObj.GetComponent(GameObjID::_Text);
+        UpdateFPS->SetText(std::to_string((int)(1/dt))+" FPS");
+        FPSObj.LateUpdate(0);
+    }
 }
 
 void State::RenderBase () {
@@ -79,6 +95,11 @@ void State::RenderBase () {
     for (int i=0; i < (int)renderingArray.size(); i++) {
         renderingArray[i].lock()->Render();
     }
+
+    //FPS Counter
+    if (Game::GetInstance().GetCurrentState().Debugging()) {
+        FPSObj.Render();
+    }    
 }
 
 void State::LoadAssets () {}
@@ -131,26 +152,30 @@ std::weak_ptr<GameObject> State::GetObjectPtr (std::string label) {
 void State::DetectCollisions () {
     bool thereIsCollision;
 
-    for (int i=0; i < (int)objectArray.size()-1; i++)
-        for (int j=i+1; j < (int)objectArray.size(); j++) {
-            Collider* colliderA = (Collider*)objectArray[i]->GetComponent("Collider");
-            Collider* colliderB = (Collider*)objectArray[j]->GetComponent("Collider");
-            if (not (colliderA and colliderB))
-                continue;
+    for (int i=0; i < (int)objectArray.size()-1; i++) {
+        if(objectArray[i]->Contains(GameObjID::_Collider)) {
+            for (int j=i+1; j < (int)objectArray.size(); j++) {
+                if(objectArray[j]->Contains(GameObjID::_Collider))
+                {
+                    Collider* colliderA = (Collider*)objectArray[i]->GetComponent(GameObjID::_Collider);
+                    Collider* colliderB = (Collider*)objectArray[j]->GetComponent(GameObjID::_Collider);
 
-            thereIsCollision = Collision::IsColliding(
-                colliderA->box, colliderB->box,
-                Deg2Rad(objectArray[i]->angleDeg), Deg2Rad(objectArray[j]->angleDeg)
-            );
-            if (thereIsCollision) {
-                objectArray[i]->NotifyCollision(*objectArray[j]);
-                objectArray[j]->NotifyCollision(*objectArray[i]);
-            }
-            else {
-                objectArray[i]->NotifyNoCollision(*objectArray[j]);
-                objectArray[j]->NotifyNoCollision(*objectArray[i]);
+                    thereIsCollision = Collision::IsColliding(
+                        colliderA->box, colliderB->box,
+                        Deg2Rad(objectArray[i]->angleDeg), Deg2Rad(objectArray[j]->angleDeg)
+                    );
+                    if (thereIsCollision) {
+                        objectArray[i]->NotifyCollision(*objectArray[j]);
+                        objectArray[j]->NotifyCollision(*objectArray[i]);
+                    }
+                    else {
+                        objectArray[i]->NotifyNoCollision(*objectArray[j]);
+                        objectArray[j]->NotifyNoCollision(*objectArray[i]);
+                    }
+                }
             }
         }
+    }
 }
 
 bool State::Debugging () {

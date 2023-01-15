@@ -13,6 +13,7 @@
 #include <utility>
 #include <unordered_map>
 #include <string>
+#include <iomanip>
 
 // SDL2 Library
 #define INCLUDE_SDL
@@ -33,6 +34,8 @@
 #include "Collision.h"
 #include "Component.h"
 #include "Resources.h"
+#include "GlobalDefinitions.h"
+#include "Color.h"
 
 // Engine Object Components
 #include "RigidBody.h"
@@ -43,6 +46,9 @@
 #include "Music.h"
 #include "Sound.h"
 #include "Text.h"
+#include "ScreenFilter.h"
+#include "ScreenFade.h"
+
 
 // Engine Auxiliary Components
 #include "CameraFollower.h"

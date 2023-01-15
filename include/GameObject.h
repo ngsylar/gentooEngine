@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "Rect.h"
+#include "GlobalDefinitions.h"
 
 class Component;
 
@@ -13,7 +14,7 @@ class GameObject {
     private:
         std::vector<std::unique_ptr<Component>> components;
         bool started, isDead;
-    
+        GameObjID contains;
     public:
         std::string label;
         int layer;          // sylar's extra layer rendering
@@ -26,11 +27,13 @@ class GameObject {
         void Update(float dt);
         void LateUpdate(float dt);
         void Render();
+        bool Contains(GameObjID type);
         bool IsDead();
         void RequestDelete();
         void AddComponent(Component* cpt);
         void RemoveComponent(Component* cpt);
         Component* GetComponent(std::string type);
+        Component* GetComponent(GameObjID type);
         void NotifyCollision(GameObject& other);
         void NotifyNoCollision(GameObject& other);
         

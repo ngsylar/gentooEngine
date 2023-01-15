@@ -11,6 +11,7 @@ class State {
         // sylar's extra layer rendering
         std::vector<std::weak_ptr<GameObject>> renderingArray;
         bool scheduleSortingLayer;
+        GameObject FPSObj;
     
     public:
         float stateDt;

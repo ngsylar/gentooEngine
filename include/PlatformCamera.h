@@ -27,6 +27,7 @@ class PlatformCamera: public Component {
         void* MoveCamera();
         void* UndoCameraMovement();
         void* LimitCamera();
+        bool Is(GameObjID type);
 };
 
 #endif

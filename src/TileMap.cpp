@@ -8,6 +8,7 @@ TileMap::TileMap (
     Load(file);
     this->parallaxFactor = parallaxFactor;
     associated.label = "TileMap";
+    type = GameObjID::_TileMap;
 }
 
 TileMap::~TileMap () {
@@ -80,4 +81,8 @@ int TileMap::GetDepth () {
 
 bool TileMap::Is (std::string type) {
     return (type == "TileMap");
+}
+
+bool TileMap::Is (GameObjID type) {
+    return (type & this->type);
 }

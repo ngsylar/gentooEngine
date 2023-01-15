@@ -5,8 +5,8 @@
 #include "TestScene.h"
 
 #define WINDOW_TITLE        "Game Title"
-#define WINDOW_SIZE         1024, 576
-#define GAME_RESOLUTION     512, 288
+#define WINDOW_SIZE         1024, 500
+#define GAME_RESOLUTION     640, 360
 
 int main (int argc, char* argv[]) {
     Game::GetInstance(WINDOW_TITLE, WINDOW_SIZE, GAME_RESOLUTION);

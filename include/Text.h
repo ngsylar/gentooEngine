@@ -39,6 +39,7 @@ class Text: public Component {
         void Update(float dt);
         void Render();
         bool Is(std::string type);
+        bool Is(GameObjID type);
 
     private:
         std::shared_ptr<TTF_Font> font;

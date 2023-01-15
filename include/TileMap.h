@@ -31,6 +31,7 @@ class TileMap: public Component {
         int GetHeight();
         int GetDepth();
         bool Is(std::string type);
+        bool Is(GameObjID type);
 };
 
 #endif

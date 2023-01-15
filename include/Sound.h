@@ -5,6 +5,7 @@
 #include "SDL_include.h"
 
 #include "Component.h"
+#include "GlobalDefinitions.h"
 
 #define SOUND_ERROR_PLAY    -1
 #define SOUND_AUTO_CHANNEL  -1
@@ -13,6 +14,7 @@ class Sound: public Component {
     private:
         std::shared_ptr<Mix_Chunk> chunk;
         int channel;
+        bool audioPan;
         bool selfDestruction;
         
     public:

@@ -10,6 +10,7 @@ class CameraFollower: public Component {
         CameraFollower(GameObject& go);
         void LateUpdate(float dt);
         bool Is(std::string type);
+        bool Is(GameObjID type);
 };
 
 #endif

@@ -4,6 +4,7 @@ GameObject::GameObject (int layer, std::string label) {
     isDead = false;
     started = false;
     angleDeg = 0.0f;
+    contains = GameObjID::_None;
 
     this->label = label;
     this->layer = layer;
@@ -45,6 +46,10 @@ void GameObject::Render () {
     }
 }
 
+bool GameObject::Contains (GameObjID type) {
+    return (contains & type);
+}
+
 bool GameObject::IsDead () {
     return isDead;
 }
@@ -58,6 +63,8 @@ void GameObject::AddComponent (Component* cpt) {
         return;
 
     components.emplace_back(cpt);
+    contains = contains | cpt->type; //Bitwise flag of contained object registered
+
     if (started)
         cpt->Start();
 }
@@ -67,15 +74,28 @@ void GameObject::RemoveComponent (Component* cpt) {
         return;
 
     for (int i=((int)components.size())-1; i >= 0; i--) {
-        if (components[i].get() == cpt)
+        if (components[i].get() == cpt) {
+            contains = contains ^ cpt->type;
             components.erase(components.begin()+i);
+        }
     }
 }
 
 Component* GameObject::GetComponent (std::string type) {
     for (int i=0; i < (int)components.size(); i++) {
         if (components[i]->Is(type))
-            return components[i].get();
+            return components[i].get(); 
+    }
+    return nullptr;
+}
+
+Component* GameObject::GetComponent (GameObjID type) {
+    
+    if(contains & type) {
+        for (int i=0; i < (int)components.size(); i++) {
+            if (components[i]->Is(type))
+                return components[i].get();
+        }
     }
     return nullptr;
 }

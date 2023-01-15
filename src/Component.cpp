@@ -19,3 +19,7 @@ void Component::NotifyNoCollision (GameObject& other) {}
 bool Component::Is (std::string type) {
     return (type == "Component");
 }
+
+bool Component::Is (GameObjID type) {
+    return (type & this->type);
+}

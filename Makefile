@@ -3,7 +3,7 @@
 
 
 # compilador
-CC = g++
+CC = tg++
 
 RMDIR = rm -rdf
 
@@ -17,7 +17,7 @@ LIBS = -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_ttf -lm
 INC_PATHS = -I$(INC_PATH) $(addprefix -I,$(SDL_INC_PATH))
 
 # diretivas
-FLAGS = -std=c++11 -Wall -pedantic -Wextra -Wno-unused-parameter -Werror=init-self
+FLAGS = -std=c++17 -Wall -pedantic -Wextra -Wno-unused-parameter -Werror=init-self
 
 D_FLAGS = -ggdb -00 -DDEBUG
 
@@ -38,9 +38,6 @@ OBJ_FILES = $(addprefix $(BIN_PATH)/,$(notdir $(CPP_FILES:.cpp=.o)))
 # executavel
 EXEC = GAME
 
-
-
-
 ifeq ($(OS),Windows_NT)
 
 
@@ -51,7 +48,7 @@ RM = del /q
 
 
 
-SDL_PATHS = C:/SDL2-2.0.16 C:/msys64/mingw32
+SDL_PATHS = sdl C:/SDL2-2.0.16 C:/msys64/mingw32 
 
 SDL_INC_PATH += $(addsuffix /include,$(SDL_PATHS))
 LINK_PATH = $(addprefix -L,$(addsuffix /lib,$(SDL_PATHS)))

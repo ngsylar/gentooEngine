@@ -21,3 +21,6 @@ spike/
 # outros
 *.zip
 *.rar
+
+#SDL Local
+sdl/

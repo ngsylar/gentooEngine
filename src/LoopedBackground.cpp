@@ -9,6 +9,7 @@ LoopedBackground::LoopedBackground (
     halfSizes[HORIZONTAL] = ((layerCount - 1) * (int)associated.box.w) >> 1;
     halfSizes[VERTICAL] = ((layerCount - 1) * (int)associated.box.h) >> 1;
     this->parallaxFactor = parallaxFactor;
+    type = GameObjID::_LoopedBackground;
 }
 
 LoopedBackground::~LoopedBackground () {
@@ -51,4 +52,8 @@ void LoopedBackground::Render () {
                 associated.box.x + (c * associated.box.w) - (parallaxFactor * Camera::pos.x),
                 associated.box.y + (r * associated.box.h) - (parallaxFactor * Camera::pos.y)
             );
+}
+
+bool LoopedBackground::Is (GameObjID type) {
+    return (type & this->type);
 }

@@ -4,6 +4,7 @@ Collider::Collider (GameObject& associated, Vec2 offset, bool trigger): Componen
     this->offset = offset;
     isTrigger = trigger;
     started = false;
+    type = GameObjID::_Collider;
 }
 
 void Collider::SetBox (Vec2 offset, Vec2 boxSize) {
@@ -55,4 +56,8 @@ void Collider::Render () {
 
 bool Collider::Is (std::string type) {
     return (type == "Collider");
+}
+
+bool Collider::Is (GameObjID type) {
+    return (type & this->type);
 }

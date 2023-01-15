@@ -30,6 +30,7 @@ class CameraBox: public Component {
         ContactSide GetContact(Axis axis);
         void Render();
         bool Is(std::string type); 
+        bool Is(GameObjID type); 
         void AddMethod(Component* component, std::function<void*()> method);
         void RemoveMethod(Component* component);
         void ClearMethods();

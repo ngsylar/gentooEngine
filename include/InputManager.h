@@ -19,6 +19,8 @@
 #define KEY_A               SDLK_a
 #define KEY_S               SDLK_s
 #define KEY_D               SDLK_d
+#define KEY_MINUS           SDLK_MINUS
+#define KEY_EQUAL           SDLK_EQUALS
 #define KEY_SPACE           SDLK_SPACE
 #define KEY_ARROW_UP        SDLK_UP
 #define KEY_ARROW_LEFT      SDLK_LEFT

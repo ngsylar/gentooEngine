@@ -71,6 +71,7 @@ class Sprite: public Component {
         void RenderWithNoOffset(int startX, int startY);
         bool HasTexture();
         bool Is(std::string type);
+        bool Is(GameObjID type);
 };
 
 #endif

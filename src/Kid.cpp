@@ -20,6 +20,7 @@ Kid::Kid (GameObject& associated): Component(associated) {
     runSpeedNow = 0.0f;
     jumpHeightNow = 0.0f;
     jumpingIsConstant = false;
+    type = GameObjID::_Kid;
 }
 
 void Kid::Start () {
@@ -162,4 +163,8 @@ void Kid::DebugScript (float dt) {
         // SDL_Log("mstoff %f", Camera::masterOffset.y);
         // SDL_Log("distan %f", Camera::GetPosition().y - associated.box.GetPosition().y);
     }
+}
+
+bool Kid::Is (GameObjID type) {
+    return (type & this->type);
 }
