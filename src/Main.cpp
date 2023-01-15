@@ -5,7 +5,7 @@
 #include "TestScene.h"
 
 #define WINDOW_TITLE        "Game Title"
-#define WINDOW_SIZE         1024, 500
+#define WINDOW_SIZE         1280, 720
 #define GAME_RESOLUTION     640, 360
 
 int main (int argc, char* argv[]) {

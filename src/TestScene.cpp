@@ -5,7 +5,7 @@
 #include "PlatformCamera.h"
 
 #define SCENE_TEST_LABEL "TestScene"
-#define SCENE_TEST_BACKGROUND "assets/img/test_area.png"
+#define SCENE_TEST_BACKGROUND "assets/img/test_area_720p.png"
 #define SCENE_TEST_LAYER -1
 
 #define SPRITE_RED_SQUARE "assets/img/red_square.png"
