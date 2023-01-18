@@ -1,8 +1,10 @@
 #ifndef GLOBAL_DEFINITIONS
 #define GLOBAL_DEFINITIONS
 
-//Window size definitions
-#define GAMEX_RESOLUTION     640, 360
+//Window definitions
+#define WINDOW_TITLE        "Game Title"
+#define WINDOW_SIZE         1280, 720
+#define GAME_RESOLUTION     640, 360
 
 //GameObject Optimization enums for bitwise based operations
 

@@ -46,7 +46,7 @@ void Sound::Update (float dt) {
     if(Mix_Playing(channel)) {
         if(audioPan) {
             float SoundPos = associated.box.GetGlobalCenter().x - Camera::GetPosition().x; //Game::GetInstance().GetState().Cam.Position.x;
-            int Location = (SoundPos/Vec2(GAMEX_RESOLUTION).x * 400.f);
+            int Location = (SoundPos/Vec2(GAME_RESOLUTION).x * 400.f);
             (Location < 0 ? Location = 0 : (Location > 400 ? Location = 400 : Location));
             Location-=200;
             int R = 255 + Location;

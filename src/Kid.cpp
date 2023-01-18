@@ -127,6 +127,7 @@ void Kid::HandleJump (bool isKeyDown, float dt) {
     }
 }
 
+// editar: dar reset no timer
 void* Kid::CameraCheckGrounded () {
     if (rigidBody->IsGrounded()) {
         float dt = Game::GetInstance().GetDeltaTime();

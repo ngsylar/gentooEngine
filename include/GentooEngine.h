@@ -34,8 +34,8 @@
 #include "Collision.h"
 #include "Component.h"
 #include "Resources.h"
-#include "GlobalDefinitions.h"
 #include "Color.h"
+#include "GlobalDefinitions.h"
 
 // Engine Object Components
 #include "RigidBody.h"

@@ -7,7 +7,7 @@ ScreenFilter::ScreenFilter(GameObject& associated, Color filterColor)
 
     this->filterColor = filterColor;
     _FilterSurface = nullptr;
-    Vec2 SurfRes(GAMEX_RESOLUTION);
+    Vec2 SurfRes(GAME_RESOLUTION);
     _FilterSurface = SDL_CreateRGBSurface(0, SurfRes.x, SurfRes.y, 32, 0,0,0,0);
 }
 
