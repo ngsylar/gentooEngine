@@ -25,7 +25,7 @@ class Ball: public Component {
         void HandleJump(bool isKeyDown, float dt);
         void CameraCheckTracking(float dt);
 
-        bool Is(GameObjID type);
+        bool Is(ComponentType type);
 
         // cinemachine assistant
         void CameraHandleFall(float dt);

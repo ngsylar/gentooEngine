@@ -4,7 +4,7 @@ GameObject::GameObject (int layer, std::string label) {
     isDead = false;
     started = false;
     angleDeg = 0.0f;
-    contains = GameObjID::_None;
+    contains = ComponentType::_None;
 
     this->label = label;
     this->layer = layer;
@@ -46,7 +46,7 @@ void GameObject::Render () {
     }
 }
 
-bool GameObject::Contains (GameObjID type) {
+bool GameObject::Contains (ComponentType type) {
     return (contains & type);
 }
 
@@ -89,7 +89,7 @@ Component* GameObject::GetComponent (std::string type) {
     return nullptr;
 }
 
-Component* GameObject::GetComponent (GameObjID type) {
+Component* GameObject::GetComponent (ComponentType type) {
     
     if(contains & type) {
         for (int i=0; i < (int)components.size(); i++) {

@@ -9,7 +9,7 @@ PlatformCamera::PlatformCamera (
     activeRect = MOVE;
     bodied = false;
     isMoved = false;
-    type = GameObjID::_PlatformCamera;
+    type = ComponentType::_PlatformCamera;
 }
 
 PlatformCamera::~PlatformCamera () {
@@ -17,7 +17,7 @@ PlatformCamera::~PlatformCamera () {
 }
 
 void PlatformCamera::SetTrigger (Rect rectToMove, Rect rectToUndo) {
-    Collider* collider = (Collider*)associated.GetComponent(GameObjID::_Collider);
+    Collider* collider = (Collider*)associated.GetComponent(ComponentType::_Collider);
     colliderRects = {rectToMove, rectToUndo};
     associated.box = rectToMove;
     if (collider == nullptr)
@@ -127,6 +127,6 @@ void* PlatformCamera::LimitCamera () {
     return nullptr;
 }
 
-bool PlatformCamera::Is (GameObjID type) {
+bool PlatformCamera::Is (ComponentType type) {
     return (type & this->type);
 }

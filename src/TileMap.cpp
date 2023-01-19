@@ -8,7 +8,7 @@ TileMap::TileMap (
     Load(file);
     this->parallaxFactor = parallaxFactor;
     associated.label = "TileMap";
-    type = GameObjID::_TileMap;
+    type = ComponentType::_TileMap;
 }
 
 TileMap::~TileMap () {
@@ -83,6 +83,6 @@ bool TileMap::Is (std::string type) {
     return (type == "TileMap");
 }
 
-bool TileMap::Is (GameObjID type) {
+bool TileMap::Is (ComponentType type) {
     return (type & this->type);
 }

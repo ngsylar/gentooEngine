@@ -20,6 +20,6 @@ bool Component::Is (std::string type) {
     return (type == "Component");
 }
 
-bool Component::Is (GameObjID type) {
+bool Component::Is (ComponentType type) {
     return (type & this->type);
 }

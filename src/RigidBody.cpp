@@ -10,7 +10,7 @@ RigidBody::RigidBody (GameObject& associated, float gravityValue): Component(ass
     collidingFaces[LEFT] = false;
     collidingFaces[RIGHT] = false;
 
-    type = GameObjID::_RigidBody;
+    type = ComponentType::_RigidBody;
 }
 
 RigidBody::~RigidBody () {
@@ -91,7 +91,7 @@ void RigidBody::NotifyCollision (GameObject& other) {
     // check if the other collider is trigger or if a collision with the other already exists
     /*--------------------------------------------------------------------------------------------------*/
 
-    Collider* otherCollider = (Collider*)other.GetComponent(GameObjID::_Collider);
+    Collider* otherCollider = (Collider*)other.GetComponent(ComponentType::_Collider);
     if (otherCollider->isTrigger) return;
     
     for (int i=0; i < (int)collidingOthers.size(); i++)
@@ -127,7 +127,7 @@ void RigidBody::NotifyCollision (GameObject& other) {
     // get information about the objects
     /*--------------------------------------------------------------------------------------------------*/
 
-    Collider* collider = (Collider*)associated.GetComponent(GameObjID::_Collider);
+    Collider* collider = (Collider*)associated.GetComponent(ComponentType::_Collider);
     Vec2 position = associated.box.GetPosition();
 
     float halfBody[4] = {
@@ -252,6 +252,6 @@ bool RigidBody::Is (std::string type) {
     return (type == "RigidBody");
 }
 
-bool RigidBody::Is (GameObjID type) {
+bool RigidBody::Is (ComponentType type) {
     return (type & this->type);
 }

@@ -25,7 +25,7 @@ class LoopedBackground: public Component {
         void Start();
         void LateUpdate(float dt);
         void Render();
-        bool Is(GameObjID type);
+        bool Is(ComponentType type);
 };
 
 #endif

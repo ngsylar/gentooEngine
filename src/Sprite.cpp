@@ -13,7 +13,7 @@ Sprite::Sprite (GameObject& associated): Component(associated) {
     selfDestruction = false;
     parallaxFactor = 1.0f;
     textureFlip = SDL_FLIP_NONE;
-    type = GameObjID::_Sprite;
+    type = ComponentType::_Sprite;
 }
 
 Sprite::~Sprite () {
@@ -212,6 +212,6 @@ bool Sprite::Is (std::string type) {
     return (type == "Sprite");
 }
 
-bool Sprite::Is (GameObjID type) {
+bool Sprite::Is (ComponentType type) {
     return (type & this->type);
 }

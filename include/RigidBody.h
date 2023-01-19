@@ -30,7 +30,7 @@ class RigidBody: public Component {
         void NotifyNoCollision(GameObject& other);
         bool IsColliding (ColliderFace face);
         bool Is(std::string type);
-        bool Is(GameObjID type);
+        bool Is(ComponentType type);
 
     private:
         Vec2 velocity;

@@ -8,8 +8,9 @@
 class Component {
     protected:
         GameObject& associated;
+
     public:
-        GameObjID type = GameObjID::_None;
+        ComponentType type = ComponentType::_None;
 
         Component(GameObject& associated);
         virtual ~Component();
@@ -20,7 +21,7 @@ class Component {
         virtual void NotifyCollision(GameObject& other);
         virtual void NotifyNoCollision(GameObject& other);
         virtual bool Is(std::string type);
-        virtual bool Is(GameObjID type);
+        virtual bool Is(ComponentType type);
 };
 
 #endif

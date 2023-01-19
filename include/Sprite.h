@@ -20,7 +20,6 @@ class Sprite: public Component {
             int textureWidth, textureHeight;
             bool textureOneshot, textureDestruction;
         };
-        enum TextureFlipper {HORIZONTAL, VERTICAL};
         std::vector<TextureStruct> textureArray;
         std::weak_ptr<SDL_Texture> texture;
         SDL_Rect clipRect;
@@ -32,6 +31,7 @@ class Sprite: public Component {
         int activeTexture;
 
     public:
+        enum TextureFlipper {HORIZONTAL, VERTICAL};
         SDL_RendererFlip textureFlip;
         std::vector<Vec2> positionArray;
         float parallaxFactor;
@@ -71,7 +71,7 @@ class Sprite: public Component {
         void RenderWithNoOffset(int startX, int startY);
         bool HasTexture();
         bool Is(std::string type);
-        bool Is(GameObjID type);
+        bool Is(ComponentType type);
 };
 
 #endif

@@ -65,7 +65,7 @@ void State::UpdateBase (float dt) {
     
     //FPS Counter
     if (Game::GetInstance().GetCurrentState().Debugging()) {
-        Text* UpdateFPS =(Text*)FPSObj.GetComponent(GameObjID::_Text);
+        Text* UpdateFPS =(Text*)FPSObj.GetComponent(ComponentType::_Text);
         UpdateFPS->SetText(std::to_string((int)(1/dt))+" FPS");
         FPSObj.LateUpdate(0);
     }
@@ -153,12 +153,12 @@ void State::DetectCollisions () {
     bool thereIsCollision;
 
     for (int i=0; i < (int)objectArray.size()-1; i++) {
-        if(objectArray[i]->Contains(GameObjID::_Collider)) {
+        if(objectArray[i]->Contains(ComponentType::_Collider)) {
             for (int j=i+1; j < (int)objectArray.size(); j++) {
-                if(objectArray[j]->Contains(GameObjID::_Collider))
+                if(objectArray[j]->Contains(ComponentType::_Collider))
                 {
-                    Collider* colliderA = (Collider*)objectArray[i]->GetComponent(GameObjID::_Collider);
-                    Collider* colliderB = (Collider*)objectArray[j]->GetComponent(GameObjID::_Collider);
+                    Collider* colliderA = (Collider*)objectArray[i]->GetComponent(ComponentType::_Collider);
+                    Collider* colliderB = (Collider*)objectArray[j]->GetComponent(ComponentType::_Collider);
 
                     thereIsCollision = Collision::IsColliding(
                         colliderA->box, colliderB->box,

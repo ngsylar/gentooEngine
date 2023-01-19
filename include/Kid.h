@@ -22,12 +22,13 @@ class Kid: public Component {
 
     public:
         Kid(GameObject& associated);
-        bool Is(GameObjID type);
         void Start();
         void Update(float dt);
         void Run(float displacement, SDL_RendererFlip flip=SDL_FLIP_NONE);
         void StartJump(float displacement);
         void HandleJump(bool isKeyDown, float dt);
+        void NotifyCollision(GameObject& other);
+        bool Is(ComponentType type);
         void* CameraCheckGrounded();
         void DebugScript(float dt);
 };

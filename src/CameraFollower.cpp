@@ -1,7 +1,7 @@
 #include "GentooEngine.h"
 
 CameraFollower::CameraFollower (GameObject& associated): Component(associated) {
-    type = GameObjID::_CameraFollower;
+    type = ComponentType::_CameraFollower;
 }
 
 void CameraFollower::LateUpdate (float dt) {
@@ -13,6 +13,6 @@ bool CameraFollower::Is (std::string type) {
     return (type == "CameraFollower");
 }
 
-bool CameraFollower::Is (GameObjID type) {
+bool CameraFollower::Is (ComponentType type) {
     return (type & this->type);
 }

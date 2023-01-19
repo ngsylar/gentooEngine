@@ -26,7 +26,7 @@
 #include "Timer.h"
 #include "Vec2.h"
 
-// Engine System Components
+// Engine System Core
 #include "Rect.h"
 #include "GameObject.h"
 #include "Camera.h"
@@ -34,28 +34,29 @@
 #include "Collision.h"
 #include "Component.h"
 #include "Resources.h"
+
+// Engine Helpers
+#include "TileSet.h"
 #include "Color.h"
+#include "Music.h"
 #include "GlobalDefinitions.h"
 
-// Engine Object Components
+// Object Components
 #include "RigidBody.h"
 #include "Collider.h"
 #include "Sprite.h"
-#include "TileSet.h"
 #include "TileMap.h"
-#include "Music.h"
 #include "Sound.h"
 #include "Text.h"
+
+// Auxiliary Components
 #include "ScreenFilter.h"
 #include "ScreenFade.h"
-
-
-// Engine Auxiliary Components
 #include "CameraFollower.h"
 #include "CameraBox.h"
 #include "LoopedBackground.h"
 
-// Engine Control Core
+// Game Control Core
 #include "State.h"
 #include "Game.h"
 

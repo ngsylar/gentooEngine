@@ -2,7 +2,7 @@
 
 ScreenFade::ScreenFade(GameObject& associated, Color filterColor, float start, float finish, float time)
 : Component(associated), _FadeFilter(associated, filterColor) {
-    type = GameObjID::_ScreenFade;
+    type = ComponentType::_ScreenFade;
 
     _StartPercent = start;
     _CurrPercent = start;
@@ -35,7 +35,7 @@ bool ScreenFade::Is(std::string type) {
     return ("ScreenFade" == type);
 }
 
-bool ScreenFade::Is(GameObjID type) {
+bool ScreenFade::Is(ComponentType type) {
     return (this->type & type);
 }
 

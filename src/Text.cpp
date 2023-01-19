@@ -20,7 +20,7 @@ Text::Text (
 
     this->text = text;
     RemakeTexture();
-    type = GameObjID::_Text;
+    type = ComponentType::_Text;
 }
 
 Text::~Text () {
@@ -133,6 +133,6 @@ bool Text::Is (std::string type) {
     return (type == "Text");
 }
 
-bool Text::Is (GameObjID type) {
+bool Text::Is (ComponentType type) {
     return (type & this->type);
 }

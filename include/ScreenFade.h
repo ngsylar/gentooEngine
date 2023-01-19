@@ -25,7 +25,7 @@ class ScreenFade: public Component {
         void RedirectFade(float finish);
         void SetTime(float time);
         bool Is(std::string type);
-        bool Is(GameObjID type);
+        bool Is(ComponentType type);
         void Render();
         void Update(float dt);
 };

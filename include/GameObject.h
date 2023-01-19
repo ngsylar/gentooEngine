@@ -14,7 +14,7 @@ class GameObject {
     private:
         std::vector<std::unique_ptr<Component>> components;
         bool started, isDead;
-        GameObjID contains;
+        ComponentType contains;
     public:
         std::string label;
         int layer;          // sylar's extra layer rendering
@@ -27,13 +27,13 @@ class GameObject {
         void Update(float dt);
         void LateUpdate(float dt);
         void Render();
-        bool Contains(GameObjID type);
+        bool Contains(ComponentType type);
         bool IsDead();
         void RequestDelete();
         void AddComponent(Component* cpt);
         void RemoveComponent(Component* cpt);
         Component* GetComponent(std::string type);
-        Component* GetComponent(GameObjID type);
+        Component* GetComponent(ComponentType type);
         void NotifyCollision(GameObject& other);
         void NotifyNoCollision(GameObject& other);
         

@@ -20,7 +20,7 @@ Ball::Ball (GameObject& associated): Component(associated) {
     jumpHeight = 0.0f;
     isJumping = false;
 
-    type = GameObjID::_Ball;
+    type = ComponentType::_Ball;
     // // cinemachine assistant
     // isFalling = false;
     // cameraDelay.SetResetTime(0.25f);
@@ -187,6 +187,6 @@ void Ball::CameraCheckTracking (float dt) {
     }
 }
 
-bool Ball::Is (GameObjID type) {
+bool Ball::Is (ComponentType type) {
     return (type & this->type);
 }

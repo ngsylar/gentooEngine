@@ -3,9 +3,14 @@
 
 #define SPRITE_IDLE                 "assets/img/prota2.png"
 #define SPRITE_RUN                  "assets/img/prota2_run.png"
+#define SPRITE_RUN_FRAMES           8, 0.05f
 
 #define RIGIDBODY_VELOCITY_MAX      400.0f
+#define COLLIDER_POSITION           0.0f, 9.0f
+#define COLLIDER_BOX_SIZE           16.0f, 28.0f
 
+#define CAMERA_BOX_RECT             16.0f, 19.0f, 16.0f, 28.0f
+#define CAMERA_BOX_SPACING          0.0f, 12.0f
 #define CINEMACHINE_LENGTH          14.0f, 86.0f
 #define CINEMACHINE_SLICES          8, 32, 2, 24
 #define CINEMACHINE_OFFSET          0.0f, -12.0f
@@ -20,12 +25,12 @@ Kid::Kid (GameObject& associated): Component(associated) {
     runSpeedNow = 0.0f;
     jumpHeightNow = 0.0f;
     jumpingIsConstant = false;
-    type = GameObjID::_Kid;
+    type = ComponentType::_Kid;
 }
 
 void Kid::Start () {
     sprite = new Sprite(associated, SPRITE_IDLE);
-    sprite->AddTexture(SPRITE_RUN, 8, 0.05f);
+    sprite->AddTexture(SPRITE_RUN, SPRITE_RUN_FRAMES);
     sprite->SetTexture(IDLE);
     associated.AddComponent(sprite);
     
@@ -35,11 +40,11 @@ void Kid::Start () {
     
     collider = new Collider(associated);
     associated.AddComponent(collider);
-    collider->SetBox(Vec2(0, 9), Vec2(16, 28));
+    collider->SetBox(Vec2(COLLIDER_POSITION), Vec2(COLLIDER_BOX_SIZE));
 
     cameraBox = new GameObject(associated.layer);
-    CameraBox* boxComponent = new CameraBox(*cameraBox, &associated, 0, 12);
-    boxComponent->focusBoxOffset = Rect(16.0f, 19.0f, 16.0f, 28.0f);
+    CameraBox* boxComponent = new CameraBox(*cameraBox, &associated, CAMERA_BOX_SPACING);
+    boxComponent->focusBoxOffset = Rect(CAMERA_BOX_RECT);
     cameraBox->AddComponent(boxComponent);
     boxComponent->AddMethod(this, std::bind(&CameraCheckGrounded, this));
     Game::GetInstance().GetCurrentState().AddObject(cameraBox);
@@ -127,19 +132,31 @@ void Kid::HandleJump (bool isKeyDown, float dt) {
     }
 }
 
-// editar: dar reset no timer
+bool Kid::Is (ComponentType type) {
+    return (type & this->type);
+}
+
+void Kid::NotifyCollision (GameObject& other) {
+
+}
+
 void* Kid::CameraCheckGrounded () {
-    if (rigidBody->IsGrounded()) {
-        float dt = Game::GetInstance().GetDeltaTime();
-        if (not cameraGroundedTimer.IsOver()) {
-            cameraGroundedTimer.Update(dt);
-            return nullptr;
-        }
-        float cameraBoxY = collider->box.y - (cameraBox->box.h - collider->box.h);
-        if (cameraBox->box.y > cameraBoxY) {
-            cameraBox->box.y -= (cameraBox->box.y - cameraBoxY) * dt;
-            if (cameraBox->box.y < cameraBoxY)
-                cameraBox->box.y = cameraBoxY;
+    if (not rigidBody->IsGrounded()) {
+        cameraGroundedTimer.Reset();
+        return nullptr;
+    }
+    float dt = Game::GetInstance().GetDeltaTime();
+    if (not cameraGroundedTimer.IsOver()) {
+        cameraGroundedTimer.Update(dt);
+        return nullptr;
+    }
+
+    float cameraBoxY = collider->box.y - (cameraBox->box.h - collider->box.h);
+    if (cameraBox->box.y > cameraBoxY) {
+        cameraBox->box.y -= (cameraBox->box.y - cameraBoxY) * dt;
+        if (cameraBox->box.y < cameraBoxY) {
+            cameraBox->box.y = cameraBoxY;
+            cameraGroundedTimer.Reset();
         }
     } return nullptr;
 }
@@ -164,8 +181,4 @@ void Kid::DebugScript (float dt) {
         // SDL_Log("mstoff %f", Camera::masterOffset.y);
         // SDL_Log("distan %f", Camera::GetPosition().y - associated.box.GetPosition().y);
     }
-}
-
-bool Kid::Is (GameObjID type) {
-    return (type & this->type);
 }

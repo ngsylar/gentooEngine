@@ -10,7 +10,7 @@ CameraBox::CameraBox (
     this->isDynamic = false;
     dynamicFactor = Vec2(1.0f, 1.0f);
 
-    type = GameObjID::_CameraBox;
+    type = ComponentType::_CameraBox;
 }
 
 void CameraBox::Start () {
@@ -137,7 +137,7 @@ bool CameraBox::Is (std::string type) {
     return (type == "CameraBox");
 }
 
-bool CameraBox::Is (GameObjID type) {
+bool CameraBox::Is (ComponentType type) {
     return (type & this->type);
 }
 

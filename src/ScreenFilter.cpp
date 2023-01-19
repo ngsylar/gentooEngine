@@ -3,7 +3,7 @@
 
 ScreenFilter::ScreenFilter(GameObject& associated, Color filterColor)
 : Component(associated) {
-    type = GameObjID::_ScreenFilter;
+    type = ComponentType::_ScreenFilter;
 
     this->filterColor = filterColor;
     _FilterSurface = nullptr;
@@ -23,7 +23,7 @@ bool ScreenFilter::Is(std::string type) {
     return ("ScreenFilter" == type);
 }
 
-bool ScreenFilter::Is(GameObjID type) {
+bool ScreenFilter::Is(ComponentType type) {
     return (this->type & type);
 }
 
