@@ -4,7 +4,6 @@
 #include "GameObject.h"
 #include "GlobalDefinitions.h"
 
-
 class Component {
     protected:
         GameObject& associated;

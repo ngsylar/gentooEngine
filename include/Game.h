@@ -11,7 +11,7 @@
 
 #define WINDOW_TITLE_DEF    "Gentoo Engine"
 #define WINDOW_SIZE_DEF     1024, 576
-#define WINDOW_FLAGS        0
+#define WINDOW_FLAGS        SDL_WINDOW_RESIZABLE
 #define MIXER_CHANNELS      32
 #define MIXER_CHUNK_SIZE    1024
 #define RENDER_AUTO_DRIVE   -1

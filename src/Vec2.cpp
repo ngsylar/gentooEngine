@@ -54,11 +54,11 @@ Vec2 Vec2::Rotate (float angle) {
 }
 
 bool Vec2::operator== (const Vec2& vec) const {
-    return ((x==vec.x) and (y==vec.y));
+    return ((abs(x-vec.x)<1e-9) and (abs(y-vec.y)<1e-9));
 }
 
 bool Vec2::operator!= (const Vec2& vec) const {
-    return ((x!=vec.x) or (y!=vec.y));
+    return not (*this == vec);
 }
 
 Vec2 Vec2::operator- () {

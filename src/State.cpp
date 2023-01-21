@@ -149,6 +149,10 @@ std::weak_ptr<GameObject> State::GetObjectPtr (std::string label) {
     return wptrGo;
 }
 
+void State::ScheduleSort() {
+    scheduleSortingLayer = true;
+}
+
 void State::DetectCollisions () {
     bool thereIsCollision;
 

@@ -3,8 +3,8 @@
 
 // Window definitions
 #define WINDOW_TITLE        "Game Title"
-#define WINDOW_SIZE         640, 360
-#define GAME_RESOLUTION     640, 360
+#define WINDOW_SIZE         455, 256
+#define GAME_RESOLUTION     455, 256
 
 // GameObject Optimization enums for bitwise based operations
 enum ComponentType {
@@ -39,15 +39,15 @@ enum ComponentType {
     //...
 };
 
-inline ComponentType operator|(ComponentType a, ComponentType b) {
+inline ComponentType operator| (ComponentType a, ComponentType b) {
     return static_cast<ComponentType>(static_cast<int>(a) | static_cast<int>(b));
 }
 
-inline ComponentType operator&(ComponentType a, ComponentType b) {
+inline ComponentType operator& (ComponentType a, ComponentType b) {
     return static_cast<ComponentType>(static_cast<int>(a) & static_cast<int>(b));
 }
 
-inline ComponentType operator^(ComponentType a, ComponentType b) {
+inline ComponentType operator^ (ComponentType a, ComponentType b) {
     return static_cast<ComponentType>(static_cast<int>(a) ^ static_cast<int>(b));
 }
 

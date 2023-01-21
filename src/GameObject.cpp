@@ -22,6 +22,11 @@ bool GameObject::CompareLayers (
     return (goA.lock()->layer < goB.lock()->layer);
 }
 
+void GameObject::SetLayer (int layer) {
+    this->layer = layer;
+    Game::GetInstance().GetCurrentState().ScheduleSort();
+}
+
 void GameObject::Start () {
     for (int i=0; i < (int)components.size(); i++)
         components[i]->Start();

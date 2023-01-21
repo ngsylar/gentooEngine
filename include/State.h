@@ -30,6 +30,7 @@ class State {
         virtual std::weak_ptr<GameObject> AddObject(GameObject* object);
         virtual std::weak_ptr<GameObject> GetObjectPtr(GameObject* object);
         virtual std::weak_ptr<GameObject> GetObjectPtr(std::string label);
+        void ScheduleSort();
         void DetectCollisions();
         bool Debugging();
         bool PopRequested();

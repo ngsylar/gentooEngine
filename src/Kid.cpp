@@ -7,7 +7,10 @@
 
 #define RIGIDBODY_VELOCITY_MAX      400.0f
 #define COLLIDER_POSITION           0.0f, 9.0f
-#define COLLIDER_BOX_SIZE           16.0f, 28.0f
+#define COLLIDER_BOX_SIZE           16.0f, 30.0f
+
+#define DAMAGE_FORCE                20.0f
+#define DAMAGE_DISPLACEMENT_MAX     70.0f
 
 #define CAMERA_BOX_RECT             16.0f, 19.0f, 16.0f, 28.0f
 #define CAMERA_BOX_SPACING          0.0f, 12.0f
@@ -16,7 +19,13 @@
 #define CINEMACHINE_OFFSET          0.0f, -12.0f
 #define CINEMACHINE_SETUP           true, true, true, false, true, true, false, false
 
+#define CAMERA_DAMAGE_SHAKE_COUNT   6
+#define CAMERA_DAMAGE_SHAKE_RANGE   3
+#define CAMERA_GROUNDED_RESET_TIME  1.5f
+
 Kid::Kid (GameObject& associated): Component(associated) {
+    type = ComponentType::_Kid;
+    // associated.SetLayer();
     associated.label = "Player";
     runSpeedMax = 150.0f;
     runAcceleration = 800.0f;
@@ -25,7 +34,10 @@ Kid::Kid (GameObject& associated): Component(associated) {
     runSpeedNow = 0.0f;
     jumpHeightNow = 0.0f;
     jumpingIsConstant = false;
-    type = ComponentType::_Kid;
+    damageDisplacement = Vec2(15.0f, -5.0f);
+    invincibilityIimer.SetResetTime(1.25f);
+    isInvincible = false;
+    status = IDLE;
 }
 
 void Kid::Start () {
@@ -37,6 +49,7 @@ void Kid::Start () {
     rigidBody = new RigidBody(associated);
     associated.AddComponent(rigidBody);
     rigidBody->velocityMax.y = RIGIDBODY_VELOCITY_MAX;
+    rigidBody->noInteractionLabels.push_back("Enemy");
     
     collider = new Collider(associated);
     associated.AddComponent(collider);
@@ -46,24 +59,32 @@ void Kid::Start () {
     CameraBox* boxComponent = new CameraBox(*cameraBox, &associated, CAMERA_BOX_SPACING);
     boxComponent->focusBoxOffset = Rect(CAMERA_BOX_RECT);
     cameraBox->AddComponent(boxComponent);
-    boxComponent->AddMethod(this, std::bind(&CameraCheckGrounded, this));
+    boxComponent->AddMethod(this, std::bind(&CameraEffects, this));
     Game::GetInstance().GetCurrentState().AddObject(cameraBox);
     
     Camera::Follow(
         cameraBox, Vec2(CINEMACHINE_LENGTH), CINEMACHINE_SLICES,
         Camera::RIGHT, Camera::UP, Vec2(CINEMACHINE_OFFSET));
     Camera::cinemachine.Setup(CINEMACHINE_SETUP);
-    cameraGroundedTimer.SetResetTime(1.5f);
+    cameraGroundedTimer.SetResetTime(CAMERA_GROUNDED_RESET_TIME);
 }
 
 void Kid::Update (float dt) {
     InputManager& input = InputManager::GetInstance();
 
     // handle status
-    if (rigidBody->IsGrounded())
+    if (isInvincible) {
+        invincibilityIimer.Update(dt);
+        if (invincibilityIimer.IsOver())
+            isInvincible = false;
+    } if (status == DAMAGE) {
+        TakeDamage(dt);
+        return;
+    } else if (rigidBody->IsGrounded()) {
         status = IDLE;
-    else if (rigidBody->GetVelocity().y > 0.0f)
+    } else if (rigidBody->GetVelocity().y > 0.0f) {
         status = FALL;
+    }
 
     // handle jumping
     if (jumpingIsConstant)
@@ -87,8 +108,8 @@ void Kid::Update (float dt) {
         runSpeedNow = 0.0f;
     }
 
-    // // debugging
-    // DebugScript(dt);
+    // debugging
+    DebugScript(input, dt);
 }
 
 void Kid::Run (float displacement, SDL_RendererFlip flip) {
@@ -132,15 +153,63 @@ void Kid::HandleJump (bool isKeyDown, float dt) {
     }
 }
 
+void Kid::TakeDamage (float dt) {
+    if (collider->box.GetPosition().DistanceTo(damageOrigin) > DAMAGE_DISPLACEMENT_MAX) {
+        rigidBody->Translate(damageDisplacement * DAMAGE_FORCE * 0.5f * dt);
+        status = FALL;
+    } else rigidBody->Translate(damageDisplacement * DAMAGE_FORCE * dt);
+}
+
+void Kid::NotifyCollision (GameObject& other) {
+    if (not isInvincible) {
+        if (other.label == "Enemy") {
+            damageOrigin = ((Collider*)other.GetComponent(ComponentType::_Collider))->box.GetPosition();
+            float signal = (associated.box.GetPosition().x < other.box.GetPosition().x) ? -1.0f : 1.0f;
+            damageDisplacement.x = signal * fabs(damageDisplacement.x);
+            rigidBody->CancelForces();
+            invincibilityIimer.Reset();
+            isInvincible = true;
+            status = DAMAGE;
+        }
+    } else if ((status == DAMAGE) and (other.label != "Enemy")) {
+        if (collider->box.GetPosition().DistanceTo(damageOrigin) < DAMAGE_DISPLACEMENT_MAX)
+            AnimationShake();
+        status = FALL;
+    }
+}
+
+void Kid::AnimationShake () {
+    cameraShakeReset = Vec2();
+    int shakeRange = (CAMERA_DAMAGE_SHAKE_RANGE << 1) + 1;
+    for (int i=0; i < CAMERA_DAMAGE_SHAKE_COUNT; i++) {
+        Vec2 shake = Vec2(
+            rand()%shakeRange-CAMERA_DAMAGE_SHAKE_RANGE,
+            rand()%shakeRange-CAMERA_DAMAGE_SHAKE_RANGE
+        ); cameraShakeQueue.push(shake);
+    }
+}
+
 bool Kid::Is (ComponentType type) {
     return (type & this->type);
 }
 
-void Kid::NotifyCollision (GameObject& other) {
+void* Kid::CameraEffects () {
+    /*--------------------------------------------------------------------------------------------------*/
+    // shakes the camera after a hit
+    /*--------------------------------------------------------------------------------------------------*/
 
-}
+    if (not cameraShakeQueue.empty()) {
+        Camera::masterOffset += cameraShakeQueue.front() - cameraShakeReset;
+        cameraShakeReset = cameraShakeQueue.front();
+        cameraShakeQueue.pop();
+        if (cameraShakeQueue.empty())
+            Camera::masterOffset -= cameraShakeReset;
+    }
 
-void* Kid::CameraCheckGrounded () {
+    /*--------------------------------------------------------------------------------------------------*/
+    // returns the camera to original focus offset when kid is grounded
+    /*--------------------------------------------------------------------------------------------------*/
+
     if (not rigidBody->IsGrounded()) {
         cameraGroundedTimer.Reset();
         return nullptr;
@@ -161,24 +230,26 @@ void* Kid::CameraCheckGrounded () {
     } return nullptr;
 }
 
-void Kid::DebugScript (float dt) {
-    InputManager& input = InputManager::GetInstance();
+void Kid::DebugScript (InputManager& input, float dt) {
+    // rigidBody->gravityEnabled = false;
+    // if (input.IsKeyDown(KEY_ARROW_LEFT))
+    //     rigidBody->Translate(Vec2(-runSpeedMax,0)*dt);
+    // if (input.IsKeyDown(KEY_ARROW_RIGHT))
+    //     rigidBody->Translate(Vec2(runSpeedMax,0)*dt);
+    // if (input.IsKeyDown(KEY_ARROW_UP))
+    //     rigidBody->Translate(Vec2(0,-runSpeedMax)*dt);
+    // if (input.IsKeyDown(KEY_ARROW_DOWN))
+    //     rigidBody->Translate(Vec2(0,runSpeedMax)*dt);
 
-    rigidBody->gravityEnabled = false;
-    if (input.IsKeyDown(KEY_ARROW_LEFT))
-        rigidBody->Translate(Vec2(-runSpeedMax,0)*dt);
-    if (input.IsKeyDown(KEY_ARROW_RIGHT))
-        rigidBody->Translate(Vec2(runSpeedMax,0)*dt);
-    if (input.IsKeyDown(KEY_ARROW_UP))
-        rigidBody->Translate(Vec2(0,-runSpeedMax)*dt);
-    if (input.IsKeyDown(KEY_ARROW_DOWN))
-        rigidBody->Translate(Vec2(0,runSpeedMax)*dt);
+    if (input.KeyPress(KEY_D) and cameraShakeQueue.empty())
+        AnimationShake();
 
     if (input.KeyPress(KEY_SPACE)) {
-        SDL_Log("camera %f", Camera::pos.y);
+        // SDL_Log("camera %f", Camera::pos.y);
         // SDL_Log("offset %f", Camera::offset.y);
         // SDL_Log("scroff %f", Camera::screenOffset.y);
         // SDL_Log("mstoff %f", Camera::masterOffset.y);
         // SDL_Log("distan %f", Camera::GetPosition().y - associated.box.GetPosition().y);
+        SDL_Log("masteroffset %f %f", Camera::masterOffset.x, Camera::masterOffset.y);
     }
 }

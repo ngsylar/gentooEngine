@@ -23,6 +23,7 @@ class GameObject {
 
         GameObject(int layer=0, std::string label="");
         ~GameObject();
+        void SetLayer(int layer);
         void Start();
         void Update(float dt);
         void LateUpdate(float dt);

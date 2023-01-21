@@ -19,10 +19,11 @@ void EnemyArmadillo::Start () {
     rigidBody = new RigidBody(associated);
     associated.AddComponent(rigidBody);
     rigidBody->velocityMax.y = RIGIDBODY_VELOCITY_MAX;
+    rigidBody->noInteractionLabels.push_back("Player");
     
     collider = new Collider(associated);
     associated.AddComponent(collider);
-    collider->SetBox(Vec2(0, 14), Vec2(29, 18));
+    collider->SetBox(Vec2(0, 14), Vec2(29, 20));
 }
 
 void EnemyArmadillo::Update (float dt) {

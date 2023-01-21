@@ -91,6 +91,9 @@ void RigidBody::NotifyCollision (GameObject& other) {
     // check if the other collider is trigger or if a collision with the other already exists
     /*--------------------------------------------------------------------------------------------------*/
 
+    for (std::string label : noInteractionLabels)
+        if (other.label == label) return;
+
     Collider* otherCollider = (Collider*)other.GetComponent(ComponentType::_Collider);
     if (otherCollider->isTrigger) return;
     
@@ -103,7 +106,7 @@ void RigidBody::NotifyCollision (GameObject& other) {
     /*--------------------------------------------------------------------------------------------------*/
 
     std::weak_ptr<GameObject> otherPtr = Game::GetInstance().GetCurrentState().GetObjectPtr(&other);
-    bool isColliding[4] = {false};
+    std::array<bool, 4> isColliding = {false, false, false, false};
     // SDL_Log("%f\t%f", movementDirection.x, movementDirection.y);
 
     if (movementDirection.y < 0) {
@@ -174,7 +177,7 @@ void RigidBody::NotifyCollision (GameObject& other) {
             else isColliding[RIGHT] = false;
         }
     }
-    
+
     /*--------------------------------------------------------------------------------------------------*/
     // pushes the associated away from the other
     /*--------------------------------------------------------------------------------------------------*/
@@ -211,7 +214,7 @@ void RigidBody::NotifyNoCollision (GameObject& other) {
     // remove movement restriction
     /*--------------------------------------------------------------------------------------------------*/
 
-    bool isColliding[4] = {false};
+    std::array<bool, 4> isColliding = {false, false, false, false};
 
     for (int i=(int)collidingOthers.size()-1; i >= 0; i--) {
         if (collidingOthers[i].first.lock().get() == &other)
@@ -220,14 +223,8 @@ void RigidBody::NotifyNoCollision (GameObject& other) {
             isColliding[collidingOthers[i].second] = true;
     }
 
-    /*--------------------------------------------------------------------------------------------------*/
     // prevents the associated from traversing the others
-    /*--------------------------------------------------------------------------------------------------*/
-    
-    collidingFaces[UP] = isColliding[UP];
-    collidingFaces[DOWN] = isColliding[DOWN];
-    collidingFaces[LEFT] = isColliding[LEFT];
-    collidingFaces[RIGHT] = isColliding[RIGHT];
+    collidingFaces = isColliding;
 }
 
 bool RigidBody::IsColliding (ColliderFace face) {

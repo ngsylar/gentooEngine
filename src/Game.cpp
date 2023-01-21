@@ -49,7 +49,7 @@ Game::Game (std::string title, int width, int height, int logicalWidth, int logi
     window = SDL_CreateWindow(
         this->title.c_str(),
         SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-        this->width, this->height, WINDOW_FLAGS
+        this->width, this->height, WINDOW_FLAGS// | SDL_WINDOW_BORDERLESS
     );
     if (window == nullptr) {
         SDL_Log("Unable to create window: %s", SDL_GetError());
@@ -68,7 +68,7 @@ Game::Game (std::string title, int width, int height, int logicalWidth, int logi
     resolution = Vec2(logicalWidth, logicalHeight);
     if (resolution != Vec2()) {
         SDL_RenderSetLogicalSize(renderer, logicalWidth, logicalHeight);
-        SDL_RenderSetIntegerScale(renderer, SDL_TRUE);
+        // SDL_RenderSetIntegerScale(renderer, SDL_TRUE);
     } else {
         resolution = Vec2(width, height);
     }

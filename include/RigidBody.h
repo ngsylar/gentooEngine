@@ -1,8 +1,9 @@
 #ifndef RIGID_BODY_H
 #define RIGID_BODY_H
 
-#include <utility>
+#include <array>
 #include <queue>
+#include <utility>
 
 #include "Component.h"
 
@@ -12,7 +13,7 @@ class RigidBody: public Component {
         // enum BodyType {DYNAMIC, KINEMATIC, STATIC};
         enum Axis {HORIZONTAL, VERTICAL, ALL};
         enum ColliderFace {UP, DOWN, LEFT, RIGHT};
-
+        std::vector<std::string> noInteractionLabels;
         bool gravityEnabled;
         float gravityValue;
         Vec2 velocityMax;
@@ -37,7 +38,7 @@ class RigidBody: public Component {
         Vec2 movementDirection;
         std::queue<Vec2> previousPosition;
         std::vector<std::pair<std::weak_ptr<GameObject>, ColliderFace>> collidingOthers;
-        bool collidingFaces[4];
+        std::array<bool, 4> collidingFaces;
     
         void HandleGravity(float dt);
         void CheckDeletedColliders();

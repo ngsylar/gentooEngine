@@ -84,7 +84,7 @@ void TestScene::LoadAssets () {
     rawPlat->box.SetPosition(150, 162.5f);
     rawPlat->AddComponent(new Collider(*rawPlat));
 
-    GameObject* rawSquare = new GameObject(LAYER_RED_SQUARE);
+    GameObject* rawSquare = new GameObject(4);
     AddObject(rawSquare);
     square = GetObjectPtr(rawSquare);
     rawSquare->AddComponent(new Kid(*rawSquare));
