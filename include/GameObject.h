@@ -43,6 +43,9 @@ class GameObject {
             std::weak_ptr<GameObject>& goA,
             std::weak_ptr<GameObject>& goB
         );
+
+        //Magnific gambiarra
+        void SignalTerrain();
 };
 
 #endif

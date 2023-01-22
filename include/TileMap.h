@@ -5,11 +5,25 @@
 
 #include "TileSet.h"
 
+struct RectInt{
+    int x, y, w, h;
+};
+
 class TileMap: public Component {
     private:
         TileSet* tileSet;
-        std::vector<int> tileMatrix;
+        std::vector<std::vector<int>> _tileMatrix;
         int mapWidth, mapHeight, mapDepth;
+
+        //Collision automation functions
+        int Hash(std::vector<std::vector<int>>& Map);
+        bool HasMapChanged(int HashResult, std::string HashPath);
+        std::vector<RectInt> LoadCoord(std::string File);
+        void DumpCoord(const std::vector<RectInt>& Data, std::string File);
+        void BorderMarking(std::vector<std::vector<int>> &Map);
+        void FindX(std::vector<std::vector<int>>& Map);
+        std::vector<RectInt> MapToCoord(std::vector<std::vector<int>>& Map);
+        void CoordOptimizer(std::vector<RectInt>& Coords);
     
     public:
         float parallaxFactor;
@@ -22,8 +36,8 @@ class TileMap: public Component {
         );
         ~TileMap();
         void Load(std::string fileName);
+        void LoadCollision(std::string fileName);
         void SetTileSet(TileSet* tileSet);
-        int& At(int x, int y, int z=0);
         void Update(float dt);
         void Render();
         void RenderLayer(int layer, int cameraX=0, int cameraY=0);

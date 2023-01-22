@@ -160,7 +160,7 @@ void TestScene2::LoadAssets () {
     // runSpr->parallaxFactor = 0.25;
     // for (int i=0; i<30; i++)
     //     runSpr->positionArray.push_back(Vec2(i*142,200));
-    
+
     GameObject* rawSquare = new GameObject(LAYER_RED_SQUARE);
     Sprite* piss = new Sprite(*rawSquare, SPRITE_RED_SQUARE);
     piss->SetScale(0.5f);
@@ -226,7 +226,7 @@ void TestScene3::LoadAssets () {
         rawPlat->box.SetPosition(250, i*200);
         rawPlat->AddComponent(new Collider(*rawPlat));
     }
-    
+
     GameObject* rawSquare = new GameObject(LAYER_RED_SQUARE);
     Sprite* piss = new Sprite(*rawSquare, SPRITE_RED_SQUARE);
     piss->SetScale(0.5f);
@@ -295,7 +295,7 @@ void TestScene4::LoadAssets () {
         rawPlat->box.SetPosition(250, 250-i*175);
         rawPlat->AddComponent(new Collider(*rawPlat));
     }
-    
+
     GameObject* rawSquare = new GameObject(LAYER_RED_SQUARE);
     Sprite* piss = new Sprite(*rawSquare, SPRITE_RED_SQUARE);
     piss->SetScale(0.5f);
@@ -361,6 +361,64 @@ void TestScene5::LoadAssets () {
 }
 
 void TestScene5::Update (float dt) {
+    if (InputManager::GetInstance().KeyPress(KEY_ESCAPE)) {
+        Game::GetInstance().AddState(new TestScene6());
+        popRequested = true;
+    }
+}
+
+#define SPRITE_BG1 "assets/img/bg1.png"
+#define SPRITE_BG2 "assets/img/bg2.png"
+#define SPRITE_TILE "assets/img/tiles.png"
+//No .txt extension because TileMap does some tricks with a raw name
+#define MAP_BASE "assets/map/BaseMap"
+
+TestScene6::TestScene6 () {
+    
+    
+    
+    GameObject* BgObj = new GameObject(SCENE_TEST_LAYER, SCENE_TEST_LABEL);
+    LoopedBackground* Bg1 = new LoopedBackground(*BgObj,SPRITE_BG1,1);
+    BgObj->AddComponent(Bg1);
+    BgObj->AddComponent(new CameraFollower(*BgObj));
+    AddObject(BgObj);
+    BgObj->box.SetPosition(0,0);
+    
+    GameObject* BgObj2 = new GameObject(0, SCENE_TEST_LABEL);
+    LoopedBackground* Bg2 = new LoopedBackground(*BgObj2,SPRITE_BG2,3,0.3);
+    BgObj2->AddComponent(Bg2);
+    AddObject(BgObj2);
+    BgObj2->box.SetPosition(0,0);
+
+   // fazer o bg loop dps
+    // Sprite* sqspr = new Sprite(*bg, SCENE_TEST_BACKGROUND);
+    // sqspr->SetScale(0.5f);
+    // bg->AddComponent(sqspr);
+    // LoopedBackground* lbg = new LoopedBackground(*bg, SCENE_TEST_BACKGROUND, 2, 0.25f);
+    // bg->AddComponent(lbg);
+}
+
+void TestScene6::LoadAssets () {
+    //#####################################
+    GameObject* TileObj = new GameObject(1);
+    TileSet* Set = new TileSet(*TileObj, SPRITE_TILE, 28,28);
+    TileMap* tile = new TileMap(*TileObj, Set, MAP_BASE);
+    tile->LoadCollision(MAP_BASE);
+    TileObj->AddComponent(tile);
+    AddObject(TileObj);
+    //#####################################
+
+    GameObject* rawSquare = new GameObject(LAYER_RED_SQUARE);
+    // Sprite* piss = new Sprite(*rawSquare, SPRITE_RED_SQUARE);
+    // piss->SetScale(0.5f);
+    // rawSquare->AddComponent(piss);
+    AddObject(rawSquare);
+    square = GetObjectPtr(rawSquare);
+    rawSquare->AddComponent(new Kid(*rawSquare));
+    rawSquare->box.SetPosition(256,150);
+}
+
+void TestScene6::Update (float dt) {
     if (InputManager::GetInstance().KeyPress(KEY_ESCAPE)) {
         Game::GetInstance().AddState(new TestScene());
         popRequested = true;

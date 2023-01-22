@@ -116,3 +116,7 @@ void GameObject::NotifyNoCollision (GameObject& other) {
         components[i]->NotifyNoCollision(other);
     }
 }
+
+void GameObject::SignalTerrain () {
+    contains = contains | ComponentType::_Terrain;
+}

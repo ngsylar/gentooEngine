@@ -54,4 +54,13 @@ class TestScene5: public State {
         void Update(float dt);
 };
 
+class TestScene6: public State {
+    private:
+        std::weak_ptr<GameObject> square;
+    public:
+        TestScene6();
+        void LoadAssets();
+        void Update(float dt);
+};
+
 #endif

@@ -35,6 +35,7 @@ enum ComponentType {
 
     // Testing Environment
     _Ball =             1 << 20,
+    _Terrain =             1 << 30,
     
     //...
 };
