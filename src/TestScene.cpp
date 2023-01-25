@@ -370,33 +370,31 @@ void TestScene5::Update (float dt) {
 #define SPRITE_BG1 "assets/img/bg1.png"
 #define SPRITE_BG2 "assets/img/bg2.png"
 #define SPRITE_TILE "assets/img/tiles.png"
+#define SPRITE_FF "assets/img/Firefly.png"
 //No .txt extension because TileMap does some tricks with a raw name
 #define MAP_BASE "assets/map/BaseMap"
 
+#include "Dummy.h"
+
 TestScene6::TestScene6 () {
-    
-    
-    
     GameObject* BgObj = new GameObject(SCENE_TEST_LAYER, SCENE_TEST_LABEL);
-    LoopedBackground* Bg1 = new LoopedBackground(*BgObj,SPRITE_BG1,1);
+    Sprite* Bg1 = new Sprite(*BgObj,SPRITE_BG1,1);
     BgObj->AddComponent(Bg1);
     BgObj->AddComponent(new CameraFollower(*BgObj));
     AddObject(BgObj);
     BgObj->box.SetPosition(0,0);
+    BgObj->box.SetSize(Bg1->GetWidth(), Bg1->GetHeight());
     
     GameObject* BgObj2 = new GameObject(0, SCENE_TEST_LABEL);
     LoopedBackground* Bg2 = new LoopedBackground(*BgObj2,SPRITE_BG2,3,0.3);
     BgObj2->AddComponent(Bg2);
     AddObject(BgObj2);
-    BgObj2->box.SetPosition(0,0);
-
-   // fazer o bg loop dps
-    // Sprite* sqspr = new Sprite(*bg, SCENE_TEST_BACKGROUND);
-    // sqspr->SetScale(0.5f);
-    // bg->AddComponent(sqspr);
-    // LoopedBackground* lbg = new LoopedBackground(*bg, SCENE_TEST_BACKGROUND, 2, 0.25f);
-    // bg->AddComponent(lbg);
+    BgObj2->box.SetPosition(0,0); 
 }
+
+ScreenFade* 👽 = nullptr;
+#define CUSTOM_BLENDCOOL SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_SRC_ALPHA, SDL_BLENDFACTOR_ONE, SDL_BLENDOPERATION_ADD,\
+            SDL_BLENDFACTOR_ONE_MINUS_SRC_COLOR, SDL_BLENDFACTOR_ONE_MINUS_DST_COLOR, SDL_BLENDOPERATION_ADD)
 
 void TestScene6::LoadAssets () {
     //#####################################
@@ -409,18 +407,46 @@ void TestScene6::LoadAssets () {
     //#####################################
 
     GameObject* rawSquare = new GameObject(LAYER_RED_SQUARE);
-    // Sprite* piss = new Sprite(*rawSquare, SPRITE_RED_SQUARE);
-    // piss->SetScale(0.5f);
-    // rawSquare->AddComponent(piss);
     AddObject(rawSquare);
     square = GetObjectPtr(rawSquare);
     rawSquare->AddComponent(new Kid(*rawSquare));
-    rawSquare->box.SetPosition(256,150);
+    rawSquare->box.SetPosition(256,710);
+
+    GameObject* FadeObj = new GameObject(10);
+    ScreenFade* Fade = new ScreenFade(*FadeObj, Color("#000000"),0, 0, 1);
+    FadeObj->AddComponent(Fade);
+    AddObject(FadeObj);
+    👽 = Fade;
+
+    GameObject* FireflyObj = new GameObject(11);
+    Sprite* Firefly = new Sprite(*FireflyObj, SPRITE_FF, 25, 0.1);
+
+    FireflyObj->box.SetSize(Firefly->GetWidth(), Firefly->GetHeight());
+    FireflyObj->box.SetPosition(400,740);
+    // Firefly->SetScale(2);
+    FireflyObj->AddComponent(Firefly);
+    AddObject(FireflyObj);
+
+    Firefly->SetBlendMode(CUSTOM_BLENDCOOL);
+
+    GameObject* DummyObj = new GameObject(3);
+    Dummy* Dum = new Dummy(*DummyObj);
+    DummyObj->AddComponent(Dum);
+    DummyObj->box.SetPosition(600,748);
+    AddObject(DummyObj);
+
 }
 
 void TestScene6::Update (float dt) {
     if (InputManager::GetInstance().KeyPress(KEY_ESCAPE)) {
         Game::GetInstance().AddState(new TestScene());
         popRequested = true;
+        👽 = nullptr;
+    }
+    if (InputManager::GetInstance().KeyPress(KEY_MINUS)) {
+        👽->RedirectFade(0);
+    }
+    if (InputManager::GetInstance().KeyPress(KEY_EQUAL)) {
+        👽->RedirectFade(0.85);
     }
 }

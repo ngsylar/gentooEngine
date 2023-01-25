@@ -101,6 +101,10 @@ void Sprite::SetScale (float scale) {
     SetScale(scale, scale);
 }
 
+void Sprite::SetBlendMode (SDL_BlendMode blendMode) {
+    SDL_SetTextureBlendMode(textureArray[activeTexture].texture_sptr.get(),blendMode);
+}
+
 Vec2 Sprite::GetScale () {
     return scale;
 }

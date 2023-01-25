@@ -26,6 +26,7 @@ enum ComponentType {
     _PlatformCamera =   1 << 11,
     _Kid =              1 << 12,
     _Enemy =            1 << 13,
+    _EntityMachine =    1 << 14,
     // x = 1 << 14,
     // x = 1 << 15,
     // x = 1 << 16,
@@ -51,5 +52,22 @@ inline ComponentType operator& (ComponentType a, ComponentType b) {
 inline ComponentType operator^ (ComponentType a, ComponentType b) {
     return static_cast<ComponentType>(static_cast<int>(a) ^ static_cast<int>(b));
 }
+
+enum EntityState
+{
+    Idle,
+    Walking,
+    Running,
+    Jump,
+    Attack,
+    HitTaken,
+
+    //Leave declaration below as the last element,
+    //it is the index for how many valid states there are
+    __TOTAL,
+    //Declaration below is for initialization
+    None = 0xFF,
+};
+
 
 #endif

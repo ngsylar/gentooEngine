@@ -59,6 +59,7 @@ class Sprite: public Component {
         void SetClip(int x, int y, int w, int h);
         void SetScale(float scaleX, float scaleY);
         void SetScale(float scale);
+        void SetBlendMode(SDL_BlendMode blendMode);
         Vec2 GetScale();
         int GetWidth();
         int GetHeight();

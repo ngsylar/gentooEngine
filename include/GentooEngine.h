@@ -25,6 +25,7 @@
 // Math Custom Library
 #include "Timer.h"
 #include "Vec2.h"
+#include "MathTools.h"
 
 // Engine System Core
 #include "Rect.h"
