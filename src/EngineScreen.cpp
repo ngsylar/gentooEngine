@@ -65,8 +65,10 @@ std::weak_ptr<GameObject> EngineScreen::AddObject (GameObject* object) {
     std::weak_ptr<GameObject> wptrGo(sptrGo);
 
     objectArray.push_back(sptrGo);
-    if (started)
+    if (awake) {
+        object->Awaken();
         object->Start();
+    }
 
     return wptrGo;
 }

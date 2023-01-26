@@ -40,7 +40,7 @@ Kid::Kid (GameObject& associated): Component(associated) {
     status = IDLE;
 }
 
-void Kid::Start () {
+void Kid::Awaken () {
     sprite = new Sprite(associated, SPRITE_IDLE);
     sprite->AddTexture(SPRITE_RUN, SPRITE_RUN_FRAMES);
     sprite->SetTexture(IDLE);
@@ -61,11 +61,14 @@ void Kid::Start () {
     cameraBox->AddComponent(boxComponent);
     boxComponent->AddMethod(this, std::bind(&CameraEffects, this));
     Game::GetInstance().GetCurrentState().AddObject(cameraBox);
-    
+}
+
+void Kid::Start () {
     Camera::Follow(
         cameraBox, Vec2(CINEMACHINE_LENGTH), CINEMACHINE_SLICES,
         Camera::RIGHT, Camera::UP, Vec2(CINEMACHINE_OFFSET));
     Camera::cinemachine.Setup(CINEMACHINE_SETUP);
+    Camera::offset.y = 0;
     cameraGroundedTimer.SetResetTime(CAMERA_GROUNDED_RESET_TIME);
 }
 

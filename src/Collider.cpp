@@ -3,18 +3,18 @@
 Collider::Collider (GameObject& associated, Vec2 offset, bool trigger): Component(associated) {
     this->offset = offset;
     isTrigger = trigger;
-    started = false;
+    awake = false;
     type = ComponentType::_Collider;
 }
 
 void Collider::SetBox (Vec2 offset, Vec2 boxSize) {
     this->offset = offset;
     box.SetSize(boxSize.x, boxSize.y);
-    started = true;
+    awake = true;
 }
 
-void Collider::Start () {
-    if (started) return;
+void Collider::Awaken () {
+    if (awake) return;
     box.SetSize(associated.box.w, associated.box.h);
 }
 

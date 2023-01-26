@@ -27,7 +27,7 @@ void PlatformCamera::SetTrigger (Rect rectToMove, Rect rectToUndo) {
     bodied = true;
 }
 
-void PlatformCamera::Start () {
+void PlatformCamera::Awaken () {
     if (not bodied)
         Camera::AddMethod(this, std::bind(&LimitCamera, this));
 }

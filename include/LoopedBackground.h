@@ -7,18 +7,17 @@
 class LoopedBackground: public Component {
     private:
         enum Axis {HORIZONTAL, VERTICAL};
-
         Sprite* sprite;
         int halfSizes[2], renderingCount, middlePositionId;
     
     public:
-        float parallaxFactor;
+        Vec2 parallaxFactor;
         
         LoopedBackground(
             GameObject& associated,
             std::string fileName,
             int layerCount=2,
-            float parallaxFactor=1.0f
+            Vec2 parallaxFactor=Vec2(1.0f, 1.0f)
         );
         ~LoopedBackground();
         void SetLayerCount(int layerCount);

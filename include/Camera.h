@@ -7,8 +7,6 @@
 
 class Camera {
     private:
-        enum Axis {X, Y};
-
         static std::vector<std::pair<Component*, std::function<void*()>>> foreignMethods;
         static Vec2 posAdjustment;
         static GameObject* focus;
@@ -24,6 +22,7 @@ class Camera {
         };
 
     public:
+        enum Axis {X, Y};
         enum FocusDirection {LEFT, RIGHT, UP, DOWN, NONE};
 
         static float tolerance;

@@ -31,6 +31,7 @@ class Kid: public Component {
 
     public:
         Kid(GameObject& associated);
+        void Awaken();
         void Start();
         void Update(float dt);
         void Run(float displacement, SDL_RendererFlip flip=SDL_FLIP_NONE);

@@ -25,11 +25,24 @@
 #define LAYER_BLACK_SQUARE 2
 
 TestScene::TestScene () {
+    // // fazer o bg loop dps
+    // GameObject* bg = new GameObject(-2, SCENE_TEST_LABEL);
+    // Sprite* sqspr = new Sprite(*bg, SCENE_TEST_BACKGROUND);
+    // sqspr->SetScale(0.5f);
+    // bg->AddComponent(sqspr);
+    // bg->AddComponent(new CameraFollower(*bg));
+    // // LoopedBackground* lbg = new LoopedBackground(*bg, SCENE_TEST_BACKGROUND, 2, 0.25f);
+    // // bg->AddComponent(lbg);
+    // AddObject(bg);
+
+    // bg = new GameObject(SCENE_TEST_LAYER, SCENE_TEST_LABEL);
+    // LoopedBackground* lbg = new LoopedBackground(*bg, "assets/img/lbg.png", 2, Vec2(0.25f,0.25f));
+    // bg->AddComponent(lbg);
+    // AddObject(bg);
+
     GameObject* bg = new GameObject(SCENE_TEST_LAYER, SCENE_TEST_LABEL);
-    Sprite* spirte = new Sprite(*bg, SCENE_TEST_BACKGROUND);
-    spirte->SetScale(0.5f);
-    bg->AddComponent(spirte);
-    bg->AddComponent(new CameraFollower(*bg));
+    LoopedBackground* lbg = new LoopedBackground(*bg, "assets/img/fundo_teletobis.png", 2, Vec2(0.25f,0.25f));
+    bg->AddComponent(lbg);
     AddObject(bg);
 }
 
@@ -39,7 +52,7 @@ void TestScene::LoadAssets () {
     rawPlat->AddComponent(platSpr);
     AddObject(rawPlat);
     mini_platform = GetObjectPtr(rawPlat);
-    platSpr->SetScale(7.5f, 0.5f);
+    platSpr->SetScale(50, 0.5f);
     rawPlat->box.SetPosition(256, 250);
     rawPlat->AddComponent(new Collider(*rawPlat));
     // rawPlat->AddComponent(new PlatformCamera(*rawPlat, PlatformCamera::DOWN, 0.0f));
@@ -89,13 +102,15 @@ void TestScene::LoadAssets () {
     square = GetObjectPtr(rawSquare);
     rawSquare->AddComponent(new Kid(*rawSquare));
     rawSquare->box.SetPosition(62,100);
+
+    // GameObject* rawSquare = new GameObject(LAYER_RED_SQUARE);
     // Sprite* piss = new Sprite(*rawSquare, SPRITE_RED_SQUARE);
     // piss->SetScale(0.5f);
     // rawSquare->AddComponent(piss);
     // AddObject(rawSquare);
     // square = GetObjectPtr(rawSquare);
     // rawSquare->AddComponent(new Ball(*rawSquare));
-    // rawSquare->box.SetPosition(85.5f,100);
+    // rawSquare->box.SetPosition(256,150);
 
     // rawSquare = new GameObject(4);
     // rawSquare->AddComponent(new LoopedBackground(*rawSquare, SPRITE_RED_SQUARE));

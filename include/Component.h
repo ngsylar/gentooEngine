@@ -13,6 +13,7 @@ class Component {
 
         Component(GameObject& associated);
         virtual ~Component();
+        virtual void Awaken();
         virtual void Start();
         virtual void Update(float dt);
         virtual void LateUpdate(float dt);

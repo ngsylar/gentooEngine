@@ -4,6 +4,8 @@ Component::Component (GameObject& associated): associated(associated) {}
 
 Component::~Component () {}
 
+void Component::Awaken () {}
+
 void Component::Start () {}
 
 void Component::Update (float dt) {}

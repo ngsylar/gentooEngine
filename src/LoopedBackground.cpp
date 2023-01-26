@@ -1,7 +1,7 @@
 #include "GentooEngine.h"
 
 LoopedBackground::LoopedBackground (
-    GameObject& associated, std::string fileName, int layerCount, float parallaxFactor
+    GameObject& associated, std::string fileName, int layerCount, Vec2 parallaxFactor
 ): Component(associated) {
     sprite = new Sprite(associated, fileName);
     renderingCount = (layerCount * 2) - 1;
@@ -49,8 +49,8 @@ void LoopedBackground::Render () {
     for (int r=-middlePositionId; r <= middlePositionId; r++)
         for (int c=-middlePositionId; c <= middlePositionId; c++)
             sprite->Render(
-                associated.box.x + (c * associated.box.w) - (parallaxFactor * Camera::pos.x),
-                associated.box.y + (r * associated.box.h) - (parallaxFactor * Camera::pos.y)
+                associated.box.x + (c * associated.box.w) - (parallaxFactor.x * Camera::pos.x),
+                associated.box.y + (r * associated.box.h) - (parallaxFactor.y * Camera::pos.y)
             );
 }
 

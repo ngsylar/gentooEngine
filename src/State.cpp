@@ -4,7 +4,7 @@
 
 State::State () {
     debugMode = false;
-    started = false;
+    awake = false;
     popRequested = false;
     quitRequested = false;
     
@@ -19,17 +19,26 @@ State::State () {
 State::~State () {
     renderingArray.clear();
     objectArray.clear();
+    Camera::Reset();
     Camera::ClearMethods();
     Camera::masterOffset = Vec2();
 }
 
-void State::StartBase () {
+void State::AwakenBase () {
     LoadAssets();
-    Start();
+    Awaken();
     
     for (int i=0; i < (int)objectArray.size(); i++)
+        objectArray[i]->Awaken();
+    awake = true;
+}
+
+void State::StartBase () {
+    Start();
+    
+    for (int i=0; i < (int)objectArray.size(); i++) {
         objectArray[i]->Start();
-    started = true;
+    }
 }
 
 void State::UpdateBase (float dt) {
@@ -63,7 +72,7 @@ void State::UpdateBase (float dt) {
     for (int i=0; i < (int)objectArray.size(); i++)
         objectArray[i]->LateUpdate(dt);
     
-    //FPS Counter
+    // FPS Counter
     if (Game::GetInstance().GetCurrentState().Debugging()) {
         Text* UpdateFPS =(Text*)FPSObj.GetComponent(ComponentType::_Text);
         UpdateFPS->SetText(std::to_string((int)(1/dt))+" FPS");
@@ -96,13 +105,15 @@ void State::RenderBase () {
         renderingArray[i].lock()->Render();
     }
 
-    //FPS Counter
+    // FPS Counter
     if (Game::GetInstance().GetCurrentState().Debugging()) {
         FPSObj.Render();
     }    
 }
 
 void State::LoadAssets () {}
+
+void State::Awaken () {}
 
 void State::Start () {}
 
@@ -119,8 +130,10 @@ std::weak_ptr<GameObject> State::AddObject (GameObject* object) {
     std::weak_ptr<GameObject> wptrGo(sptrGo);
 
     objectArray.push_back(sptrGo);
-    if (started)
+    if (awake) {
+        object->Awaken();
         object->Start();
+    }
 
     // sylar's extra layer rendering
     renderingArray.push_back(wptrGo);
@@ -159,8 +172,8 @@ void State::DetectCollisions () {
     for (int i=0; i < (int)objectArray.size()-1; i++) {
         if(objectArray[i]->Contains(ComponentType::_Collider)) {
             for (int j=i+1; j < (int)objectArray.size(); j++) {
-                if(objectArray[j]->Contains(ComponentType::_Collider))
-                {
+                if(objectArray[j]->Contains(ComponentType::_Collider)) {
+
                     Collider* colliderA = (Collider*)objectArray[i]->GetComponent(ComponentType::_Collider);
                     Collider* colliderB = (Collider*)objectArray[j]->GetComponent(ComponentType::_Collider);
 

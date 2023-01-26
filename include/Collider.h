@@ -8,7 +8,7 @@ class Collider: public Component {
         Rect box;
         Vec2 offset;
         bool isTrigger;
-        bool started;
+        bool awake;
 
         Collider(
             GameObject& associated,
@@ -16,7 +16,7 @@ class Collider: public Component {
             bool trigger=false
         );
         void SetBox(Vec2 offset, Vec2 boxSize);
-        void Start();
+        void Awaken();
         void Update(float dt);
         void Render();
         bool Is(std::string type);

@@ -13,7 +13,7 @@ CameraBox::CameraBox (
     type = ComponentType::_CameraBox;
 }
 
-void CameraBox::Start () {
+void CameraBox::Awaken () {
     focusBox.x = focus.lock()->box.x + focusBoxOffset.x;
     focusBox.y = focus.lock()->box.y + focusBoxOffset.y;
     focusBox.w = (focusBoxOffset.w > 0.0f) ? focusBoxOffset.w : focus.lock()->box.w;

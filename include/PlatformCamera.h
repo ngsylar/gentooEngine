@@ -22,7 +22,7 @@ class PlatformCamera: public Component {
         PlatformCamera(GameObject& associated, Direction direction, float positionLimit);
         ~PlatformCamera();
         void SetTrigger(Rect rectToMove, Rect rectToUndo);
-        void Start();
+        void Awaken();
         void NotifyCollision(GameObject& other);
         void* MoveCamera();
         void* UndoCameraMovement();

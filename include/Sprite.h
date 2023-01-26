@@ -34,8 +34,8 @@ class Sprite: public Component {
         enum TextureFlipper {HORIZONTAL, VERTICAL};
         SDL_RendererFlip textureFlip;
         std::vector<Vec2> positionArray;
-        float parallaxFactor;
-        
+        Vec2 parallaxFactor;
+
         Sprite(GameObject& associated);
         ~Sprite();
         Sprite(
