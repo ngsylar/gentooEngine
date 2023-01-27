@@ -8,6 +8,7 @@ class Timer {
     public:
         Timer(float resetTime=0.0f, float startTime=0.0f);
         void SetResetTime(float time);
+        void FalseStart();
         void Update(float dt);
         void Reset();
         float GetTime();

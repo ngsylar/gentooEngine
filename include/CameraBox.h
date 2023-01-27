@@ -20,7 +20,7 @@ class CameraBox: public Component {
             float spacingX=20.0f,
             float spacingY=20.0f
         );
-        void Start();
+        void Awaken();
         void Follow(
             GameObject* focus,
             float spacingX=20.0f,

@@ -5,10 +5,8 @@
 
 class State {
     protected:
-        bool debugMode, started, popRequested, quitRequested;
+        bool debugMode, awake, popRequested, quitRequested;
         std::vector<std::shared_ptr<GameObject>> objectArray;
-
-        // sylar's extra layer rendering
         std::vector<std::weak_ptr<GameObject>> renderingArray;
         bool scheduleSortingLayer;
         GameObject FPSObj;
@@ -18,12 +16,14 @@ class State {
 
         State();
         virtual ~State();
-        virtual void LoadAssets();
+        virtual void AwakenBase();
         virtual void StartBase();
-        virtual void Start();
         virtual void UpdateBase(float dt);
-        virtual void Update(float dt);
         virtual void RenderBase();
+        virtual void LoadAssets();
+        virtual void Awaken();
+        virtual void Start();
+        virtual void Update(float dt);
         virtual void Render();
         virtual void Pause();
         virtual void Resume();

@@ -1,6 +1,7 @@
 #include "GentooEngine.h"
 
 std::vector<std::pair<Component*, std::function<void*()>>> Camera::foreignMethods;
+std::set<int> Camera::removedMethods;
 GameObject* Camera::focus = nullptr;
 Vec2 Camera::pos, Camera::velocity, Camera::offset;
 Vec2 Camera::posAdjustment, Camera::screenOffset, Camera::masterOffset;
@@ -17,7 +18,7 @@ void Camera::AddMethod(Component* component, std::function<void*()> method) {
 void Camera::RemoveMethod(Component* component) {
     for (int i=(int)foreignMethods.size()-1; i >= 0; i--)
         if (foreignMethods[i].first == component)
-            foreignMethods.erase(foreignMethods.begin()+i);
+            removedMethods.emplace(i);
 }
 
 void Camera::Follow (
@@ -260,8 +261,13 @@ void Camera::Update (float dt) {
     pos = player.position + offset - posAdjustment;
     pos += screenOffset;
 
-    for (int i=0; i < (int)foreignMethods.size(); i++)
-        foreignMethods[i].second();
+    if (not removedMethods.empty()) {
+        for (auto& methodId : removedMethods)
+            foreignMethods.erase(foreignMethods.begin()+methodId);
+        removedMethods.clear();
+    }
+    for (auto& method : foreignMethods)
+        method.second();
 }
 
 Vec2 Camera::GetPosition () {
@@ -279,8 +285,11 @@ void Camera::Reset () {
     cinemachine.length = Vec2();
     cinemachine.slices = {0, 0};
     cinemachine.deadSlices = {0, 0};
+    foreignMethods.clear();
+    removedMethods.clear();
 }
 
 void Camera::ClearMethods () {
     foreignMethods.clear();
+    removedMethods.clear();
 }

@@ -146,6 +146,7 @@ void Game::Run () {
     if (stateStack.empty())
         return;
 
+    stateStack.top()->AwakenBase();
     stateStack.top()->StartBase();
     while (not GetCurrentState().QuitRequested()) {
         CalculateDeltaTime();
@@ -164,6 +165,7 @@ void Game::Run () {
                 stateStack.top()->Pause();
             stateStack.emplace(storedState);
             storedState = nullptr;
+            stateStack.top()->AwakenBase();
             stateStack.top()->StartBase();
         }
         if (stateStack.empty())

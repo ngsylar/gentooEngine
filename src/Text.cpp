@@ -88,6 +88,11 @@ void Text::RemakeTexture () {
     SDL_FreeSurface(surface);
 }
 
+void Text::SetFlickTime (float displayTime, float concealTime) {
+    this->displayTime = displayTime;
+    this->concealTime = concealTime;
+}
+
 void Text::Start () {
     if (flickTimer.HasResetTime())
         SDL_SetTextureAlphaMod(texture, 0x00);

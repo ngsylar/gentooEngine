@@ -19,8 +19,9 @@
 #define CINEMACHINE_OFFSET          0.0f, -12.0f
 #define CINEMACHINE_SETUP           true, true, true, false, true, true, false, false
 
-#define CAMERA_DAMAGE_SHAKE_COUNT   6
-#define CAMERA_DAMAGE_SHAKE_RANGE   3
+#define CAMERA_SHAKE_COUNT          6
+#define CAMERA_SHAKE_RANGE          3
+#define CAMERA_SHAKE_RESET_TIME     0.03f
 #define CAMERA_GROUNDED_RESET_TIME  1.5f
 
 Kid::Kid (GameObject& associated): Component(associated) {
@@ -40,7 +41,7 @@ Kid::Kid (GameObject& associated): Component(associated) {
     status = IDLE;
 }
 
-void Kid::Start () {
+void Kid::Awaken () {
     sprite = new Sprite(associated, SPRITE_IDLE);
     sprite->AddTexture(SPRITE_RUN, SPRITE_RUN_FRAMES);
     sprite->SetTexture(IDLE);
@@ -61,12 +62,18 @@ void Kid::Start () {
     cameraBox->AddComponent(boxComponent);
     boxComponent->AddMethod(this, std::bind(&CameraEffects, this));
     Game::GetInstance().GetCurrentState().AddObject(cameraBox);
-    
+}
+
+void Kid::Start () {
     Camera::Follow(
         cameraBox, Vec2(CINEMACHINE_LENGTH), CINEMACHINE_SLICES,
         Camera::RIGHT, Camera::UP, Vec2(CINEMACHINE_OFFSET));
     Camera::cinemachine.Setup(CINEMACHINE_SETUP);
+    Camera::offset.y = 0;
+    
     cameraGroundedTimer.SetResetTime(CAMERA_GROUNDED_RESET_TIME);
+    cameraShakeTimer.SetResetTime(CAMERA_SHAKE_RESET_TIME);
+    cameraShakeTimer.FalseStart();
 }
 
 void Kid::Update (float dt) {
@@ -180,11 +187,11 @@ void Kid::NotifyCollision (GameObject& other) {
 
 void Kid::AnimationShake () {
     cameraShakeReset = Vec2();
-    int shakeRange = (CAMERA_DAMAGE_SHAKE_RANGE << 1) + 1;
-    for (int i=0; i < CAMERA_DAMAGE_SHAKE_COUNT; i++) {
+    int shakeRange = (CAMERA_SHAKE_RANGE << 1) + 1;
+    for (int i=0; i < CAMERA_SHAKE_COUNT; i++) {
         Vec2 shake = Vec2(
-            rand()%shakeRange-CAMERA_DAMAGE_SHAKE_RANGE,
-            rand()%shakeRange-CAMERA_DAMAGE_SHAKE_RANGE
+            rand()%shakeRange-CAMERA_SHAKE_RANGE,
+            rand()%shakeRange-CAMERA_SHAKE_RANGE
         ); cameraShakeQueue.push(shake);
     }
 }
@@ -199,11 +206,15 @@ void* Kid::CameraEffects () {
     /*--------------------------------------------------------------------------------------------------*/
 
     if (not cameraShakeQueue.empty()) {
-        Camera::masterOffset += cameraShakeQueue.front() - cameraShakeReset;
-        cameraShakeReset = cameraShakeQueue.front();
-        cameraShakeQueue.pop();
-        if (cameraShakeQueue.empty())
-            Camera::masterOffset -= cameraShakeReset;
+        if (cameraShakeTimer.IsOver()) {
+            Camera::masterOffset += cameraShakeQueue.front() - cameraShakeReset;
+            cameraShakeReset = cameraShakeQueue.front();
+            cameraShakeQueue.pop();
+            if (cameraShakeQueue.empty()) {
+                Camera::masterOffset -= cameraShakeReset;
+                cameraShakeTimer.FalseStart();
+            }
+        } else cameraShakeTimer.Update(Game::GetInstance().GetDeltaTime());
     }
 
     /*--------------------------------------------------------------------------------------------------*/

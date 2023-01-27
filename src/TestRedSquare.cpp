@@ -34,14 +34,16 @@ void Ball::Start () {
     associated.AddComponent(new Collider(associated));
     rigidBody->velocityMax.y = RIGIDBODY_VELOCITY_MAX;
 
-    GameObject* cameraBox = new GameObject(associated.layer);
-    cameraBox->AddComponent(new CameraBox(*cameraBox, &associated, 0, 12));
-    Game::GetInstance().GetCurrentState().AddObject(cameraBox);
+    // GameObject* cameraBox = new GameObject(associated.layer);
+    // cameraBox->AddComponent(new CameraBox(*cameraBox, &associated, 0, 12));
+    // Game::GetInstance().GetCurrentState().AddObject(cameraBox);
     
-    Camera::Follow(
-        cameraBox, Vec2(CINEMACHINE_LENGTH), CINEMACHINE_SLICES,
-        Camera::RIGHT, Camera::UP, Vec2(CINEMACHINE_OFFSET));
-    Camera::cinemachine.Setup(CINEMACHINE_SETUP);
+    // Camera::Follow(
+    //     cameraBox, Vec2(CINEMACHINE_LENGTH), CINEMACHINE_SLICES,
+    //     Camera::RIGHT, Camera::UP, Vec2(CINEMACHINE_OFFSET));
+    // Camera::cinemachine.Setup(CINEMACHINE_SETUP);
+
+    Camera::Follow(&associated);
 }
 
 void Ball::Update (float dt) {
@@ -52,8 +54,8 @@ void Ball::Update (float dt) {
     // if (isFalling)
     //     CameraHandleFall(dt);
 
-    if (isJumping)
-        HandleJump(input.IsKeyDown(KEY_ARROW_UP), dt);
+    // if (isJumping)
+    //     HandleJump(input.IsKeyDown(KEY_ARROW_UP), dt);
 
     if (input.KeyPress(KEY_ARROW_UP) and rigidBody->IsGrounded())
         StartJump(dt);
@@ -62,12 +64,12 @@ void Ball::Update (float dt) {
     if (input.IsKeyDown(KEY_ARROW_RIGHT))
         rigidBody->Translate(Vec2(runSpeed,0)*dt);
 
-    // // remover
-    // rigidBody->gravityEnabled = false;
-    // if (input.IsKeyDown(KEY_ARROW_UP))
-    //     rigidBody->Translate(Vec2(0,-runSpeed)*dt);
-    // if (input.IsKeyDown(KEY_ARROW_DOWN))
-    //     rigidBody->Translate(Vec2(0,runSpeed)*dt);
+    // remover
+    rigidBody->gravityEnabled = false;
+    if (input.IsKeyDown(KEY_ARROW_UP))
+        rigidBody->Translate(Vec2(0,-runSpeed)*dt);
+    if (input.IsKeyDown(KEY_ARROW_DOWN))
+        rigidBody->Translate(Vec2(0,runSpeed)*dt);
 
     // remover
     if (input.KeyPress(KEY_SPACE)) {

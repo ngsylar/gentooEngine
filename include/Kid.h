@@ -25,12 +25,13 @@ class Kid: public Component {
 
         // Camera Assistants
         GameObject* cameraBox;
-        Timer cameraGroundedTimer;
+        Timer cameraGroundedTimer, cameraShakeTimer;
         std::queue<Vec2> cameraShakeQueue;
         Vec2 cameraShakeReset;
 
     public:
         Kid(GameObject& associated);
+        void Awaken();
         void Start();
         void Update(float dt);
         void Run(float displacement, SDL_RendererFlip flip=SDL_FLIP_NONE);

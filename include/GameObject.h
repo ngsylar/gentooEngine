@@ -13,17 +13,19 @@ class Component;
 class GameObject {
     private:
         std::vector<std::unique_ptr<Component>> components;
-        bool started, isDead;
+        bool awake, isDead;
         ComponentType contains;
+
     public:
         std::string label;
-        int layer;          // sylar's extra layer rendering
+        int layer;
         Rect box;
         float angleDeg;
 
         GameObject(int layer=0, std::string label="");
         ~GameObject();
         void SetLayer(int layer);
+        void Awaken();
         void Start();
         void Update(float dt);
         void LateUpdate(float dt);

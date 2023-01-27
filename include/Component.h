@@ -2,7 +2,6 @@
 #define COMPONENT_H
 
 #include "GameObject.h"
-#include "GlobalDefinitions.h"
 
 class Component {
     protected:
@@ -13,6 +12,7 @@ class Component {
 
         Component(GameObject& associated);
         virtual ~Component();
+        virtual void Awaken();
         virtual void Start();
         virtual void Update(float dt);
         virtual void LateUpdate(float dt);

@@ -11,7 +11,7 @@ Sprite::Sprite (GameObject& associated): Component(associated) {
     currentFrame = 0;
     frameOneshot = false;
     selfDestruction = false;
-    parallaxFactor = 1.0f;
+    parallaxFactor = Vec2(1.0f, 1.0f);
     textureFlip = SDL_FLIP_NONE;
     type = ComponentType::_Sprite;
 }
@@ -163,8 +163,8 @@ void Sprite::Render () {
         );
     else for (int i=0; i < (int)positionArray.size(); i++)
         Render(
-            (int)positionArray[i].x - (parallaxFactor * Camera::pos.x),
-            (int)positionArray[i].y - (parallaxFactor * Camera::pos.y)
+            (int)positionArray[i].x - (parallaxFactor.x * Camera::pos.x),
+            (int)positionArray[i].y - (parallaxFactor.y * Camera::pos.y)
         );
 }
 
@@ -177,8 +177,8 @@ void Sprite::Render (int startX, int startY) {
         (int)associated.box.w, (int)associated.box.h
     };
     SDL_Point boxCenter = SDL_Point{
-        destRect.w/2 + (int)associated.box.offset.x,
-        destRect.h/2 + (int)associated.box.offset.y
+        (destRect.w >> 1) + (int)associated.box.offset.x,
+        (destRect.h >> 1) + (int)associated.box.offset.y
     };
     int rendercpy = SDL_RenderCopyEx(
         Game::GetInstance().GetRenderer(),
