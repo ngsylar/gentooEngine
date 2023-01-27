@@ -8,6 +8,7 @@ class LoopedBackground: public Component {
     private:
         enum Axis {HORIZONTAL, VERTICAL};
         Sprite* sprite;
+        Vec2 cameraInitialPosition, cameraAdjustment;
         int halfSizes[2], renderingCount, middlePositionId;
     
     public:
@@ -21,7 +22,10 @@ class LoopedBackground: public Component {
         );
         ~LoopedBackground();
         void SetLayerCount(int layerCount);
+        void SetPosition(float positionX, float positionY);
+        void SetPosition(Vec2 position);
         void Start();
+        void* LateStart();
         void LateUpdate(float dt);
         void Render();
         bool Is(ComponentType type);

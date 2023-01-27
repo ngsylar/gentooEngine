@@ -3,10 +3,12 @@
 
 #include "Timer.h"
 #include "State.h"
+#include "LoopedBackground.h"
 
 class TestScene: public State {
     private:
         std::weak_ptr<GameObject> mini_platform, square;
+        LoopedBackground* lbg;
 
     public:
         TestScene();

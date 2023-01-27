@@ -20,7 +20,6 @@ State::~State () {
     renderingArray.clear();
     objectArray.clear();
     Camera::Reset();
-    Camera::ClearMethods();
     Camera::masterOffset = Vec2();
 }
 

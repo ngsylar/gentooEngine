@@ -36,12 +36,12 @@ TestScene::TestScene () {
     // AddObject(bg);
 
     // bg = new GameObject(SCENE_TEST_LAYER, SCENE_TEST_LABEL);
-    // LoopedBackground* lbg = new LoopedBackground(*bg, "assets/img/lbg.png", 2, Vec2(0.25f,0.25f));
+    // lbg = new LoopedBackground(*bg, "assets/img/lbg.png", 2, Vec2(0.25f,0.25f));
     // bg->AddComponent(lbg);
     // AddObject(bg);
 
     GameObject* bg = new GameObject(SCENE_TEST_LAYER, SCENE_TEST_LABEL);
-    LoopedBackground* lbg = new LoopedBackground(*bg, "assets/img/fundo_teletobis.png", 2, Vec2(0.25f,0.25f));
+    lbg = new LoopedBackground(*bg, "assets/img/fundo_teletobis.png", 2, Vec2(0.25f,0.25f));
     bg->AddComponent(lbg);
     AddObject(bg);
 }
@@ -52,6 +52,7 @@ void TestScene::LoadAssets () {
     rawPlat->AddComponent(platSpr);
     AddObject(rawPlat);
     mini_platform = GetObjectPtr(rawPlat);
+    // platSpr->SetScale(7.5f, 0.5f);
     platSpr->SetScale(50, 0.5f);
     rawPlat->box.SetPosition(256, 250);
     rawPlat->AddComponent(new Collider(*rawPlat));
@@ -110,7 +111,7 @@ void TestScene::LoadAssets () {
     // AddObject(rawSquare);
     // square = GetObjectPtr(rawSquare);
     // rawSquare->AddComponent(new Ball(*rawSquare));
-    // rawSquare->box.SetPosition(256,150);
+    // rawSquare->box.SetPosition(0,0);
 
     // rawSquare = new GameObject(4);
     // rawSquare->AddComponent(new LoopedBackground(*rawSquare, SPRITE_RED_SQUARE));
@@ -121,15 +122,16 @@ void TestScene::LoadAssets () {
     // rawPlat->AddComponent(new CameraBox(*rawPlat, rawSquare, 0, 10));
     // AddObject(rawPlat);
 
-    rawSquare = new GameObject(LAYER_RED_SQUARE);
-    AddObject(rawSquare);
-    square = GetObjectPtr(rawSquare);
-    rawSquare->AddComponent(new EnemyArmadillo(*rawSquare));
-    rawSquare->box.SetPosition(262,100);
+    // rawSquare = new GameObject(LAYER_RED_SQUARE);
+    // AddObject(rawSquare);
+    // square = GetObjectPtr(rawSquare);
+    // rawSquare->AddComponent(new EnemyArmadillo(*rawSquare));
+    // rawSquare->box.SetPosition(262,100);
 }
 
 void TestScene::Start () {
-    // Camera::Follow(square.lock().get());
+    Camera::Follow(square.lock().get());
+    lbg->SetPosition(0,0);
 }
 
 void TestScene::Update (float dt) {

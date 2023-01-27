@@ -173,8 +173,8 @@ void Sprite::Render (int startX, int startY) {
         (int)associated.box.w, (int)associated.box.h
     };
     SDL_Point boxCenter = SDL_Point{
-        destRect.w/2 + (int)associated.box.offset.x,
-        destRect.h/2 + (int)associated.box.offset.y
+        (destRect.w >> 1) + (int)associated.box.offset.x,
+        (destRect.h >> 1) + (int)associated.box.offset.y
     };
     int rendercpy = SDL_RenderCopyEx(
         Game::GetInstance().GetRenderer(),

@@ -2,12 +2,14 @@
 #define CAMERA_H
 
 #include <array>
+#include <set>
 
 #include "GameObject.h"
 
 class Camera {
     private:
         static std::vector<std::pair<Component*, std::function<void*()>>> foreignMethods;
+        static std::set<int> removedMethods;
         static Vec2 posAdjustment;
         static GameObject* focus;
 
@@ -20,6 +22,8 @@ class Camera {
             std::array<bool, 2> isStopping;
             std::array<Timer, 2> stopwatch;
         };
+
+        static void FreeMethod(Component* component);
 
     public:
         enum Axis {X, Y};

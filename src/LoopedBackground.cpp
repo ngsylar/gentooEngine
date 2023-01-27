@@ -23,35 +23,54 @@ void LoopedBackground::SetLayerCount (int layerCount) {
     halfSizes[VERTICAL] = ((layerCount - 1) * (int)associated.box.h) >> 1;
 }
 
+void LoopedBackground::SetPosition (float positionX, float positionY) {
+    associated.box.SetPosition(positionX, positionY);
+    Camera::AddMethod(this, std::bind(&LateStart, this));
+}
+
+void LoopedBackground::SetPosition (Vec2 position) {
+    associated.box.SetPosition(position);
+    Camera::AddMethod(this, std::bind(&LateStart, this));
+}
+
 void LoopedBackground::Start () {
-    associated.box.SetPosition(Camera::GetPosition());
+    cameraInitialPosition = Camera::pos;
+    cameraAdjustment = (cameraInitialPosition * parallaxFactor) - cameraInitialPosition;
+    cameraInitialPosition += cameraAdjustment;
+}
+
+void* LoopedBackground::LateStart () {
+    Start();
+    Camera::RemoveMethod(this);
+    return nullptr;
 }
 
 void LoopedBackground::LateUpdate (float dt) {
-    Vec2 position = associated.box.GetPosition();
-    Vec2 cameraDistance = (Camera::GetPosition() * parallaxFactor) - position;
+    Vec2 cameraDistance = (Camera::pos * parallaxFactor) - cameraInitialPosition;
 
     if (fabs(cameraDistance.x) >= halfSizes[HORIZONTAL]) {
         int signX = (std::signbit(cameraDistance.x)? -1 : 1);
-        associated.box.SetPosition(
-            position.x + (signX * halfSizes[HORIZONTAL]) + cameraDistance.x, position.y
-        );
+        float displacement = (signX * halfSizes[HORIZONTAL]) + cameraDistance.x;
+        associated.box.x += displacement;
+        cameraInitialPosition.x += displacement;
     }
     if (fabs(cameraDistance.y) >= halfSizes[VERTICAL]) {
         int signY = (std::signbit(cameraDistance.y) ? -1 : 1);
-        associated.box.SetPosition(
-            position.x, position.y + (signY * halfSizes[VERTICAL]) + cameraDistance.y
-        );
+        float displacement = (signY * halfSizes[VERTICAL]) + cameraDistance.y;
+        associated.box.y += displacement;
+        cameraInitialPosition.y += displacement;
     }
 }
 
 void LoopedBackground::Render () {
     for (int r=-middlePositionId; r <= middlePositionId; r++)
-        for (int c=-middlePositionId; c <= middlePositionId; c++)
+        for (int c=-middlePositionId; c <= middlePositionId; c++) {
+            Vec2 displacement = (parallaxFactor * Camera::pos) - cameraAdjustment;
             sprite->Render(
-                associated.box.x + (c * associated.box.w) - (parallaxFactor.x * Camera::pos.x),
-                associated.box.y + (r * associated.box.h) - (parallaxFactor.y * Camera::pos.y)
+                associated.box.x+(c*associated.box.w) - (int)displacement.x,
+                associated.box.y+(r*associated.box.h) - (int)displacement.y
             );
+        }
 }
 
 bool LoopedBackground::Is (ComponentType type) {
