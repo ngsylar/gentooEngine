@@ -142,14 +142,15 @@ void Sprite::Update (float dt) {
         frameTimer.Update(dt);
 
         if (frameTimer.IsOver()) {
-            SetFrame(currentFrame+1);
-            frameTimer.Reset();
-            
-            if ((currentFrame == frameCount-1) and frameOneshot) {
+            if ((currentFrame == frameCount) and frameOneshot) {
                 frameTimer.SetResetTime(0.0f);
 
                 if (selfDestruction)
                     associated.RequestDelete();
+
+            } else {
+                SetFrame(currentFrame+1);
+                frameTimer.Reset();
             }
         }
     }
