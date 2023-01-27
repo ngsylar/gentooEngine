@@ -33,6 +33,24 @@ void LoopedBackground::SetPosition (Vec2 position) {
     Camera::AddMethod(this, std::bind(&LateStart, this));
 }
 
+void LoopedBackground::FixLeaks () {
+    Vec2 cameraDistance = Camera::GetPosition() - associated.box.GetPosition();
+
+    std::array<int, 2> sign = {
+        (std::signbit(cameraDistance.x)? -1 : 1),
+        (std::signbit(cameraDistance.x)? -1 : 1)
+    };
+    Vec2 rectsDistance(
+        floor((cameraDistance.x / halfSizes[HORIZONTAL]) * sign[HORIZONTAL]),
+        floor((cameraDistance.y / halfSizes[VERTICAL]) * sign[VERTICAL])
+    );
+    if ((int)rectsDistance.x % 2 != 0) rectsDistance.x++;
+    if ((int)rectsDistance.y % 2 != 0) rectsDistance.y++;
+    
+    associated.box.x += rectsDistance.x * halfSizes[HORIZONTAL] * sign[HORIZONTAL];
+    associated.box.y += rectsDistance.y * halfSizes[VERTICAL] * sign[VERTICAL];
+}
+
 void LoopedBackground::Start () {
     cameraInitialPosition = Camera::pos;
     cameraAdjustment = (cameraInitialPosition * parallaxFactor) - cameraInitialPosition;
@@ -40,6 +58,7 @@ void LoopedBackground::Start () {
 }
 
 void* LoopedBackground::LateStart () {
+    FixLeaks();
     Start();
     Camera::RemoveMethod(this);
     return nullptr;
@@ -67,8 +86,8 @@ void LoopedBackground::Render () {
         for (int c=-middlePositionId; c <= middlePositionId; c++) {
             Vec2 displacement = (parallaxFactor * Camera::pos) - cameraAdjustment;
             sprite->Render(
-                associated.box.x+(c*associated.box.w) - (int)displacement.x,
-                associated.box.y+(r*associated.box.h) - (int)displacement.y
+                associated.box.x + (c * associated.box.w) - (int)displacement.x,
+                associated.box.y + (r * associated.box.h) - (int)displacement.y
             );
         }
 }

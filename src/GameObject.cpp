@@ -103,7 +103,6 @@ Component* GameObject::GetComponent (std::string type) {
 }
 
 Component* GameObject::GetComponent (ComponentType type) {
-    
     if(contains & type) {
         for (int i=0; i < (int)components.size(); i++) {
             if (components[i]->Is(type))

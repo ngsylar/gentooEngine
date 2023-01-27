@@ -1,6 +1,8 @@
 #ifndef LOOPED_BACKGROUND_H
 #define LOOPED_BACKGROUND_H
 
+#include <array>
+
 #include "Component.h"
 #include "Sprite.h"
 
@@ -9,8 +11,11 @@ class LoopedBackground: public Component {
         enum Axis {HORIZONTAL, VERTICAL};
         Sprite* sprite;
         Vec2 cameraInitialPosition, cameraAdjustment;
-        int halfSizes[2], renderingCount, middlePositionId;
+        std::array<int, 2> halfSizes;
+        int renderingCount, middlePositionId;
     
+        void FixLeaks();
+
     public:
         Vec2 parallaxFactor;
         

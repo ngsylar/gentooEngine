@@ -2,7 +2,6 @@
 #define COMPONENT_H
 
 #include "GameObject.h"
-#include "GlobalDefinitions.h"
 
 class Component {
     protected:
