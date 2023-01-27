@@ -171,11 +171,10 @@ void State::DetectCollisions () {
     for (int i=0; i < (int)objectArray.size()-1; i++) {
         if(objectArray[i]->Contains(ComponentType::_Collider)) {
             for (int j=i+1; j < (int)objectArray.size(); j++) {
-                if(objectArray[j]->Contains(ComponentType::_Collider)
-                and !(objectArray[i]->Contains(ComponentType::_Terrain)
-                and objectArray[j]->Contains(ComponentType::_Terrain))) {
-                
-                if(objectArray[j]->Contains(ComponentType::_Collider)) {
+                if (objectArray[j]->Contains(ComponentType::_Collider)
+                    and not (objectArray[i]->Contains(ComponentType::_Terrain)
+                    and objectArray[j]->Contains(ComponentType::_Terrain)))
+                {
                     Collider* colliderA = (Collider*)objectArray[i]->GetComponent(ComponentType::_Collider);
                     Collider* colliderB = (Collider*)objectArray[j]->GetComponent(ComponentType::_Collider);
 
