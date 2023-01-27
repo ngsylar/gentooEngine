@@ -5,13 +5,25 @@
 #include "State.h"
 #include "LoopedBackground.h"
 
-class TestScene: public State {
+class TestScene0: public State {
     private:
         std::weak_ptr<GameObject> mini_platform, square;
         LoopedBackground* lbg;
 
     public:
-        TestScene();
+        TestScene0();
+        void LoadAssets();
+        void Start();
+        void Update(float dt);
+};
+
+class TestScene1: public State {
+    private:
+        std::weak_ptr<GameObject> mini_platform, square;
+        LoopedBackground* lbg;
+
+    public:
+        TestScene1();
         void LoadAssets();
         void Start();
         void Update(float dt);

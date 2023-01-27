@@ -25,7 +25,7 @@ class Kid: public Component {
 
         // Camera Assistants
         GameObject* cameraBox;
-        Timer cameraGroundedTimer;
+        Timer cameraGroundedTimer, cameraShakeTimer;
         std::queue<Vec2> cameraShakeQueue;
         Vec2 cameraShakeReset;
 

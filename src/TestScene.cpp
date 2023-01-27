@@ -24,7 +24,124 @@
 #define LAYER_RUN_LEFT 0
 #define LAYER_BLACK_SQUARE 2
 
-TestScene::TestScene () {
+TestScene0::TestScene0 () {
+    // // fazer o bg loop dps
+    // GameObject* bg = new GameObject(-2, SCENE_TEST_LABEL);
+    // Sprite* sqspr = new Sprite(*bg, SCENE_TEST_BACKGROUND);
+    // sqspr->SetScale(0.5f);
+    // bg->AddComponent(sqspr);
+    // bg->AddComponent(new CameraFollower(*bg));
+    // // LoopedBackground* lbg = new LoopedBackground(*bg, SCENE_TEST_BACKGROUND, 2, 0.25f);
+    // // bg->AddComponent(lbg);
+    // AddObject(bg);
+
+    // bg = new GameObject(SCENE_TEST_LAYER, SCENE_TEST_LABEL);
+    // lbg = new LoopedBackground(*bg, "assets/img/lbg.png", 2, Vec2(0.25f,0.25f));
+    // bg->AddComponent(lbg);
+    // AddObject(bg);
+
+    GameObject* bg = new GameObject(SCENE_TEST_LAYER, SCENE_TEST_LABEL);
+    lbg = new LoopedBackground(*bg, "assets/img/fundo_teletobis.png", 2, Vec2(0.25f,0.25f));
+    bg->AddComponent(lbg);
+    AddObject(bg);
+}
+
+void TestScene0::LoadAssets () {
+    GameObject* rawPlat = new GameObject(LAYER_BLACK_SQUARE, "Ground");
+    Sprite* platSpr = new Sprite(*rawPlat, SPRITE_BLACK_SQUARE);
+    rawPlat->AddComponent(platSpr);
+    AddObject(rawPlat);
+    mini_platform = GetObjectPtr(rawPlat);
+    // platSpr->SetScale(7.5f, 0.5f);
+    platSpr->SetScale(50, 0.5f);
+    rawPlat->box.SetPosition(256, 250);
+    rawPlat->AddComponent(new Collider(*rawPlat));
+    // rawPlat->AddComponent(new PlatformCamera(*rawPlat, PlatformCamera::DOWN, 0.0f));
+
+    rawPlat = new GameObject(LAYER_BLACK_SQUARE);
+    platSpr = new Sprite(*rawPlat, SPRITE_BLACK_SQUARE);
+    rawPlat->AddComponent(platSpr);
+    AddObject(rawPlat);
+    mini_platform = GetObjectPtr(rawPlat);
+    platSpr->SetScale(7.5f, 0.5f);
+    rawPlat->box.SetPosition(256, 50);
+    rawPlat->AddComponent(new Collider(*rawPlat));
+
+    // rawPlat = new GameObject(LAYER_BLACK_SQUARE);
+    // platSpr = new Sprite(*rawPlat, SPRITE_BLACK_SQUARE);
+    // rawPlat->AddComponent(platSpr);
+    // AddObject(rawPlat);
+    // mini_platform = GetObjectPtr(rawPlat);
+    // platSpr->SetScale(0.5f, 3.5f);
+    // rawPlat->box.SetPosition(50, 150);
+    // Collider* platcoll = new Collider(*rawPlat);
+    // rawPlat->AddComponent(platcoll);
+
+    // rawPlat = new GameObject(LAYER_BLACK_SQUARE);
+    // platSpr = new Sprite(*rawPlat, SPRITE_BLACK_SQUARE);
+    // rawPlat->AddComponent(platSpr);
+    // AddObject(rawPlat);
+    // mini_platform = GetObjectPtr(rawPlat);
+    // platSpr->SetScale(0.5f, 3.5f);
+    // rawPlat->box.SetPosition(450, 150);
+    // platcoll = new Collider(*rawPlat);
+    // rawPlat->AddComponent(platcoll);
+    // // platcoll->isTrigger = true;
+
+    rawPlat = new GameObject(LAYER_BLACK_SQUARE);
+    platSpr = new Sprite(*rawPlat, SPRITE_BLACK_SQUARE);
+    rawPlat->AddComponent(platSpr);
+    AddObject(rawPlat);
+    mini_platform = GetObjectPtr(rawPlat);
+    platSpr->SetScale(1.5f, 0.5f);
+    // rawPlat->box.SetPosition(300, 300);
+    rawPlat->box.SetPosition(150, 162.5f);
+    rawPlat->AddComponent(new Collider(*rawPlat));
+
+    GameObject* rawSquare = new GameObject(4);
+    AddObject(rawSquare);
+    square = GetObjectPtr(rawSquare);
+    rawSquare->AddComponent(new Kid(*rawSquare));
+    rawSquare->box.SetPosition(62,100);
+
+    // GameObject* rawSquare = new GameObject(LAYER_RED_SQUARE);
+    // Sprite* piss = new Sprite(*rawSquare, SPRITE_RED_SQUARE);
+    // piss->SetScale(0.5f);
+    // rawSquare->AddComponent(piss);
+    // AddObject(rawSquare);
+    // square = GetObjectPtr(rawSquare);
+    // rawSquare->AddComponent(new Ball(*rawSquare));
+    // rawSquare->box.SetPosition(0,0);
+
+    // rawSquare = new GameObject(4);
+    // rawSquare->AddComponent(new LoopedBackground(*rawSquare, SPRITE_RED_SQUARE));
+    // rawSquare->box.SetPosition(512,300);
+    // AddObject(rawSquare);
+
+    // rawPlat = new GameObject(LAYER_BLACK_SQUARE);
+    // rawPlat->AddComponent(new CameraBox(*rawPlat, rawSquare, 0, 10));
+    // AddObject(rawPlat);
+
+    // rawSquare = new GameObject(LAYER_RED_SQUARE);
+    // AddObject(rawSquare);
+    // square = GetObjectPtr(rawSquare);
+    // rawSquare->AddComponent(new EnemyArmadillo(*rawSquare));
+    // rawSquare->box.SetPosition(262,100);
+}
+
+void TestScene0::Start () {
+    Camera::Follow(square.lock().get());
+    lbg->SetPosition(0,0);
+}
+
+void TestScene0::Update (float dt) {
+    if (InputManager::GetInstance().KeyPress(KEY_ESCAPE)) {
+        Game::GetInstance().AddState(new TestScene1());
+        popRequested = true;
+    }
+}
+
+TestScene1::TestScene1 () {
     // fazer o bg loop dps
     GameObject* bg = new GameObject(-2, SCENE_TEST_LABEL);
     Sprite* sqspr = new Sprite(*bg, SCENE_TEST_BACKGROUND);
@@ -46,7 +163,7 @@ TestScene::TestScene () {
     // AddObject(bg);
 }
 
-void TestScene::LoadAssets () {
+void TestScene1::LoadAssets () {
     GameObject* rawPlat = new GameObject(LAYER_BLACK_SQUARE, "Ground");
     Sprite* platSpr = new Sprite(*rawPlat, SPRITE_BLACK_SQUARE);
     rawPlat->AddComponent(platSpr);
@@ -129,12 +246,12 @@ void TestScene::LoadAssets () {
     // rawSquare->box.SetPosition(262,100);
 }
 
-void TestScene::Start () {
+void TestScene1::Start () {
     Camera::Follow(square.lock().get());
     lbg->SetPosition(0,0);
 }
 
-void TestScene::Update (float dt) {
+void TestScene1::Update (float dt) {
     if (InputManager::GetInstance().KeyPress(KEY_ESCAPE)) {
         Game::GetInstance().AddState(new TestScene2());
         popRequested = true;
@@ -379,7 +496,7 @@ void TestScene5::LoadAssets () {
 
 void TestScene5::Update (float dt) {
     if (InputManager::GetInstance().KeyPress(KEY_ESCAPE)) {
-        Game::GetInstance().AddState(new TestScene());
+        Game::GetInstance().AddState(new TestScene0());
         popRequested = true;
     }
 }

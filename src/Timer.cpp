@@ -9,6 +9,10 @@ void Timer::SetResetTime (float time) {
     resetTime = time;
 }
 
+void Timer::FalseStart () {
+    currentTime = resetTime;
+}
+
 void Timer::Update (float dt) {
     currentTime += dt;
 }
