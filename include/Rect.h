@@ -21,9 +21,9 @@ class Rect {
         void Translate(float x, float y);
         void Translate(Vec2 displacement);
         void RotateAround(Vec2 point, Vec2 axis, float angle);
-
         // Access
         Vec2 GetPosition();
+        Rect GetIntersection(Rect& other);
         bool Contains(float pX, float pY);
 };
 

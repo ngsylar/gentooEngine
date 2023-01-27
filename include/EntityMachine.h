@@ -6,15 +6,14 @@
 #include "GlobalDefinitions.h"
 
 
-class EntityMachine : public Component
-{
+class EntityMachine : public Component {
     protected:
         EntityState currState;
-        std::vector<Sprite*> entitySprite;
+        std::vector<std::unique_ptr<Sprite>> entitySprite;
 
     public:
         EntityMachine(GameObject& associated);
-        virtual ~EntityMachine();
+        ~EntityMachine();
         void AddEntityStateSprite(EntityState NewState, Sprite* NewSheet);
         void RemoveEntityState(EntityState NewState);
         bool HasEntityState(EntityState Compare);

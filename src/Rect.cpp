@@ -59,3 +59,10 @@ Vec2 Rect::GetPosition () {
 bool Rect::Contains (float pX, float pY) {
     return ((pX > x) and (pX < (x+w)) and (pY > y) and (pY < (y+h)));
 }
+
+Rect Rect::GetIntersection(Rect& other) {
+    Rect intersect(std::max(x, other.x), std::max(y, other.y), 0, 0);
+    intersect.SetSize(std::min(other.x+other.w, x+w) - intersect.x,
+        std::min(y+h, other.y+other.h) - intersect.y);
+    return intersect;
+}

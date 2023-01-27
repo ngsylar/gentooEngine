@@ -6,26 +6,36 @@
 
 class RBody : public Component {
     private:
-        float mass;
         float gravity;
-
-        Vec2 force;
+        float limitspeed;
         Vec2 friction;
         Vec2 speed;
-        Vec2 acceleration;
+        bool up, down, left, right;
 
     public:
         RBody(GameObject& associated);
         ~RBody();
-        void SetMass(float mass);
+
+        float GetGravity();
         void SetGravity(float gravity);
-        void ApplyForce(Vec2 force);
-        void ApplyForceOnX(float x);
-        void ApplyForceOnY(float y);
-        void ResetForce();
+        void ResetGravity();
+        
+        Vec2 GetSpeed();
+        void SetSpeed(Vec2 force);
+        void SetSpeedOnX(float x);
+        void SetSpeedOnY(float y);
+        void ResetSpeed();
+
+        float GetLimitSpeed();
+        void SetLimitSpeed(float limit);
 
         void ApplyFriction(Vec2 friction);
         void ResetFriction();
+
+        bool ImpactUp();
+        bool ImpactDown();
+        bool ImpactLeft();
+        bool ImpactRight();
 
         //inheritance
         bool Is(ComponentType type);

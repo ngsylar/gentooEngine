@@ -25,6 +25,13 @@ void Collider::Update (float dt) {
     box.SetPosition(associated.box.GetPosition() + offsetDifference);
 }
 
+void Collider::LateUpdate (float dt) {
+    Vec2 offsetDifference = offset - associated.box.offset;
+    if (associated.angleDeg)
+        offsetDifference = offsetDifference.Rotate(Deg2Rad(associated.angleDeg));
+    box.SetPosition(associated.box.GetPosition() + offsetDifference);
+}
+
 // DEBUG
 void Collider::Render () {
     if (not Game::GetInstance().GetCurrentState().Debugging())

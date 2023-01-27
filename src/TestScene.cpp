@@ -369,10 +369,10 @@ void TestScene5::Update (float dt) {
 
 #define SPRITE_BG1 "assets/img/bg1.png"
 #define SPRITE_BG2 "assets/img/bg2.png"
-#define SPRITE_TILE "assets/img/tiles.png"
+#define SPRITE_TILE "assets/img/mine.png"
 #define SPRITE_FF "assets/img/Firefly.png"
 //No .txt extension because TileMap does some tricks with a raw name
-#define MAP_BASE "assets/map/BaseMap"
+#define MAP_BASE "assets/map/Test"
 
 #include "Dummy.h"
 
@@ -392,61 +392,57 @@ TestScene6::TestScene6 () {
     BgObj2->box.SetPosition(0,0); 
 }
 
-ScreenFade* 👽 = nullptr;
+ScreenFade* Silk = nullptr;
 #define CUSTOM_BLENDCOOL SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_SRC_ALPHA, SDL_BLENDFACTOR_ONE, SDL_BLENDOPERATION_ADD,\
             SDL_BLENDFACTOR_ONE_MINUS_SRC_COLOR, SDL_BLENDFACTOR_ONE_MINUS_DST_COLOR, SDL_BLENDOPERATION_ADD)
 
 void TestScene6::LoadAssets () {
+    // GameObject* rawSquare = new GameObject(LAYER_RED_SQUARE);
+    // AddObject(rawSquare);
+    // square = GetObjectPtr(rawSquare);
+    // rawSquare->AddComponent(new Kid(*rawSquare));
+    // rawSquare->box.SetPosition(20,10);
+
     //#####################################
     GameObject* TileObj = new GameObject(1);
-    TileSet* Set = new TileSet(*TileObj, SPRITE_TILE, 28,28);
+    TileSet* Set = new TileSet(*TileObj, SPRITE_TILE, 32,32);
     TileMap* tile = new TileMap(*TileObj, Set, MAP_BASE);
     tile->LoadCollision(MAP_BASE);
     TileObj->AddComponent(tile);
     AddObject(TileObj);
-    //#####################################
-
-    GameObject* rawSquare = new GameObject(LAYER_RED_SQUARE);
-    AddObject(rawSquare);
-    square = GetObjectPtr(rawSquare);
-    rawSquare->AddComponent(new Kid(*rawSquare));
-    rawSquare->box.SetPosition(256,710);
-
+    
     GameObject* FadeObj = new GameObject(10);
     ScreenFade* Fade = new ScreenFade(*FadeObj, Color("#000000"),0, 0, 1);
     FadeObj->AddComponent(Fade);
     AddObject(FadeObj);
-    👽 = Fade;
+    Silk = Fade;
 
     GameObject* FireflyObj = new GameObject(11);
     Sprite* Firefly = new Sprite(*FireflyObj, SPRITE_FF, 25, 0.1);
-
     FireflyObj->box.SetSize(Firefly->GetWidth(), Firefly->GetHeight());
-    FireflyObj->box.SetPosition(400,740);
-    // Firefly->SetScale(2);
+    FireflyObj->box.SetPosition(200,400);
     FireflyObj->AddComponent(Firefly);
     AddObject(FireflyObj);
-
     Firefly->SetBlendMode(CUSTOM_BLENDCOOL);
 
     GameObject* DummyObj = new GameObject(3);
     Dummy* Dum = new Dummy(*DummyObj);
     DummyObj->AddComponent(Dum);
-    DummyObj->box.SetPosition(600,748);
+    DummyObj->box.SetPosition(120, 70);
     AddObject(DummyObj);
-
+    //#####################################
 }
 
 void TestScene6::Update (float dt) {
     if (InputManager::GetInstance().KeyPress(KEY_ESCAPE)) {
         Game::GetInstance().AddState(new TestScene());
         popRequested = true;
-        👽 = nullptr;
+        Silk = nullptr;
     }
     if (InputManager::GetInstance().KeyPress(KEY_MINUS)) {
-        👽->RedirectFade(0);
+        Silk->RedirectFade(0);
     }
     if (InputManager::GetInstance().KeyPress(KEY_EQUAL)) {
-        👽->RedirectFade(0.85);
+        Silk->RedirectFade(0.85);
     }
 }

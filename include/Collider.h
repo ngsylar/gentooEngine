@@ -18,6 +18,7 @@ class Collider: public Component {
         void SetBox(Vec2 offset, Vec2 boxSize);
         void Start();
         void Update(float dt);
+        void LateUpdate(float dt);
         void Render();
         bool Is(std::string type);
         bool Is(ComponentType type);

@@ -36,6 +36,7 @@ enum ComponentType {
 
     // Testing Environment
     _Ball =             1 << 20,
+    _RBody =             1 << 21,
     _Terrain =             1 << 30,
     
     //...
@@ -58,8 +59,9 @@ enum EntityState
     Idle,
     Walking,
     Running,
-    Jump,
-    Attack,
+    Jumping,
+    Falling,
+    Attacking,
     HitTaken,
 
     //Leave declaration below as the last element,

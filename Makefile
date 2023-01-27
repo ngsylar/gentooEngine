@@ -3,7 +3,7 @@
 
 
 # compilador
-CC = tg++
+CC = g++
 
 RMDIR = rm -rdf
 
