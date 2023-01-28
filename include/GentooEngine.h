@@ -41,9 +41,14 @@
 #include "TileSet.h"
 #include "Color.h"
 #include "Music.h"
+
+// Hybrid Helpers
 #include "GlobalDefinitions.h"
+#include "Controller.h"
 
 // Object Components
+#include "EntityMachine.h"
+#include "RBody.h" // editar
 #include "RigidBody.h"
 #include "Collider.h"
 #include "Sprite.h"

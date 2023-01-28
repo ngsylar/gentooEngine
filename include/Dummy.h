@@ -4,7 +4,7 @@
 #include "EntityMachine.h"
 #include "Timer.h"
 
-class Dummy : public EntityMachine {
+class Dummy: public EntityMachine {
     private:
         int HP;
         int lastDirection;

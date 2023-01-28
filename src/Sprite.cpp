@@ -1,7 +1,6 @@
 #include "GentooEngine.h"
 
 Sprite::Sprite (GameObject& associated): Component(associated) {
-    activeTexture = 0;
     clipRect = {0, 0, 0, 0};
     width = 0;
     height = 0;
@@ -16,18 +15,16 @@ Sprite::Sprite (GameObject& associated): Component(associated) {
     type = ComponentType::_Sprite;
 }
 
-Sprite::~Sprite () {
-    textureArray.clear();
-}
+Sprite::~Sprite () {}
 
 Sprite::Sprite (
     GameObject& associated, std::string file,
     int frameCount, float frameTime, bool oneshot, bool destruct
 ): Sprite(associated) {
-    AddTexture(file, frameCount, frameTime, oneshot, destruct);
+    Open(file, frameCount, frameTime, oneshot, destruct);
 }
 
-void Sprite::AddTexture (
+void Sprite::Open (
     std::string file,
     int frameCount, float frameTime, bool oneshot, bool destruct
 ) {
@@ -35,53 +32,21 @@ void Sprite::AddTexture (
     scale = Vec2(SPRITE_DEFAULT_SCALE);
 
     int qtexture = SDL_QueryTexture(
-        texture.lock().get(), nullptr, nullptr,
+        texture.get(), nullptr, nullptr,
         &width, &height
     );
     if (qtexture == SPRITE_ERROR) {
         SDL_Log("SDL_QueryTexture: %s", SDL_GetError());
     }
 
-    TextureStruct textureStruct;
-    textureStruct.textureFrameCount = frameCount;
-    textureStruct.textureFrameTime = frameTime;
-    textureStruct.textureOneshot = oneshot;
-    textureStruct.textureDestruction = destruct;
-    textureStruct.textureWidth = width;
-    textureStruct.textureHeight = height;
-
-    textureArray.push_back(textureStruct);
-    textureArray.back().texture_sptr = texture.lock();
-    SetTexture(textureArray.size()-1);
-}
-
-void Sprite::SetTexture (int textureId) {
-    int i = textureId % textureArray.size();
-    if (i < 0) i += textureArray.size();
-    texture = textureArray[i].texture_sptr;
-    activeTexture = i;
-
-    width = textureArray[i].textureWidth;
-    height = textureArray[i].textureHeight;
-
-    frameCount = textureArray[i].textureFrameCount;
-    frameTimer = Timer(textureArray[i].textureFrameTime);
-    frameOneshot = textureArray[i].textureOneshot;
-    selfDestruction = textureArray[i].textureDestruction;
+    this->frameCount = frameCount;
+    frameTimer = Timer(frameTime);
+    frameOneshot = oneshot;
+    selfDestruction = destruct;
 
     frameWidth = width / frameCount;
     SetClip(SPRITE_CLIP_START_POINT, frameWidth, height);
     associated.box.SetSize((float)frameWidth, (float)height);
-    currentFrame = 0;
-}
-
-void Sprite::FlipTexture (TextureFlipper axis) {
-    SDL_RendererFlip flip = (axis == HORIZONTAL) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_VERTICAL;
-    textureFlip = SDL_RendererFlip(textureFlip ^ flip);
-}
-
-int Sprite::GetActiveTexture () {
-    return activeTexture;
 }
 
 void Sprite::SetClip (int x, int y, int w, int h) {
@@ -102,19 +67,7 @@ void Sprite::SetScale (float scale) {
 }
 
 void Sprite::SetBlendMode (SDL_BlendMode blendMode) {
-    SDL_SetTextureBlendMode(textureArray[activeTexture].texture_sptr.get(),blendMode);
-}
-
-Vec2 Sprite::GetScale () {
-    return scale;
-}
-
-int Sprite::GetWidth () {
-    return (frameWidth * (int)scale.x);
-}
-
-int Sprite::GetHeight () {
-    return (height * (int)scale.y);
+    SDL_SetTextureBlendMode(texture.get(), blendMode);
 }
 
 void Sprite::SetFrame (int frame) {
@@ -135,6 +88,23 @@ void Sprite::SetFrameCount (int frameCount) {
     clipRect.w = frameWidth;
 
     associated.box.w = (float)frameWidth * scale.x;
+}
+
+Vec2 Sprite::GetScale () {
+    return scale;
+}
+
+int Sprite::GetWidth () {
+    return (frameWidth * (int)scale.x);
+}
+
+int Sprite::GetHeight () {
+    return (height * (int)scale.y);
+}
+
+void Sprite::Flip (TextureFlip axis) {
+    SDL_RendererFlip flip = (axis == HORIZONTAL) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_VERTICAL;
+    textureFlip = SDL_RendererFlip(textureFlip ^ flip);
 }
 
 void Sprite::Update (float dt) {
@@ -170,7 +140,7 @@ void Sprite::Render () {
 }
 
 void Sprite::Render (int startX, int startY) {
-    if (textureArray.empty())
+    if (texture == nullptr)
         return;
 
     SDL_Rect destRect = SDL_Rect{
@@ -183,7 +153,7 @@ void Sprite::Render (int startX, int startY) {
     };
     int rendercpy = SDL_RenderCopyEx(
         Game::GetInstance().GetRenderer(),
-        texture.lock().get(), &clipRect, &destRect,
+        texture.get(), &clipRect, &destRect,
         associated.angleDeg, &boxCenter, textureFlip
     );
     if (rendercpy == SPRITE_ERROR) {
@@ -192,7 +162,7 @@ void Sprite::Render (int startX, int startY) {
 }
 
 void Sprite::RenderWithNoOffset (int startX, int startY) {
-    if (textureArray.empty())
+    if (texture == nullptr)
         return;
 
     SDL_Rect destRect = SDL_Rect{
@@ -201,16 +171,12 @@ void Sprite::RenderWithNoOffset (int startX, int startY) {
     };
     int rendercpy = SDL_RenderCopyEx(
         Game::GetInstance().GetRenderer(),
-        texture.lock().get(), &clipRect, &destRect,
+        texture.get(), &clipRect, &destRect,
         associated.angleDeg, nullptr, textureFlip
     );
     if (rendercpy == SPRITE_ERROR) {
         SDL_Log("SDL_RenderCopy: %s", SDL_GetError());
     }
-}
-
-bool Sprite::HasTexture () {
-    return (not textureArray.empty());
 }
 
 bool Sprite::Is (std::string type) {

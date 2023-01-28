@@ -31,7 +31,7 @@ void EnemyArmadillo::Update (float dt) {
     if (rigidBody->IsGrounded() and (not currentGround.expired())) {
         if ((collider->box.x < currentRoute.x) or (collider->box.x+collider->box.w > currentRoute.y)) {
             if (flipIsReady) {
-                sprite->FlipTexture(Sprite::HORIZONTAL);
+                sprite->Flip(Sprite::HORIZONTAL);
                 movementDirection *= -1;
                 flipIsReady = false;
             }

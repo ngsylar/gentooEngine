@@ -1,4 +1,4 @@
-#include "Rbody.h"
+#include "GentooEngine.h"
 
 #define GRAVITY 10
 #define LIMITSPD 300
@@ -31,7 +31,7 @@ Vec2 RBody::GetSpeed() {
     return speed;
 }
 void RBody::SetSpeed(Vec2 force) {
-    this->speed = speed;
+    this->speed = force;
 }
 void RBody::SetSpeedOnX(float x) {
     this->speed.x = x;
@@ -52,14 +52,6 @@ void RBody::ResetFriction() {
 }
 
 //Inheritance
-
-bool RBody::Is(ComponentType type) {
-    return type & this->type;
-}
-bool RBody::Is(std::string type){
-    return type == "RBody";
-}
-
 #define REPULSION_FACTOR 1e-4
 void RBody::NotifyCollision(GameObject& other) {
     Collider* A = (Collider*)associated.GetComponent(ComponentType::_Collider);
@@ -92,7 +84,7 @@ void RBody::NotifyCollision(GameObject& other) {
 void RBody::NotifyNoCollision(GameObject& other) {
     up = false;
     down = false;
-    left =false;
+    left = false;
     right = false;
 }
 
@@ -105,10 +97,6 @@ void RBody::Update(float dt) {
     speed.y = (speed.y>limitspeed?limitspeed:speed.y);
     associated.box.x += speed.x*dt;
     associated.box.y += speed.y*dt;
-}
-
-void RBody::LateUpdate(float dt) {
-
 }
 
 bool RBody::ImpactUp() {
@@ -132,4 +120,12 @@ float RBody::GetLimitSpeed() {
 }
 void RBody::SetLimitSpeed(float limit) {
     limitspeed = limit;
+}
+
+bool RBody::Is(ComponentType type) {
+    return type & this->type;
+}
+
+bool RBody::Is(std::string type){
+    return type == "RBody";
 }

@@ -8,13 +8,9 @@ class Collider: public Component {
         Rect box;
         Vec2 offset;
         bool isTrigger;
-        bool awake;
+        bool setManually;
 
-        Collider(
-            GameObject& associated,
-            Vec2 offset=Vec2(0, 0),
-            bool trigger=false
-        );
+        Collider(GameObject& associated, bool trigger=false);
         void SetBox(Vec2 offset, Vec2 boxSize);
         void Awaken();
         void Update(float dt);

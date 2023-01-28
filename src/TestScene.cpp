@@ -95,7 +95,7 @@ void TestScene0::LoadAssets () {
     mini_platform = GetObjectPtr(rawPlat);
     platSpr->SetScale(1.5f, 0.5f);
     // rawPlat->box.SetPosition(300, 300);
-    rawPlat->box.SetPosition(150, 162.5f);
+    rawPlat->box.SetPosition(250, 162.5f);
     rawPlat->AddComponent(new Collider(*rawPlat));
 
     GameObject* rawSquare = new GameObject(4);
@@ -122,15 +122,15 @@ void TestScene0::LoadAssets () {
     // rawPlat->AddComponent(new CameraBox(*rawPlat, rawSquare, 0, 10));
     // AddObject(rawPlat);
 
-    rawSquare = new GameObject(LAYER_RED_SQUARE);
-    AddObject(rawSquare);
-    square = GetObjectPtr(rawSquare);
-    rawSquare->AddComponent(new EnemyArmadillo(*rawSquare));
-    rawSquare->box.SetPosition(262,100);
+    // rawSquare = new GameObject(LAYER_RED_SQUARE);
+    // AddObject(rawSquare);
+    // square = GetObjectPtr(rawSquare);
+    // rawSquare->AddComponent(new EnemyArmadillo(*rawSquare));
+    // rawSquare->box.SetPosition(262,100);
 }
 
 void TestScene0::Start () {
-    Camera::Follow(square.lock().get());
+    // Camera::Follow(square.lock().get());
     lbg->SetPosition(0,0);
 }
 
@@ -520,7 +520,7 @@ TestScene6::TestScene6 () {
     BgObj->box.SetSize(Bg1->GetWidth(), Bg1->GetHeight());
     
     GameObject* BgObj2 = new GameObject(0, SCENE_TEST_LABEL);
-    LoopedBackground* Bg2 = new LoopedBackground(*BgObj2,SPRITE_BG2,3,0.3);
+    LoopedBackground* Bg2 = new LoopedBackground(*BgObj2,SPRITE_BG2,3,Vec2(0.3,0.3));
     BgObj2->AddComponent(Bg2);
     AddObject(BgObj2);
     BgObj2->box.SetPosition(0,0); 

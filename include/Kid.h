@@ -1,27 +1,26 @@
 #ifndef KID_H
 #define KID_H
 
-#include "Timer.h"
-#include "Component.h"
-#include "RigidBody.h"
+#include "EntityMachine.h"
+#include "RBody.h"
 #include "Collider.h"
-#include "Sprite.h"
+#include "CameraBox.h"
+#include "Timer.h"
 
-class Kid: public Component {
+class Kid: public EntityMachine {
     private:
-        enum Action {IDLE, RUN, JUMP, FALL, DAMAGE};
-        Sprite* sprite;
-        RigidBody* rigidBody;
+        RBody* rigidBody;
         Collider* collider;
-        Action status;
+        Timer jumpTimer;
+        int hp;
 
-        float runSpeedMax, runAcceleration, jumpForce, jumpHeightMax;
-        float runSpeedNow, jumpHeightNow;
-        bool jumpingIsConstant;
+        // Automatic Factors
+        Vec2 damageOrigin;
+        float speedRunFactor, speedJumpFactor;
+        int lastDirectionX;
 
-        Vec2 damageOrigin, damageDisplacement;
-        Timer invincibilityIimer;
-        bool isInvincible;
+        // Collision Faces
+        bool collidingUp, collidingDown;
 
         // Camera Assistants
         GameObject* cameraBox;
@@ -33,18 +32,17 @@ class Kid: public Component {
         Kid(GameObject& associated);
         void Awaken();
         void Start();
-        void Update(float dt);
-        void Run(float displacement, SDL_RendererFlip flip=SDL_FLIP_NONE);
-        void StartJump(float displacement);
-        void HandleJump(bool isKeyDown, float dt);
-        void TakeDamage(float dt);
+        void LateUpdate(float dt);
+        void UpdateEntity(float dt);
         void NotifyCollision(GameObject& other);
-        void AnimationShake();
         bool Is(ComponentType type);
-        void* CameraEffects();
 
-        // remover
-        void DebugScript(InputManager& input, float dt);
+        // Entity Specific Methods
+        void TakeDamage(Vec2 damageOrigin, float dt);
+
+        // Camera Assistants
+        void CameraStartShake();
+        void* CameraEffects();
 };
 
 #endif

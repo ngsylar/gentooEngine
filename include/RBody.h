@@ -2,7 +2,6 @@
 #define R_BODY_H
 
 #include "Component.h"
-#include "GentooEngine.h"
 
 class RBody : public Component {
     private:
@@ -45,10 +44,6 @@ class RBody : public Component {
         void Render();
         void Start();
         void Update(float dt);
-        void LateUpdate(float dt);
-
 };
-
-
 
 #endif// R_BODY_H

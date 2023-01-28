@@ -1,8 +1,11 @@
 #include "GentooEngine.h"
 
+InputManager* InputManager::inputManager = nullptr;
+
 InputManager& InputManager::GetInstance () {
-    static InputManager inputManager;
-    return inputManager;
+    if (inputManager == nullptr)
+        inputManager = new InputManager();
+    return *inputManager;
 }
 
 InputManager::InputManager () {

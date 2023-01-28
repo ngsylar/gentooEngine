@@ -1,7 +1,5 @@
-#include "Dummy.h"
-#include "RBody.h"
-#include "Collider.h"
 #include "GentooEngine.h"
+#include "Dummy.h"
 
 #define DUMMY_IDLE "assets/img/Dummy/idle.png"
 #define DUMMY_WALK "assets/img/Dummy/walk.png"
@@ -10,9 +8,7 @@
 #define DUMMY_FALL "assets/img/Dummy/fall.png"
 #define DUMMY_ATTACK "assets/img/Dummy/attack.png"
 
-
-Dummy::Dummy (GameObject& associated) 
-: EntityMachine(associated) {
+Dummy::Dummy (GameObject& associated): EntityMachine(associated) {
     HP = 100;
     lastDirection = 1;
     jumpDecrease = 0;
@@ -28,12 +24,12 @@ void Dummy::StartEntity() {
     Sprite* Fall = new Sprite(associated, DUMMY_FALL, 2, 0.3, true);
     Sprite* Attack = new Sprite(associated, DUMMY_ATTACK, 5, 0.12, true);
 
-    AddEntityStateSprite(EntityState::Idle, Idle);
-    AddEntityStateSprite(EntityState::Walking, Walk);
-    AddEntityStateSprite(EntityState::Running, Run);
-    AddEntityStateSprite(EntityState::Jumping, Jump);
-    AddEntityStateSprite(EntityState::Falling, Fall);
-    AddEntityStateSprite(EntityState::Attacking, Attack);
+    AddSpriteState(EntityState::Idle, Idle);
+    AddSpriteState(EntityState::Walking, Walk);
+    AddSpriteState(EntityState::Running, Run);
+    AddSpriteState(EntityState::Jumping, Jump);
+    AddSpriteState(EntityState::Falling, Fall);
+    AddSpriteState(EntityState::Attacking, Attack);
 
     RBody* Rig = new RBody(associated);
     Collider* Col = new Collider(associated);
@@ -47,7 +43,7 @@ void Dummy::StartEntity() {
     Game::GetInstance().GetCurrentState().AddObject(CamBoxObj);
     Camera::Follow(CamBoxObj);
 
-    currState = EntityState::Idle;
+    state = EntityState::Idle;
     associated.box.SetSize(Idle->GetWidth(), Idle->GetHeight());
     Col->box.SetPosition(associated.box.GetGlobalCenter());
     Col->SetBox(Vec2(0,4), Vec2(16,26));
@@ -64,25 +60,25 @@ void Dummy::UpdateEntity(float dt) {
     InputManager& input = InputManager::GetInstance();
     RBody* Rigid = (RBody*)associated.GetComponent(ComponentType::_RBody);
     int XDirection  = input.IsKeyDown(KEY_D) - input.IsKeyDown(KEY_A);
-    
+
     if(Rigid->GetSpeed().y > 100) { //Fall always starts from certain speed downwards
-        currState = EntityState::Falling;
+        state = EntityState::Falling;
     }
-    switch (currState) {
+    switch (state) {
         case EntityState::Idle:
             if(XDirection != 0) { //Changing to walk or run
                 if(input.IsKeyDown(SDLK_LSHIFT)){
-                    currState = EntityState::Running;
-                    entitySprite[currState].get()->SetFrame(0);
+                    state = EntityState::Running;
+                    sprites[state].get()->SetFrame(0);
                 } else {
-                    currState = EntityState::Walking;
-                    entitySprite[currState].get()->SetFrame(0);
+                    state = EntityState::Walking;
+                    sprites[state].get()->SetFrame(0);
                 }                
             }
 
             //Jump trigger
             if (input.KeyPress(KEY_SPACE)){
-                currState = EntityState::Jumping;
+                state = EntityState::Jumping;
                 Rigid->SetGravity(0);
                 jumpLimit.Reset();
             }
@@ -91,11 +87,11 @@ void Dummy::UpdateEntity(float dt) {
 
         case EntityState::Walking:
             if(input.KeyPress(SDLK_LSHIFT)) {//Start to run
-                currState = EntityState::Running;
+                state = EntityState::Running;
 
             } else if(XDirection == 0){//go to idle
                 Rigid->SetSpeedOnX(0);
-                currState = EntityState::Idle;
+                state = EntityState::Idle;
 
             } else {//Keep walking
                 Rigid->SetSpeedOnX(XDirection*WALK_SPD);
@@ -103,7 +99,7 @@ void Dummy::UpdateEntity(float dt) {
 
             //Jump trigger
             if (input.KeyPress(KEY_SPACE)){
-                currState = EntityState::Jumping;
+                state = EntityState::Jumping;
                 Rigid->SetGravity(0);
                 jumpLimit.Reset();
             }
@@ -112,17 +108,17 @@ void Dummy::UpdateEntity(float dt) {
         case EntityState::Running:
             if(XDirection == 0){//Back to idle
                 Rigid->SetSpeedOnX(0);
-                currState = EntityState::Idle;
+                state = EntityState::Idle;
 
             } else if(input.KeyRelease(SDLK_LSHIFT)) {//Start to walk
-                currState = EntityState::Walking;
+                state = EntityState::Walking;
             } else {
                     Rigid->SetSpeedOnX(XDirection*RUN_SPD);
             }
             
             //Jump trigger
             if (input.KeyPress(KEY_SPACE)){
-                currState = EntityState::Jumping;
+                state = EntityState::Jumping;
                 Rigid->SetGravity(0);
                 jumpLimit.Reset();
             }
@@ -139,7 +135,7 @@ void Dummy::UpdateEntity(float dt) {
                 Rigid->SetSpeedOnY(0);
                 jumpLimit.Reset();
                 ceiling = false;
-                currState = EntityState::Falling;
+                state = EntityState::Falling;
             }
 
             if(XDirection != 0) { //Movement while jumping
@@ -161,9 +157,9 @@ void Dummy::UpdateEntity(float dt) {
     }
 
     lastDirection = (XDirection!=0?XDirection:lastDirection);
-    if((lastDirection == -1 and entitySprite[currState].get()->textureFlip == SDL_FLIP_NONE)
-        or (lastDirection == 1 and entitySprite[currState].get()->textureFlip == SDL_FLIP_HORIZONTAL)) {
-        entitySprite[currState].get()->FlipTexture(Sprite::TextureFlipper::HORIZONTAL);
+    if((lastDirection == -1 and sprites[state].get()->textureFlip == SDL_FLIP_NONE)
+        or (lastDirection == 1 and sprites[state].get()->textureFlip == SDL_FLIP_HORIZONTAL)) {
+        sprites[state].get()->Flip(Sprite::TextureFlip::HORIZONTAL);
     }
 }
 
@@ -173,10 +169,10 @@ void Dummy::NotifyCollision(GameObject& other) {
     RBody* Rigid = (RBody*)associated.GetComponent(ComponentType::_RBody);
     Rigid->NotifyCollision(other);
         
-    if(Rigid->ImpactDown() and currState == EntityState::Falling) {
-        currState = EntityState::Idle;
+    if(Rigid->ImpactDown() and state == EntityState::Falling) {
+        state = EntityState::Idle;
     } 
-    else if(Rigid->ImpactUp() and currState == EntityState::Jumping) {
+    else if(Rigid->ImpactUp() and state == EntityState::Jumping) {
         ceiling = true;
     }
 }

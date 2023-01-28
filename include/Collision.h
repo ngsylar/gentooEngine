@@ -1,7 +1,6 @@
 #ifndef COLLISION_H
 #define COLLISION_H
 
-
 #include "Rect.h"
 #include "Vec2.h"
 

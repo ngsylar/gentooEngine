@@ -1,20 +1,19 @@
 #include "GentooEngine.h"
 
-Collider::Collider (GameObject& associated, Vec2 offset, bool trigger): Component(associated) {
-    this->offset = offset;
-    isTrigger = trigger;
-    awake = false;
+Collider::Collider (GameObject& associated, bool trigger): Component(associated) {
     type = ComponentType::_Collider;
+    isTrigger = trigger;
+    setManually = false;
 }
 
 void Collider::SetBox (Vec2 offset, Vec2 boxSize) {
     this->offset = offset;
     box.SetSize(boxSize.x, boxSize.y);
-    awake = true;
+    setManually = true;
 }
 
 void Collider::Awaken () {
-    if (awake) return;
+    if (setManually) return;
     box.SetSize(associated.box.w, associated.box.h);
 }
 

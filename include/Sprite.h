@@ -13,31 +13,21 @@
 
 class Sprite: public Component {
     private:
-        struct TextureStruct {
-            std::shared_ptr<SDL_Texture> texture_sptr;
-            int textureFrameCount;
-            float textureFrameTime;
-            int textureWidth, textureHeight;
-            bool textureOneshot, textureDestruction;
-        };
-        std::vector<TextureStruct> textureArray;
-        std::weak_ptr<SDL_Texture> texture;
+        std::shared_ptr<SDL_Texture> texture;
         SDL_Rect clipRect;
         int width, height;
         Vec2 scale;
         Timer frameTimer;
         int frameWidth, frameCount, currentFrame;
         bool frameOneshot, selfDestruction;
-        int activeTexture;
 
     public:
-        enum TextureFlipper {HORIZONTAL, VERTICAL};
+        enum TextureFlip {HORIZONTAL, VERTICAL};
         SDL_RendererFlip textureFlip;
         std::vector<Vec2> positionArray;
         Vec2 parallaxFactor;
 
         Sprite(GameObject& associated);
-        ~Sprite();
         Sprite(
             GameObject& associated,
             std::string file,
@@ -46,31 +36,29 @@ class Sprite: public Component {
             bool frameOneshot=false,
             bool selfDestruction=false
         );
-        void AddTexture(
+        ~Sprite();
+        void Open(
             std::string file,
             int frameCount=1,
             float frameTime=0.0f,
             bool frameOneshot=false,
             bool selfDestruction=false
         );
-        void SetTexture(int textureId);
-        void FlipTexture(TextureFlipper axis);
-        int GetActiveTexture();
         void SetClip(int x, int y, int w, int h);
         void SetScale(float scaleX, float scaleY);
         void SetScale(float scale);
         void SetBlendMode(SDL_BlendMode blendMode);
-        Vec2 GetScale();
-        int GetWidth();
-        int GetHeight();
         void SetFrame(int frame);
         void SetFrameTime(float frameTime);
         void SetFrameCount(int frameCount);
+        Vec2 GetScale();
+        int GetWidth();
+        int GetHeight();
+        void Flip(TextureFlip axis);
         void Update(float dt);
         void Render();
         void Render(int startX, int startY);
         void RenderWithNoOffset(int startX, int startY);
-        bool HasTexture();
         bool Is(std::string type);
         bool Is(ComponentType type);
 };

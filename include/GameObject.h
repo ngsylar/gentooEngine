@@ -5,8 +5,8 @@
 #include <string>
 #include <vector>
 
-#include "Rect.h"
 #include "GlobalDefinitions.h"
+#include "Rect.h"
 
 class Component;
 

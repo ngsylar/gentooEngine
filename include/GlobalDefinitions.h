@@ -69,8 +69,9 @@ enum LayerDistance {
     _NPC_Far,
     _NPC,
     _NPC_Close,
+    _Player_Back,
     _Player,
-    _Player_Item,
+    _Player_Front,
     _ForeGround,
     _ForeGround_Close,
     _ForeGround_VeryClose,
@@ -83,7 +84,7 @@ enum EntityState {
     Jumping,
     Falling,
     Attacking,
-    HitTaken,
+    Injured,
 
     // Leave declaration below as the last element,
     // it is the index for how many valid states there are
