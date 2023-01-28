@@ -27,7 +27,7 @@ enum ComponentType {
     _Kid =              1 << 12,
     _Enemy =            1 << 13,
     _EntityMachine =    1 << 14,
-    // x = 1 << 14,
+    _Attack =           1 << 14,
     // x = 1 << 15,
     // x = 1 << 16,
     // x = 1 << 17,
@@ -54,8 +54,29 @@ inline ComponentType operator^ (ComponentType a, ComponentType b) {
     return static_cast<ComponentType>(static_cast<int>(a) ^ static_cast<int>(b));
 }
 
-enum EntityState
-{
+enum LayerDistance {
+    _Background_FarAway,
+    _Background_Far,
+    _Background,
+    _Background_Close,
+    _Background_VeryClose,
+    _Scenery_Far,
+    _Scenery,
+    _Scenery_Close,
+    _Environment_Far,
+    _Environment,
+    _Environment_Close,
+    _NPC_Far,
+    _NPC,
+    _NPC_Close,
+    _Player,
+    _Player_Item,
+    _ForeGround,
+    _ForeGround_Close,
+    _ForeGround_VeryClose,
+};
+
+enum EntityState {
     Idle,
     Walking,
     Running,
@@ -64,12 +85,12 @@ enum EntityState
     Attacking,
     HitTaken,
 
-    //Leave declaration below as the last element,
-    //it is the index for how many valid states there are
+    // Leave declaration below as the last element,
+    // it is the index for how many valid states there are
     __TOTAL,
-    //Declaration below is for initialization
+
+    // Declaration below is for initialization
     None = 0xFF,
 };
-
 
 #endif
