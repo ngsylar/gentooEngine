@@ -5,13 +5,14 @@
 
 class RBody : public Component {
     private:
-        float gravity;
         float limitspeed;
         Vec2 friction;
         Vec2 speed;
         bool up, down, left, right;
 
     public:
+        float gravity;
+
         RBody(GameObject& associated);
         ~RBody();
 

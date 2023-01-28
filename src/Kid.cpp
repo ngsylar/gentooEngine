@@ -8,19 +8,20 @@
 #define SPRITE_FALL                 "assets/img/kid/fall.png"
 #define SPRITE_ATTACK               "assets/img/kid/attack.png"
 
-#define SPRITE_IDLE_FRAMES          8, 0.08f
-#define SPRITE_WALK_FRAMES          8, 0.08f
-#define SPRITE_RUN_FRAMES           8, 0.08f
-#define SPRITE_JUMP_FRAMES          8, 0.08f
-#define SPRITE_FALL_FRAMES          8, 0.08f
-#define SPRITE_ATTACK_FRAMES        8, 0.08f
+#define SPRITE_IDLE_FRAMES          8, 0.05f
+#define SPRITE_WALK_FRAMES          8, 0.05f
+#define SPRITE_RUN_FRAMES           8, 0.05f
+#define SPRITE_JUMP_FRAMES          8, 0.05f
+#define SPRITE_FALL_FRAMES          8, 0.05f
+#define SPRITE_ATTACK_FRAMES        8, 0.05f
 
-#define SPEED_RUN_MAX               120.0f
+#define SPEED_RUN_MIN               60.0f
+#define SPEED_RUN_MAX               140.0f
 #define SPEED_ONAIR                 100.0f
-#define FORCE_JUMP                  200.0f
-#define FORCE_MASS                  200.0f
-#define FORCE_DAMAGE_X              -300.0f
-#define FORCE_DAMAGE_Y              -100.0f
+#define FORCE_JUMP                  300.0f
+#define FORCE_MASS                  400.0f
+#define FORCE_DAMAGE_X              -400.0f
+#define FORCE_DAMAGE_Y              -75.0f
 #define IMPULSE_DAMAGE              70.0f
 
 #define COLLIDER_POSITION           0.0f, 9.0f
@@ -43,7 +44,7 @@ Kid::Kid (GameObject& associated): EntityMachine(associated) {
     jumpTimer.SetResetTime(0.8f);
     hp = 4;
 
-    speedRunFactor = 0.0f;
+    speedRunFactor = SPEED_RUN_MIN;
     speedJumpFactor = 0.0f;
     lastDirectionX = 1;
     collidingUp = false;
@@ -114,6 +115,7 @@ void Kid::UpdateEntity (float dt) {
 
     if (input.KeyPress(Key::attack)) {
         damageOrigin = collider->box.GetPosition();
+        rigidBody->ResetGravity();
         state = Injured;
     }
 
@@ -138,13 +140,13 @@ void Kid::UpdateEntity (float dt) {
             if (directionX == 0) {
                 state = Idle;
                 rigidBody->SetSpeedOnX(0.0f);
-                speedRunFactor = 0.0f;
+                speedRunFactor = SPEED_RUN_MIN;
             }
             // movement is performing
             else {
                 speedRunFactor = (speedRunFactor > SPEED_RUN_MAX)?
                     SPEED_RUN_MAX : (speedRunFactor + (SPEED_RUN_MAX * dt));
-                float acceleration = SmoothStep(0.2f, SPEED_RUN_MAX, speedRunFactor);
+                float acceleration = SmoothStep(0.0f, SPEED_RUN_MAX, speedRunFactor);
                 rigidBody->SetSpeedOnX(directionX * acceleration * SPEED_RUN_MAX);
             }
             // start jump
@@ -193,7 +195,6 @@ void Kid::UpdateEntity (float dt) {
                 state = Falling;
             } else {
                 rigidBody->SetSpeed(Vec2(lastDirectionX * FORCE_DAMAGE_X, FORCE_DAMAGE_Y));
-                rigidBody->ResetGravity();
             }
             break;
 

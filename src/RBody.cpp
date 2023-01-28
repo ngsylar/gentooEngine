@@ -1,7 +1,7 @@
 #include "GentooEngine.h"
 
-#define GRAVITY 10
-#define LIMITSPD 300
+#define GRAVITY 600
+#define LIMITSPD 400
 
 RBody::RBody(GameObject& associated)
 : Component(associated), 
@@ -93,7 +93,7 @@ void RBody::Render() {}
 void RBody::Start() {}
 
 void RBody::Update(float dt) {
-    speed.y+=gravity;
+    speed.y += gravity*dt;
     speed.y = (speed.y>limitspeed?limitspeed:speed.y);
     associated.box.x += speed.x*dt;
     associated.box.y += speed.y*dt;
