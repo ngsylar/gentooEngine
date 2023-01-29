@@ -35,7 +35,8 @@ bool EntityMachine::HasState (EntityState compare) {
 }
 
 void EntityMachine::SetState (EntityState newState) {
-    state = newState;
+    if (NewStateRule(newState))
+        state = newState;
 }
 
 EntityState EntityMachine::GetCurrentState () {
@@ -80,6 +81,10 @@ void EntityMachine::UpdateEntity (float dt) {}
 void EntityMachine::LateUpdateEntity (float dt) {}
 
 void EntityMachine::RenderEntity () {}
+
+bool EntityMachine::NewStateRule (EntityState newState) {
+    return true;
+}
 
 void EntityMachine::FlipSprite (Sprite::Axis axis) {
     SDL_RendererFlip flip = (axis == Sprite::HORIZONTAL) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_VERTICAL;

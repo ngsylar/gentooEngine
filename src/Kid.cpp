@@ -21,7 +21,7 @@
 #define FORCE_JUMP                  300.0f
 #define FORCE_MASS                  460.0f
 #define FORCE_DAMAGE_X              -400.0f
-#define FORCE_DAMAGE_Y              -75.0f
+#define FORCE_DAMAGE_Y              -140.0f
 #define IMPULSE_DAMAGE              70.0f
 
 #define COLLIDER_POSITION           0.0f, 9.0f
@@ -44,6 +44,7 @@ Kid::Kid (GameObject& associated): EntityMachine(associated) {
     associated.layer = LayerDistance::_Player;
     associated.label = "Player";
     jumpTimer.SetResetTime(0.8f);
+    invincibilityTimer.SetResetTime(1.25f);
     isInvincible = false;
     hp = 4;
 
@@ -109,6 +110,14 @@ void Kid::UpdateEntity (float dt) {
     InputManager& input = InputManager::GetInstance();
     EntityState previousState = state;
 
+    if (isInvincible) {
+        invincibilityTimer.Update(dt);
+        if (invincibilityTimer.IsOver()) {
+            invincibilityTimer.Reset();
+            isInvincible = false;
+            rigidBody->triggerLabels.clear();
+        }
+    }
     // prevent movement when opposite directions are active
     int directionX = input.IsKeyDown(Key::moveRight) - input.IsKeyDown(Key::moveLeft);
 
@@ -188,22 +197,13 @@ void Kid::UpdateEntity (float dt) {
         //     break;
         
         case Injured:
-            if (hitWall) {
-                state = Falling;
-                hitWall = false;
-                isInvincible = false; // remover
-            }
-            if (not isInvincible) {
-                damageOrigin = collider->box.GetPosition();
-                rigidBody->ResetGravity();
-                isInvincible = true;
-            }
             if (collider->box.GetPosition().DistanceTo(damageOrigin) > IMPULSE_DAMAGE) {
                 rigidBody->SetSpeed(Vec2(lastDirectionX * FORCE_DAMAGE_X * 0.5f, FORCE_DAMAGE_Y));
                 state = Falling;
-                isInvincible = false; // remover
-            } else {
-                rigidBody->SetSpeed(Vec2(lastDirectionX * FORCE_DAMAGE_X, FORCE_DAMAGE_Y));
+            }
+            if (hitWall) {
+                state = Falling;
+                hitWall = false;
             }
             break;
 
@@ -217,6 +217,23 @@ void Kid::UpdateEntity (float dt) {
         textureFlip = (directionX == 1)? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL;
         lastDirectionX = directionX;
     }
+
+    SDL_Log("%d", state);
+}
+
+bool Kid::NewStateRule (EntityState newState) {
+    if (newState == state)
+        return false;
+
+    if (newState == Injured) {
+        if (isInvincible) return false;
+        damageOrigin = collider->box.GetPosition();
+        rigidBody->SetSpeed(Vec2(lastDirectionX * FORCE_DAMAGE_X, FORCE_DAMAGE_Y));
+        rigidBody->ResetGravity();
+        isInvincible = true;
+        rigidBody->triggerLabels.push_back("Enemy");
+    }
+    return true;
 }
 
 void Kid::NotifyCollision (GameObject& other) {

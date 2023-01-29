@@ -11,7 +11,7 @@ class Kid: public EntityMachine {
     private:
         RigidBody* rigidBody;
         Collider* collider;
-        Timer jumpTimer;
+        Timer jumpTimer, invincibilityTimer;
         bool isInvincible;
         int hp;
 
@@ -29,6 +29,8 @@ class Kid: public EntityMachine {
         std::queue<Vec2> cameraShakeQueue;
         Vec2 cameraShakeReset;
 
+        bool NewStateRule(EntityState newState);
+
     public:
         Kid(GameObject& associated);
         void Awaken();
@@ -37,9 +39,6 @@ class Kid: public EntityMachine {
         void UpdateEntity(float dt);
         void NotifyCollision(GameObject& other);
         bool Is(ComponentType type);
-
-        // Entity Specific Methods
-        void TakeDamage(Vec2 damageOrigin, float dt);
 
         // Camera Assistants
         void CameraStartShake();

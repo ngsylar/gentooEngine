@@ -11,9 +11,11 @@ class RigidBody : public Component {
         bool up, down, left, right;
 
     public:
+        std::vector<std::string> triggerLabels;
+        bool isTrigger;
         float gravity;
 
-        RigidBody(GameObject& associated);
+        RigidBody(GameObject& associated, bool isTrigger=false);
         ~RigidBody();
 
         float GetGravity();
