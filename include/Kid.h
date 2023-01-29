@@ -2,25 +2,26 @@
 #define KID_H
 
 #include "EntityMachine.h"
-#include "RBody.h"
+#include "RigidBody.h"
 #include "Collider.h"
 #include "CameraBox.h"
 #include "Timer.h"
 
 class Kid: public EntityMachine {
     private:
-        RBody* rigidBody;
+        RigidBody* rigidBody;
         Collider* collider;
         Timer jumpTimer;
+        bool isInvincible;
         int hp;
 
         // Automatic Factors
         Vec2 damageOrigin;
-        float speedRunFactor, speedJumpFactor;
+        float speedRunFactor, speedJumpDecrease;
         int lastDirectionX;
 
         // Collision Faces
-        bool collidingUp, collidingDown;
+        bool isGrounded, hitCeiling, hitWall;
 
         // Camera Assistants
         GameObject* cameraBox;

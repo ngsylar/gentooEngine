@@ -48,7 +48,6 @@
 
 // Object Components
 #include "EntityMachine.h"
-#include "RBody.h" // editar
 #include "RigidBody.h"
 #include "Collider.h"
 #include "Sprite.h"

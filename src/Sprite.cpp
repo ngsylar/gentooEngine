@@ -102,7 +102,7 @@ int Sprite::GetHeight () {
     return (height * (int)scale.y);
 }
 
-void Sprite::Flip (TextureFlip axis) {
+void Sprite::Flip (Axis axis) {
     SDL_RendererFlip flip = (axis == HORIZONTAL) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_VERTICAL;
     textureFlip = SDL_RendererFlip(textureFlip ^ flip);
 }

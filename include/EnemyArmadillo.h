@@ -6,24 +6,24 @@
 #include "Collider.h"
 #include "Sprite.h"
 
-class EnemyArmadillo: public Component {
+class EnemyArmadillo: public EntityMachine {
     private:
-        Sprite* sprite;
         RigidBody* rigidBody;
         Collider* collider;
-        float runSpeed;
         int movementDirection;
         bool flipIsReady;
-
-        std::weak_ptr<GameObject> currentGround;
         Vec2 currentRoute;
+
+        // Collision Faces
+        bool isGrounded, hitWall;
 
     public:
         EnemyArmadillo(GameObject& associated);
+        void Awaken();
         void Start();
-        void Update(float dt);
+        void LateUpdate(float dt);
+        void UpdateEntity(float dt);
         void NotifyCollision(GameObject& other);
-        void NotifyNoCollision(GameObject& other);
 };
 
 #endif

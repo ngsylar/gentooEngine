@@ -22,7 +22,7 @@ class Sprite: public Component {
         bool frameOneshot, selfDestruction;
 
     public:
-        enum TextureFlip {HORIZONTAL, VERTICAL};
+        enum Axis {HORIZONTAL, VERTICAL};
         SDL_RendererFlip textureFlip;
         std::vector<Vec2> positionArray;
         Vec2 parallaxFactor;
@@ -54,7 +54,7 @@ class Sprite: public Component {
         Vec2 GetScale();
         int GetWidth();
         int GetHeight();
-        void Flip(TextureFlip axis);
+        void Flip(Axis axis);
         void Update(float dt);
         void Render();
         void Render(int startX, int startY);

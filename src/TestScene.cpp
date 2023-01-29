@@ -52,8 +52,8 @@ void TestScene0::LoadAssets () {
     rawPlat->AddComponent(platSpr);
     AddObject(rawPlat);
     mini_platform = GetObjectPtr(rawPlat);
-    // platSpr->SetScale(7.5f, 0.5f);
-    platSpr->SetScale(50, 0.5f);
+    platSpr->SetScale(7.5f, 0.5f);
+    // platSpr->SetScale(50, 0.5f);
     rawPlat->box.SetPosition(256, 250);
     rawPlat->AddComponent(new Collider(*rawPlat));
     // rawPlat->AddComponent(new PlatformCamera(*rawPlat, PlatformCamera::DOWN, 0.0f));
@@ -67,26 +67,26 @@ void TestScene0::LoadAssets () {
     // rawPlat->box.SetPosition(256, 50);
     // rawPlat->AddComponent(new Collider(*rawPlat));
 
-    // rawPlat = new GameObject(LAYER_BLACK_SQUARE);
-    // platSpr = new Sprite(*rawPlat, SPRITE_BLACK_SQUARE);
-    // rawPlat->AddComponent(platSpr);
-    // AddObject(rawPlat);
-    // mini_platform = GetObjectPtr(rawPlat);
-    // platSpr->SetScale(0.5f, 3.5f);
-    // rawPlat->box.SetPosition(50, 150);
-    // Collider* platcoll = new Collider(*rawPlat);
-    // rawPlat->AddComponent(platcoll);
+    rawPlat = new GameObject(LAYER_BLACK_SQUARE);
+    platSpr = new Sprite(*rawPlat, SPRITE_BLACK_SQUARE);
+    rawPlat->AddComponent(platSpr);
+    AddObject(rawPlat);
+    mini_platform = GetObjectPtr(rawPlat);
+    platSpr->SetScale(0.5f, 3.5f);
+    rawPlat->box.SetPosition(50, 150);
+    Collider* platcoll = new Collider(*rawPlat);
+    rawPlat->AddComponent(platcoll);
 
-    // rawPlat = new GameObject(LAYER_BLACK_SQUARE);
-    // platSpr = new Sprite(*rawPlat, SPRITE_BLACK_SQUARE);
-    // rawPlat->AddComponent(platSpr);
-    // AddObject(rawPlat);
-    // mini_platform = GetObjectPtr(rawPlat);
-    // platSpr->SetScale(0.5f, 3.5f);
-    // rawPlat->box.SetPosition(450, 150);
-    // platcoll = new Collider(*rawPlat);
-    // rawPlat->AddComponent(platcoll);
-    // // platcoll->isTrigger = true;
+    rawPlat = new GameObject(LAYER_BLACK_SQUARE);
+    platSpr = new Sprite(*rawPlat, SPRITE_BLACK_SQUARE);
+    rawPlat->AddComponent(platSpr);
+    AddObject(rawPlat);
+    mini_platform = GetObjectPtr(rawPlat);
+    platSpr->SetScale(0.5f, 3.5f);
+    rawPlat->box.SetPosition(450, 150);
+    platcoll = new Collider(*rawPlat);
+    rawPlat->AddComponent(platcoll);
+    // platcoll->isTrigger = true;
 
     rawPlat = new GameObject(LAYER_BLACK_SQUARE);
     platSpr = new Sprite(*rawPlat, SPRITE_BLACK_SQUARE);
@@ -122,11 +122,11 @@ void TestScene0::LoadAssets () {
     // rawPlat->AddComponent(new CameraBox(*rawPlat, rawSquare, 0, 10));
     // AddObject(rawPlat);
 
-    // rawSquare = new GameObject(LAYER_RED_SQUARE);
-    // AddObject(rawSquare);
-    // square = GetObjectPtr(rawSquare);
-    // rawSquare->AddComponent(new EnemyArmadillo(*rawSquare));
-    // rawSquare->box.SetPosition(262,100);
+    rawSquare = new GameObject(LAYER_RED_SQUARE);
+    AddObject(rawSquare);
+    square = GetObjectPtr(rawSquare);
+    rawSquare->AddComponent(new EnemyArmadillo(*rawSquare));
+    rawSquare->box.SetPosition(400,100);
 }
 
 void TestScene0::Start () {

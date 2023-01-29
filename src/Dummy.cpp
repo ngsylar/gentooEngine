@@ -31,7 +31,7 @@ void Dummy::StartEntity() {
     AddSpriteState(EntityState::Falling, Fall);
     AddSpriteState(EntityState::Attacking, Attack);
 
-    RBody* Rig = new RBody(associated);
+    RigidBody* Rig = new RigidBody(associated);
     Collider* Col = new Collider(associated);
 
     GameObject* CamBoxObj = new GameObject(associated.layer);
@@ -58,7 +58,7 @@ void Dummy::StartEntity() {
 void Dummy::UpdateEntity(float dt) {
     jumpLimit.Update(dt);
     InputManager& input = InputManager::GetInstance();
-    RBody* Rigid = (RBody*)associated.GetComponent(ComponentType::_RBody);
+    RigidBody* Rigid = (RigidBody*)associated.GetComponent(ComponentType::_RigidBody);
     int XDirection  = input.IsKeyDown(KEY_D) - input.IsKeyDown(KEY_A);
 
     if(Rigid->GetSpeed().y > 100) { //Fall always starts from certain speed downwards
@@ -159,14 +159,14 @@ void Dummy::UpdateEntity(float dt) {
     lastDirection = (XDirection!=0?XDirection:lastDirection);
     if((lastDirection == -1 and sprites[state].get()->textureFlip == SDL_FLIP_NONE)
         or (lastDirection == 1 and sprites[state].get()->textureFlip == SDL_FLIP_HORIZONTAL)) {
-        sprites[state].get()->Flip(Sprite::TextureFlip::HORIZONTAL);
+        FlipSprite(Sprite::HORIZONTAL);
     }
 }
 
 // void Dummy::LateUpdate(float dt) {}
 
 void Dummy::NotifyCollision(GameObject& other) {
-    RBody* Rigid = (RBody*)associated.GetComponent(ComponentType::_RBody);
+    RigidBody* Rigid = (RigidBody*)associated.GetComponent(ComponentType::_RigidBody);
     Rigid->NotifyCollision(other);
         
     if(Rigid->ImpactDown() and state == EntityState::Falling) {

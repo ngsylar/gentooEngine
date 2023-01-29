@@ -40,15 +40,20 @@
 #define CAMERA_GROUNDED_RESET_TIME  1.5f
 
 Kid::Kid (GameObject& associated): EntityMachine(associated) {
+    type = type | ComponentType::_Kid;
     associated.layer = LayerDistance::_Player;
+    associated.label = "Player";
     jumpTimer.SetResetTime(0.8f);
+    isInvincible = false;
     hp = 4;
 
     speedRunFactor = SPEED_RUN_MIN;
-    speedJumpFactor = 0.0f;
+    speedJumpDecrease = 0.0f;
     lastDirectionX = 1;
-    collidingUp = false;
-    collidingDown = false;
+
+    isGrounded = false;
+    hitCeiling = false;
+    hitWall = false;
 }
 
 void Kid::Awaken () {
@@ -68,7 +73,7 @@ void Kid::Awaken () {
     // AddSpriteState(Attacking, spriteAttack);
     AddSpriteState(Injured, spriteDamage);
 
-    rigidBody = new RBody(associated);
+    rigidBody = new RigidBody(associated);
     associated.AddComponent(rigidBody);
 
     collider = new Collider(associated);
@@ -109,14 +114,8 @@ void Kid::UpdateEntity (float dt) {
 
     // tolerance before start falling
     if ((state != Falling) and (rigidBody->GetSpeed().y > 100)) {
-        collidingDown = false;
+        isGrounded = false;
         state = Falling;
-    }
-
-    if (input.KeyPress(Key::attack)) {
-        damageOrigin = collider->box.GetPosition();
-        rigidBody->ResetGravity();
-        state = Injured;
     }
 
     switch (state) {
@@ -129,7 +128,7 @@ void Kid::UpdateEntity (float dt) {
             if (input.KeyPress(Key::jump)) {
                 state = Jumping;
                 rigidBody->SetGravity(0.0f);
-                collidingDown = false;
+                isGrounded = false;
             }
             break;
         
@@ -154,29 +153,27 @@ void Kid::UpdateEntity (float dt) {
             if (input.KeyPress(Key::jump)) {
                 state = Jumping;
                 rigidBody->SetGravity(0.0f);
-                collidingDown = false;
+                isGrounded = false;
             }
-
             break;
         
         case Jumping:
             // jump is performing
-            rigidBody->SetSpeedOnY(-FORCE_JUMP + speedJumpFactor);
-            speedJumpFactor += FORCE_MASS * dt;
+            rigidBody->SetSpeedOnY(-FORCE_JUMP + speedJumpDecrease);
+            speedJumpDecrease += FORCE_MASS * dt;
             if (directionX != 0)
                 rigidBody->SetSpeedOnX(directionX * SPEED_ONAIR);
             jumpTimer.Update(dt);
 
             // jump is performed
-            if (input.KeyRelease(Key::jump) or jumpTimer.IsOver() or collidingUp) {
+            if (input.KeyRelease(Key::jump) or jumpTimer.IsOver() or hitCeiling) {
                 state = Falling;
                 rigidBody->SetSpeedOnY(0.0f);
                 rigidBody->ResetGravity();
                 jumpTimer.Reset();
-                speedJumpFactor = 0.0f;
-                collidingUp = false;
+                speedJumpDecrease = 0.0f;
+                hitCeiling = false;
             }
-
             break;
         
         case Falling:
@@ -191,9 +188,20 @@ void Kid::UpdateEntity (float dt) {
         //     break;
         
         case Injured:
+            if (hitWall) {
+                state = Falling;
+                hitWall = false;
+                isInvincible = false; // remover
+            }
+            if (not isInvincible) {
+                damageOrigin = collider->box.GetPosition();
+                rigidBody->ResetGravity();
+                isInvincible = true;
+            }
             if (collider->box.GetPosition().DistanceTo(damageOrigin) > IMPULSE_DAMAGE) {
                 rigidBody->SetSpeed(Vec2(lastDirectionX * FORCE_DAMAGE_X * 0.5f, FORCE_DAMAGE_Y));
                 state = Falling;
+                isInvincible = false; // remover
             } else {
                 rigidBody->SetSpeed(Vec2(lastDirectionX * FORCE_DAMAGE_X, FORCE_DAMAGE_Y));
             }
@@ -218,11 +226,15 @@ void Kid::NotifyCollision (GameObject& other) {
     if ((state == Falling) and rigidBody->ImpactDown()) {
         state = Idle;
         rigidBody->SetSpeedOnX(0.0f);
-        collidingDown = true;
+        isGrounded = true;
     }
     // hits the ceiling
     if ((state == Jumping) and rigidBody->ImpactUp())
-        collidingUp = true;
+        hitCeiling = true;
+
+    // hits a wall
+    if ((state == Injured) and (rigidBody->ImpactLeft() or rigidBody->ImpactRight()))
+        hitWall = true;
 }
 
 bool Kid::Is (ComponentType type) {
@@ -261,7 +273,7 @@ void* Kid::CameraEffects () {
     // returns the camera to original focus offset when kid is grounded
     /*--------------------------------------------------------------------------------------------------*/
 
-    if (not collidingDown) {
+    if (not isGrounded) {
         cameraGroundedTimer.Reset();
         return nullptr;
     }

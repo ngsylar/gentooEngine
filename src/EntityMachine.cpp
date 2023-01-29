@@ -81,6 +81,11 @@ void EntityMachine::LateUpdateEntity (float dt) {}
 
 void EntityMachine::RenderEntity () {}
 
+void EntityMachine::FlipSprite (Sprite::Axis axis) {
+    SDL_RendererFlip flip = (axis == Sprite::HORIZONTAL) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_VERTICAL;
+    textureFlip = SDL_RendererFlip(textureFlip ^ flip);
+}
+
 void EntityMachine::NotifyCollision (GameObject& other) {}
 
 void EntityMachine::NotifyNoCollision (GameObject& other) {}

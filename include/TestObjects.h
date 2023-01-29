@@ -3,11 +3,12 @@
 
 #include "Timer.h"
 #include "InputManager.h"
+#include "RigidBodyLegacy.h"
 #include "Component.h"
 
 class Ball: public Component {
     private:
-        RigidBody* rigidBody;
+        RigidBodyLegacy* rigidBody;
         float runSpeed, jumpForce, jumpHeight, jumpHeightMax;
         bool isJumping;
 

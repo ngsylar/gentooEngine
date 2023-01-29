@@ -47,7 +47,11 @@ void Attack::SetupCollider (Vec2 offset, Vec2 size) {
 
 void Attack::Update (float dt) {}
 
-void Attack::NotifyCollision (GameObject& other) {}
+void Attack::NotifyCollision (GameObject& other) {
+    EntityMachine* entity = (EntityMachine*)other.GetComponent(ComponentType::_EntityMachine);
+    if (entity != nullptr)
+        entity->SetState(EntityState::Injured);
+}
 
 bool Attack::UsingInternalAssociated () {
     return (not usingExternalAssociated);

@@ -1,254 +1,131 @@
 #include "GentooEngine.h"
 
-RigidBody::RigidBody (GameObject& associated, float gravityValue): Component(associated) {
-    // bodyType = DYNAMIC;
-    gravityEnabled = true;
-    this->gravityValue = gravityValue;
+#define GRAVITY 900
+#define LIMITSPD 400
 
-    collidingFaces[UP] = false;
-    collidingFaces[DOWN] = false;
-    collidingFaces[LEFT] = false;
-    collidingFaces[RIGHT] = false;
-
+RigidBody::RigidBody(GameObject& associated)
+: Component(associated), 
+friction(1,1), 
+speed(0,0)
+{
+    gravity = GRAVITY;
+    limitspeed = LIMITSPD;
     type = ComponentType::_RigidBody;
 }
 
-RigidBody::~RigidBody () {
-    collidingOthers.clear();
+RigidBody::~RigidBody() {}
+
+//Gravity
+float RigidBody::GetGravity() {
+    return gravity;
+}
+void RigidBody::SetGravity(float gravity) {
+    this->gravity = gravity;
+}
+void RigidBody::ResetGravity() {
+    this->gravity = GRAVITY;
 }
 
-void RigidBody::Start () {
-    Vec2 position = associated.box.GetPosition();
-    previousPosition.push(position);
-    previousPosition.push(position);
-    previousPosition.push(position);
+//Speed
+Vec2 RigidBody::GetSpeed() {
+    return speed;
+}
+void RigidBody::SetSpeed(Vec2 force) {
+    this->speed = force;
+}
+void RigidBody::SetSpeedOnX(float x) {
+    this->speed.x = x;
+}
+void RigidBody::SetSpeedOnY(float y) {
+    this->speed.y = y;
+}
+void RigidBody::ResetSpeed() {
+    this->speed = Vec2(0,0);
 }
 
-void RigidBody::Update (float dt) {
-    Vec2 position = associated.box.GetPosition();
-    movementDirection = position - previousPosition.front();
-    previousPosition.push(position);
-    previousPosition.pop();
+//Friction
+void RigidBody::ApplyFriction(Vec2 friction) {
+    this->friction = friction;
+}
+void RigidBody::ResetFriction() {
+    this->friction = Vec2(1,1);
+}
+
+//Inheritance
+#define REPULSION_FACTOR 1e-4
+void RigidBody::NotifyCollision(GameObject& other) {
+    Collider* A = (Collider*)associated.GetComponent(ComponentType::_Collider);
+    Collider* B = (Collider*)other.GetComponent(ComponentType::_Collider);
+    Rect intersection = A->box.GetIntersection(B->box);
     
-    if (gravityEnabled)
-        HandleGravity(dt);
-    
-    Translate(velocity * dt);
-    CheckDeletedColliders();
-}
-
-void RigidBody::HandleGravity (float dt) {
-    float gravitationalAcceleration = 0.0f;
-
-    if (collidingFaces[DOWN])
-        gravitationalAcceleration = 0.0f;
-    else
-        gravitationalAcceleration = gravityValue;
-
-    if ((velocityMax.y > 0.0f) and (velocity.y >= velocityMax.y))
-        velocity.y = velocityMax.y;
-    else
-        velocity.y += gravitationalAcceleration * dt;
-}
-
-bool RigidBody::IsGrounded () {
-    return collidingFaces[DOWN];
-}
-
-Vec2 RigidBody::GetVelocity () {
-    return velocity;
-}
-
-void RigidBody::Translate (Vec2 displacement) {
-    if ((collidingFaces[UP] and (displacement.y < 0)) or (collidingFaces[DOWN] and (displacement.y > 0)))
-        displacement.y = 0;
-    if ((collidingFaces[LEFT] and (displacement.x < 0)) or (collidingFaces[RIGHT] and (displacement.x > 0)))
-        displacement.x = 0;
-    associated.box.Translate(displacement);
-}
-
-void RigidBody::AddForce (Vec2 force) {
-    velocity += force;
-}
-
-void RigidBody::CancelForces (RigidBody::Axis axis) {
-    switch (axis) {
-        case HORIZONTAL:
-            velocity.x = 0.0f;
-            break;
-        case VERTICAL:
-            velocity.y = 0.0f;
-            break;
-        case ALL:
-            velocity = Vec2();
-            break;
-        default: break;
-    }
-}
-
-void RigidBody::NotifyCollision (GameObject& other) {
-    /*--------------------------------------------------------------------------------------------------*/
-    // check if the other collider is trigger or if a collision with the other already exists
-    /*--------------------------------------------------------------------------------------------------*/
-
-    for (std::string label : noInteractionLabels)
-        if (other.label == label) return;
-
-    Collider* otherCollider = (Collider*)other.GetComponent(ComponentType::_Collider);
-    if (otherCollider->isTrigger) return;
-    
-    for (int i=0; i < (int)collidingOthers.size(); i++)
-        if (collidingOthers[i].first.lock().get() == &other)
-            return;
-
-    /*--------------------------------------------------------------------------------------------------*/
-    // defines the collision contact face on the associated
-    /*--------------------------------------------------------------------------------------------------*/
-
-    std::weak_ptr<GameObject> otherPtr = Game::GetInstance().GetCurrentState().GetObjectPtr(&other);
-    std::array<bool, 4> isColliding = {false, false, false, false};
-    // SDL_Log("%f\t%f", movementDirection.x, movementDirection.y);
-
-    if (movementDirection.y < 0) {
-        isColliding[UP] = true;
-        // SDL_Log("UP");
-    }
-    if (movementDirection.y > 0) {
-        isColliding[DOWN] = true;
-        // SDL_Log("DOWN");
-    }
-    if (movementDirection.x < 0) {
-        isColliding[LEFT] = true;
-        // SDL_Log("LEFT");
-    }
-    if (movementDirection.x > 0) {
-        isColliding[RIGHT] = true;
-        // SDL_Log("RIGHT");
-    }
-
-    /*--------------------------------------------------------------------------------------------------*/
-    // get information about the objects
-    /*--------------------------------------------------------------------------------------------------*/
-
-    Collider* collider = (Collider*)associated.GetComponent(ComponentType::_Collider);
-    Vec2 position = associated.box.GetPosition();
-
-    float halfBody[4] = {
-        (collider->box.h*0.5f)-collider->offset.y, (collider->box.h*0.5f)+collider->offset.y,
-        (collider->box.w*0.5f)-collider->offset.x, (collider->box.w*0.5f)+collider->offset.x
-    };
-    float faces[4] = {
-        collider->box.y, collider->box.y+collider->box.h,
-        collider->box.x, collider->box.x+collider->box.w
-    };
-    float otherFaces[4] = {
-        otherCollider->box.y, otherCollider->box.y+otherCollider->box.h,
-        otherCollider->box.x, otherCollider->box.x+otherCollider->box.w
-    };
-    float pushFaceTo[4] = {
-        faces[DOWN]-otherFaces[UP], otherFaces[DOWN]-faces[UP],
-        faces[RIGHT]-otherFaces[LEFT], otherFaces[RIGHT]-faces[LEFT]
-    };
-
-    /*--------------------------------------------------------------------------------------------------*/
-    // decides the contact face when there is competition on the edges of the other
-    /*--------------------------------------------------------------------------------------------------*/
-
-    if (isColliding[UP]) {
-        if (isColliding[LEFT]) {
-            if (pushFaceTo[RIGHT] < pushFaceTo[DOWN])
-                isColliding[UP] = false;
-            else isColliding[LEFT] = false;
-        }
-        else if (isColliding[RIGHT]) {
-            if (pushFaceTo[LEFT] < pushFaceTo[DOWN])
-                isColliding[UP] = false;
-            else isColliding[RIGHT] = false;
-        }
-    } else if (isColliding[DOWN]) {
-        if (isColliding[LEFT]) {
-            if (pushFaceTo[RIGHT] < pushFaceTo[UP])
-                isColliding[DOWN] = false;
-            else isColliding[LEFT] = false;
-        }
-        else if (isColliding[RIGHT]) {
-            if (pushFaceTo[LEFT] < pushFaceTo[UP])
-                isColliding[DOWN] = false;
-            else isColliding[RIGHT] = false;
+    if (intersection.h>intersection.w) {
+        //hit left or right
+            left = intersection.x>A->box.x;
+            right = !left;
+            associated.box.x += (intersection.w + REPULSION_FACTOR)*(left?(-1):1);
+            SetSpeedOnX(0);
+    } else {
+        if(intersection.y > A->box.y)
+        {
+            //hit floor
+            down = true;
+            ResetGravity();
+            SetSpeedOnY(0);
+            associated.box.y-= intersection.h + REPULSION_FACTOR;
+        } else {
+            //hit top
+            up = true;
+            associated.box.y += (intersection.h + REPULSION_FACTOR);
         }
     }
-
-    /*--------------------------------------------------------------------------------------------------*/
-    // pushes the associated away from the other
-    /*--------------------------------------------------------------------------------------------------*/
-
-    if (isColliding[UP]) {
-        associated.box.SetPosition(position.x, otherFaces[DOWN]+halfBody[UP]);
-        collidingOthers.push_back(std::make_pair(otherPtr, UP));
-        collidingFaces[UP] = true;
-        velocity.y = 0.0f;
-    }
-    if (isColliding[DOWN]) {
-        associated.box.SetPosition(position.x, otherFaces[UP]-halfBody[DOWN]);
-        collidingOthers.push_back(std::make_pair(otherPtr, DOWN));
-        collidingFaces[DOWN] = true;
-        velocity.y = 0.0f;
-    }
-    if (isColliding[LEFT]) {
-        associated.box.SetPosition(otherFaces[RIGHT]+halfBody[LEFT], position.y);
-        collidingOthers.push_back(std::make_pair(otherPtr, LEFT));
-        collidingFaces[LEFT] = true;
-        velocity.x = 0.0f;
-    }
-    if (isColliding[RIGHT]) {
-        associated.box.SetPosition(otherFaces[LEFT]-halfBody[RIGHT], position.y);
-        collidingOthers.push_back(std::make_pair(otherPtr, RIGHT));
-        collidingFaces[RIGHT] = true;
-        velocity.x = 0.0f;
-    }
-    // SDL_Log("%d %d %d %d", isColliding[UP], isColliding[DOWN], isColliding[LEFT], isColliding[RIGHT]);
+    A->Update(0);
 }
 
-void RigidBody::NotifyNoCollision (GameObject& other) {
-    /*--------------------------------------------------------------------------------------------------*/
-    // remove movement restriction
-    /*--------------------------------------------------------------------------------------------------*/
-
-    std::array<bool, 4> isColliding = {false, false, false, false};
-
-    for (int i=(int)collidingOthers.size()-1; i >= 0; i--) {
-        if (collidingOthers[i].first.lock().get() == &other)
-            collidingOthers.erase(collidingOthers.begin()+i);
-        else
-            isColliding[collidingOthers[i].second] = true;
-    }
-
-    // prevents the associated from traversing the others
-    collidingFaces = isColliding;
+void RigidBody::NotifyNoCollision(GameObject& other) {
+    up = false;
+    down = false;
+    left = false;
+    right = false;
 }
 
-bool RigidBody::IsColliding (ColliderFace face) {
-    return collidingFaces[face];
+void RigidBody::Render() {}
+
+void RigidBody::Start() {}
+
+void RigidBody::Update(float dt) {
+    speed.y += gravity*dt;
+    speed.y = (speed.y>limitspeed?limitspeed:speed.y);
+    associated.box.x += speed.x*dt;
+    associated.box.y += speed.y*dt;
 }
 
-void RigidBody::CheckDeletedColliders () {
-    int collidingCount[4] = {0};
-
-    for (int i=0; i < (int)collidingOthers.size(); i++)
-        if (collidingOthers[i].first.expired())
-            collidingOthers.erase(collidingOthers.begin()+i);
-        else
-            collidingCount[collidingOthers[i].second]++;
-
-    for (int i=0; i<4; i++)
-        if (collidingCount[i] == 0)
-            collidingFaces[i] = false;
+bool RigidBody::ImpactUp() {
+    return up;
 }
 
-bool RigidBody::Is (std::string type) {
-    return (type == "RigidBody");
+bool RigidBody::ImpactDown() {
+    return down;
 }
 
-bool RigidBody::Is (ComponentType type) {
-    return (type & this->type);
+bool RigidBody::ImpactLeft() {
+    return left;
+}
+
+bool RigidBody::ImpactRight() {
+    return right;
+}
+
+float RigidBody::GetLimitSpeed() {
+    return limitspeed;
+}
+void RigidBody::SetLimitSpeed(float limit) {
+    limitspeed = limit;
+}
+
+bool RigidBody::Is(ComponentType type) {
+    return type & this->type;
+}
+
+bool RigidBody::Is(std::string type){
+    return type == "RigidBody";
 }

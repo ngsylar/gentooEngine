@@ -1,47 +1,50 @@
-#ifndef RIGID_BODY_H
-#define RIGID_BODY_H
-
-#include <array>
-#include <queue>
-#include <utility>
+#ifndef R_BODY_H
+#define R_BODY_H
 
 #include "Component.h"
 
-// editar: velocity esta sub-desenvolvida
-class RigidBody: public Component {
-    public:
-        // enum BodyType {DYNAMIC, KINEMATIC, STATIC};
-        enum Axis {HORIZONTAL, VERTICAL, ALL};
-        enum ColliderFace {UP, DOWN, LEFT, RIGHT};
-        std::vector<std::string> noInteractionLabels;
-        bool gravityEnabled;
-        float gravityValue;
-        Vec2 velocityMax;
+class RigidBody : public Component {
+    private:
+        float limitspeed;
+        Vec2 friction;
+        Vec2 speed;
+        bool up, down, left, right;
 
-        RigidBody(GameObject& associated, float gravityValue=570.0f);
+    public:
+        float gravity;
+
+        RigidBody(GameObject& associated);
         ~RigidBody();
-        void Start();
-        void Update(float dt);
-        bool IsGrounded();
-        Vec2 GetVelocity();
-        void Translate(Vec2 displacement);
-        void AddForce(Vec2 force);
-        void CancelForces(Axis axis=ALL);
+
+        float GetGravity();
+        void SetGravity(float gravity);
+        void ResetGravity();
+        
+        Vec2 GetSpeed();
+        void SetSpeed(Vec2 force);
+        void SetSpeedOnX(float x);
+        void SetSpeedOnY(float y);
+        void ResetSpeed();
+
+        float GetLimitSpeed();
+        void SetLimitSpeed(float limit);
+
+        void ApplyFriction(Vec2 friction);
+        void ResetFriction();
+
+        bool ImpactUp();
+        bool ImpactDown();
+        bool ImpactLeft();
+        bool ImpactRight();
+
+        //inheritance
+        bool Is(ComponentType type);
+        bool Is(std::string type);
         void NotifyCollision(GameObject& other);
         void NotifyNoCollision(GameObject& other);
-        bool IsColliding (ColliderFace face);
-        bool Is(std::string type);
-        bool Is(ComponentType type);
-
-    private:
-        Vec2 velocity;
-        Vec2 movementDirection;
-        std::queue<Vec2> previousPosition;
-        std::vector<std::pair<std::weak_ptr<GameObject>, ColliderFace>> collidingOthers;
-        std::array<bool, 4> collidingFaces;
-    
-        void HandleGravity(float dt);
-        void CheckDeletedColliders();
+        void Render();
+        void Start();
+        void Update(float dt);
 };
 
-#endif
+#endif// R_BODY_H

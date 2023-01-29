@@ -10,6 +10,8 @@ class EntityMachine: public Component {
         std::vector<std::unique_ptr<Sprite>> sprites;
         SDL_RendererFlip textureFlip;
 
+        void FlipSprite(Sprite::Axis axis);
+
     public:
         EntityMachine(GameObject& associated);
         ~EntityMachine();

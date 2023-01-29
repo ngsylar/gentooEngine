@@ -29,7 +29,7 @@ Ball::Ball (GameObject& associated): Component(associated) {
 }
 
 void Ball::Start () {
-    rigidBody = new RigidBody(associated);
+    rigidBody = new RigidBodyLegacy(associated);
     associated.AddComponent(rigidBody);
     associated.AddComponent(new Collider(associated));
     rigidBody->velocityMax.y = RIGIDBODY_VELOCITY_MAX;
@@ -112,8 +112,8 @@ void Ball::HandleJump (bool isKeyDown, float dt) {
         //     isFalling = true;
     }
     // if it hits the ceiling cancels the jump or the force applied in previous conditions
-    if (rigidBody->IsColliding(RigidBody::UP)) {
-        rigidBody->CancelForces(RigidBody::VERTICAL);
+    if (rigidBody->IsColliding(RigidBodyLegacy::UP)) {
+        rigidBody->CancelForces(RigidBodyLegacy::VERTICAL);
         rigidBody->gravityEnabled = true;
         isJumping = false;
     }
