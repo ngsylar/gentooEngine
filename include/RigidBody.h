@@ -1,5 +1,5 @@
-#ifndef R_BODY_H
-#define R_BODY_H
+#ifndef RIGID_BODY_H
+#define RIGID_BODY_H
 
 #include "Component.h"
 

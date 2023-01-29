@@ -6,6 +6,7 @@
 #include "Collider.h"
 #include "CameraBox.h"
 #include "Timer.h"
+#include "KidAttackMelee.h"
 
 class Kid: public EntityMachine {
     private:
@@ -14,6 +15,8 @@ class Kid: public EntityMachine {
         Timer jumpTimer, invincibilityTimer;
         bool isInvincible;
         int hp;
+
+        KidAttackMelee* attackMelee;
 
         // Automatic Factors
         Vec2 damageOrigin;
@@ -31,6 +34,9 @@ class Kid: public EntityMachine {
 
         bool NewStateRule(EntityState newState);
 
+        // Camera Assistants
+        void* CameraEffects();
+
     public:
         Kid(GameObject& associated);
         void Awaken();
@@ -42,7 +48,6 @@ class Kid: public EntityMachine {
 
         // Camera Assistants
         void CameraStartShake();
-        void* CameraEffects();
 };
 
 #endif

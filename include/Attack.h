@@ -4,19 +4,24 @@
 #include "Component.h"
 #include "Collider.h"
 #include "Sprite.h"
+#include "Timer.h"
 
 class Attack: public Component {
-    private:
+    protected:
         std::weak_ptr<GameObject> externalAssociated;
         bool usingExternalAssociated;
         Collider* collider;
         Sprite* sprite;
 
     public:
+        Timer lifetime;
+        bool enabled;
+
         Attack(
             GameObject& associated,
             GameObject* externalAssociated=nullptr
         );
+        ~Attack();
         void OpenSprite(
             std::string file,
             int frameCount=1,
@@ -25,7 +30,11 @@ class Attack: public Component {
             bool selfDestruction=false
         );
         void SetupCollider(Vec2 offset, Vec2 size);
+        virtual void Awaken();
+        virtual void Start();
         void Update(float dt);
+        virtual void UpdateAttack(float dt);
+        void Render();
         void NotifyCollision(GameObject& other);
         bool UsingInternalAssociated();
         bool UsingExternalAssociated();

@@ -52,6 +52,11 @@ Kid::Kid (GameObject& associated): EntityMachine(associated) {
     speedJumpDecrease = 0.0f;
     lastDirectionX = 1;
 
+    GameObject* attack = new GameObject(LayerDistance::_Player_Front);
+    attackMelee = new KidAttackMelee(*attack, &associated);
+    attack->AddComponent(attackMelee);
+    Game::GetInstance().GetCurrentState().AddObject(attack);
+
     isGrounded = false;
     hitCeiling = false;
     hitWall = false;
@@ -125,6 +130,11 @@ void Kid::UpdateEntity (float dt) {
     if ((state != Falling) and (rigidBody->GetSpeed().y > 100)) {
         isGrounded = false;
         state = Falling;
+    }
+
+    // remover
+    if (input.KeyPress(Key::attack)) {
+        attackMelee->enabled = true;
     }
 
     switch (state) {
@@ -217,8 +227,6 @@ void Kid::UpdateEntity (float dt) {
         textureFlip = (directionX == 1)? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL;
         lastDirectionX = directionX;
     }
-
-    SDL_Log("%d", state);
 }
 
 bool Kid::NewStateRule (EntityState newState) {
