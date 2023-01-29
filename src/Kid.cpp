@@ -17,9 +17,9 @@
 
 #define SPEED_RUN_MIN               60.0f
 #define SPEED_RUN_MAX               140.0f
-#define SPEED_ONAIR                 100.0f
+#define SPEED_ONAIR                 120.0f
 #define FORCE_JUMP                  300.0f
-#define FORCE_MASS                  400.0f
+#define FORCE_MASS                  460.0f
 #define FORCE_DAMAGE_X              -400.0f
 #define FORCE_DAMAGE_Y              -75.0f
 #define IMPULSE_DAMAGE              70.0f
@@ -129,6 +129,7 @@ void Kid::UpdateEntity (float dt) {
             if (input.KeyPress(Key::jump)) {
                 state = Jumping;
                 rigidBody->SetGravity(0.0f);
+                collidingDown = false;
             }
             break;
         

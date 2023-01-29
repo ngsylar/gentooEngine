@@ -14,6 +14,7 @@ InputManager::InputManager () {
     mouseX = 0;
     mouseY = 0;
     updateCounter = 0;
+    skipFrames = false;
     quitRequested = false;
 }
 
@@ -28,6 +29,9 @@ void InputManager::Update () {
 
     while (SDL_PollEvent(&event)) {
         switch (event.type) {
+            case SDL_WINDOWEVENT:
+                WindowEvent(event);
+                break;
             case SDL_QUIT:
                 quitRequested = true;
                 break;
@@ -50,6 +54,60 @@ void InputManager::Update () {
                 break;
             default: break;
         }
+    }
+}
+
+void InputManager::WindowEvent (SDL_Event& event) {
+    switch (event.window.event) {
+        case SDL_WINDOWEVENT_HIDDEN:
+            SDL_Log("Window %d hidden", event.window.windowID);
+            skipFrames = true;
+            break;
+        case SDL_WINDOWEVENT_MOVED:
+            SDL_Log("Window %d moved to %d,%d",
+                    event.window.windowID, event.window.data1,
+                    event.window.data2);
+            skipFrames = true;
+            break;
+        case SDL_WINDOWEVENT_RESIZED:
+            SDL_Log("Window %d resized to %dx%d",
+                    event.window.windowID, event.window.data1,
+                    event.window.data2);
+            skipFrames = true;
+            break;
+        case SDL_WINDOWEVENT_SIZE_CHANGED:
+            SDL_Log("Window %d size changed to %dx%d",
+                    event.window.windowID, event.window.data1,
+                    event.window.data2);
+            skipFrames = true;
+            break;
+        case SDL_WINDOWEVENT_MINIMIZED:
+            SDL_Log("Window %d minimized", event.window.windowID);
+            skipFrames = true;
+            break;
+        case SDL_WINDOWEVENT_MAXIMIZED:
+            SDL_Log("Window %d maximized", event.window.windowID);
+            skipFrames = true;
+            break;
+        case SDL_WINDOWEVENT_RESTORED:
+            SDL_Log("Window %d restored", event.window.windowID);
+            skipFrames = true;
+            break;
+        case SDL_WINDOWEVENT_FOCUS_GAINED:
+            SDL_Log("Window %d gained keyboard focus",
+                    event.window.windowID);
+            skipFrames = true;
+            break;
+        case SDL_WINDOWEVENT_FOCUS_LOST:
+            SDL_Log("Window %d lost keyboard focus",
+                    event.window.windowID);
+            skipFrames = true;
+            break;
+        // case SDL_WINDOWEVENT_CLOSE:
+        //     SDL_Log("Window %d closed", event.window.windowID);
+        //     skipFrames = true;
+        //     break;
+        default: break;
     }
 }
 
@@ -87,6 +145,14 @@ int InputManager::GetMouseX () {
 
 int InputManager::GetMouseY () {
     return mouseY;
+}
+
+void InputManager::DontSkipFrames () {
+    skipFrames = false;
+}
+
+bool InputManager::SkippingFrames () {
+    return skipFrames;
 }
 
 bool InputManager::QuitRequested () {

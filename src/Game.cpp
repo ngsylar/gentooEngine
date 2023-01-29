@@ -77,6 +77,8 @@ Game::Game (std::string title, int width, int height, int logicalWidth, int logi
     storedState = nullptr;
     frameStart = 0;
     dt = 0.0f;
+
+    interruptionTimer.SetResetTime(0.25f);
 }
 
 Game::~Game () {
@@ -136,6 +138,16 @@ State& Game::GetCurrentState () {
     return *stateStack.top();
 }
 
+bool Game::Interruption (InputManager& input) {
+    if (input.SkippingFrames()) {
+        interruptionTimer.Update(dt);
+        if (interruptionTimer.IsOver()) {
+            input.DontSkipFrames();
+            interruptionTimer.Reset();
+        } return true;
+    } return false;
+}
+
 void Game::Run () {
     InputManager& inputManager = InputManager::GetInstance();
 
@@ -148,9 +160,12 @@ void Game::Run () {
 
     stateStack.top()->AwakenBase();
     stateStack.top()->StartBase();
+
     while (not GetCurrentState().QuitRequested()) {
         CalculateDeltaTime();
         inputManager.Update();
+        if (Interruption(inputManager)) continue;
+        
         GetCurrentState().UpdateBase(dt);
         GetCurrentState().RenderBase();
 

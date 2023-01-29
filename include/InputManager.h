@@ -73,13 +73,14 @@ class InputManager {
         int mouseUpdate[6];
         int mouseX, mouseY;
         int updateCounter;
-        bool quitRequested;
+        bool skipFrames, quitRequested;
     
     public:
         static InputManager& GetInstance();
         InputManager();
         ~InputManager();
         void Update();
+        void WindowEvent(SDL_Event& event);
         bool KeyPress(int key);
         bool KeyRelease(int key);
         bool IsKeyDown(int key);
@@ -89,6 +90,8 @@ class InputManager {
         Vec2 GetMousePosition();
         int GetMouseX();
         int GetMouseY();
+        void DontSkipFrames();
+        bool SkippingFrames();
         bool QuitRequested();
 };
 

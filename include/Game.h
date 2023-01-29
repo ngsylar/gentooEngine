@@ -8,6 +8,8 @@
 #include "SDL_include.h"
 
 #include "State.h"
+#include "InputManager.h"
+#include "Timer.h"
 
 #define WINDOW_TITLE_DEF    "Gentoo Engine"
 #define WINDOW_SIZE_DEF     1024, 576
@@ -31,11 +33,13 @@ class Game {
         Vec2 resolution;
         int frameStart;
         float dt;
+        Timer interruptionTimer;
 
         Game(
             std::string title, int width, int height,
             int logicalWidth=0, int logicalHeight=0);
         void CalculateDeltaTime();
+        bool Interruption(InputManager& input);
 
     public:
         ~Game();

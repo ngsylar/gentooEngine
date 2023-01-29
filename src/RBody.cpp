@@ -1,6 +1,6 @@
 #include "GentooEngine.h"
 
-#define GRAVITY 600
+#define GRAVITY 900
 #define LIMITSPD 400
 
 RBody::RBody(GameObject& associated)
