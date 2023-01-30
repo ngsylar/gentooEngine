@@ -20,7 +20,7 @@ class Kid: public EntityMachine {
 
         // Automatic Factors
         Vec2 damageOrigin;
-        float speedRunFactor, speedJumpDecrease;
+        float speedRunIncrease, speedJumpDecrease;
         int lastDirectionX;
 
         // Collision Faces

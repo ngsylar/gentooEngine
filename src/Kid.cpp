@@ -15,8 +15,8 @@
 #define SPRITE_FALL_FRAMES          8, 0.05f
 #define SPRITE_ATTACK_FRAMES        8, 0.05f
 
-#define SPEED_RUN_MIN               60.0f
-#define SPEED_RUN_MAX               140.0f
+#define ACCELERATION_RUN            800.0f
+#define SPEED_RUN                   140.0f
 #define SPEED_ONAIR                 120.0f
 #define FORCE_JUMP                  300.0f
 #define FORCE_MASS                  460.0f
@@ -48,7 +48,7 @@ Kid::Kid (GameObject& associated): EntityMachine(associated) {
     isInvincible = false;
     hp = 4;
 
-    speedRunFactor = SPEED_RUN_MIN;
+    speedRunIncrease = 0.0f;
     speedJumpDecrease = 0.0f;
     lastDirectionX = 1;
 
@@ -162,14 +162,13 @@ void Kid::UpdateEntity (float dt) {
             if (directionX == 0) {
                 state = Idle;
                 rigidBody->SetSpeedOnX(0.0f);
-                speedRunFactor = SPEED_RUN_MIN;
+                speedRunIncrease = 0.0f;
             }
             // movement is performing
             else {
-                speedRunFactor = (speedRunFactor > SPEED_RUN_MAX)?
-                    SPEED_RUN_MAX : (speedRunFactor + (SPEED_RUN_MAX * dt));
-                float acceleration = SmoothStep(0.0f, SPEED_RUN_MAX, speedRunFactor);
-                rigidBody->SetSpeedOnX(directionX * acceleration * SPEED_RUN_MAX);
+                speedRunIncrease = (speedRunIncrease < SPEED_RUN)?
+                    speedRunIncrease + (ACCELERATION_RUN * dt) : SPEED_RUN;
+                rigidBody->SetSpeedOnX(directionX * speedRunIncrease);
             }
             // start jump
             if (input.KeyPress(Key::jump)) {
@@ -234,15 +233,18 @@ bool Kid::NewStateRule (EntityState newState) {
     if (newState == state)
         return false;
 
-    if (newState == Injured) {
-        if (isInvincible) return false;
-        damageOrigin = collider->box.GetPosition();
-        rigidBody->SetSpeed(Vec2(lastDirectionX * FORCE_DAMAGE_X, FORCE_DAMAGE_Y));
-        rigidBody->ResetGravity();
-        isInvincible = true;
-        rigidBody->triggerLabels.push_back("Enemy");
+    switch (newState) {
+        case Injured:
+            if (isInvincible) return false;
+            damageOrigin = collider->box.GetPosition();
+            rigidBody->SetSpeed(Vec2(lastDirectionX * FORCE_DAMAGE_X, FORCE_DAMAGE_Y));
+            rigidBody->ResetGravity();
+            isInvincible = true;
+            rigidBody->triggerLabels.push_back("Enemy");
+            return true;
+
+        default: return true;
     }
-    return true;
 }
 
 void Kid::NotifyCollision (GameObject& other) {
