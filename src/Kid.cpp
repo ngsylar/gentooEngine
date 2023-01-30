@@ -125,6 +125,8 @@ void Kid::UpdateEntity (float dt) {
     }
     // prevent movement when opposite directions are active
     int directionX = input.IsKeyDown(Key::moveRight) - input.IsKeyDown(Key::moveLeft);
+    bool directionXhasChanged = (directionX != 0) and (directionX != lastDirectionX);
+    if (directionXhasChanged) lastDirectionX = directionX;
 
     // tolerance before start falling
     if ((state != Falling) and (rigidBody->GetSpeed().y > 100)) {
@@ -134,6 +136,7 @@ void Kid::UpdateEntity (float dt) {
 
     // remover
     if (input.KeyPress(Key::attack)) {
+        attackMelee->direction = (lastDirectionX == 1)? KidAttackMelee::RIGHT : KidAttackMelee::LEFT;
         attackMelee->enabled = true;
     }
 
@@ -223,10 +226,8 @@ void Kid::UpdateEntity (float dt) {
     // sprite state and direction based change
     if (state != previousState)
         sprites[state].get()->SetFrame(0);
-    if ((directionX != 0) and (directionX != lastDirectionX)) {
+    if (directionXhasChanged)
         textureFlip = (directionX == 1)? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL;
-        lastDirectionX = directionX;
-    }
 }
 
 bool Kid::NewStateRule (EntityState newState) {

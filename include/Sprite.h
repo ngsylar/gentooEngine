@@ -7,9 +7,13 @@
 #include "Component.h"
 #include "Timer.h"
 
-#define SPRITE_ERROR                -1
-#define SPRITE_CLIP_START_POINT     0, 0
-#define SPRITE_DEFAULT_SCALE        1.0f, 1.0f
+#define SPRITE_ERROR                    -1
+#define SPRITE_CLIP_START_POINT         0, 0
+#define SPRITE_DEFAULT_SCALE            1.0f, 1.0f
+#define SPRITE_ONESHOT_TRUE             true
+#define SPRITE_ONESHOT_FALSE            false
+#define SPRITE_SELFDESTRUCTION_TRUE     true
+#define SPRITE_SELFDESTRUCTION_FALSE    false
 
 class Sprite: public Component {
     private:

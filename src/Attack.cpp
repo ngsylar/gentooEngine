@@ -35,7 +35,9 @@ void Attack::OpenSprite (
         sprite = new Sprite(associated);
     sprite->Open(file, frameCount, frameTime, frameOneshot, selfDestruction);
 
-    collider = new Collider(associated);
+    if (collider == nullptr)
+        collider = new Collider(associated, COLLIDER_TRIGGER_TRUE);
+    collider->Reset();
 }
 
 // collider is only configurable if an external associated is used
@@ -50,7 +52,7 @@ void Attack::SetupCollider (Vec2 offset, Vec2 size) {
         associated.box.h = size.y;
     }
     if (collider == nullptr)
-        collider = new Collider(associated);
+        collider = new Collider(associated, COLLIDER_TRIGGER_TRUE);
 
     if (sprite != nullptr)
         collider->SetBox(offset, size);
@@ -68,6 +70,11 @@ void Attack::Update (float dt) {
         UpdateAttack(dt);
     else return;
 
+    if (usingExternalAssociated) {
+        sprite->Update(dt);
+        collider->Update(dt);
+    }
+
     if (lifetime.HasResetTime()) {
         lifetime.Update(dt);
         if (lifetime.IsOver()) {
@@ -80,8 +87,10 @@ void Attack::Update (float dt) {
 void Attack::UpdateAttack (float dt) {}
 
 void Attack::Render () {
-    if (enabled and usingExternalAssociated and (not externalAssociated.expired()))
+    if (enabled and usingExternalAssociated and (not externalAssociated.expired())) {
         sprite->Render();
+        collider->Render();
+    }
 }
 
 void Attack::NotifyCollision (GameObject& other) {

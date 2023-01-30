@@ -3,16 +3,22 @@
 
 #include "Component.h"
 
+#define COLLIDER_TRIGGER_TRUE   true
+#define COLLIDER_TRIGGER_FALSE  false
+
 class Collider: public Component {
+    private:
+        bool setManually;
+
     public:
         Rect box;
         Vec2 offset;
         bool isTrigger;
-        bool setManually;
 
         Collider(GameObject& associated, bool trigger=false);
         void SetBox(Vec2 offset, Vec2 boxSize);
-        void Awaken();
+        void Reset();
+        void Start();
         void Update(float dt);
         void LateUpdate(float dt);
         void Render();

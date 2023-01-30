@@ -12,7 +12,13 @@ void Collider::SetBox (Vec2 offset, Vec2 boxSize) {
     setManually = true;
 }
 
-void Collider::Awaken () {
+void Collider::Reset () {
+    offset = Vec2();
+    box.SetSize(associated.box.w, associated.box.h);
+    setManually = false;
+}
+
+void Collider::Start () {
     if (setManually) return;
     box.SetSize(associated.box.w, associated.box.h);
 }
