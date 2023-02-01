@@ -69,6 +69,8 @@ void EnemyArmadillo::UpdateEntity (float dt) {
             } break;
 
         case Injured:
+            SDL_Log("AAAAAAAAAI");
+            state = Running;
             break;
 
         case Dying:

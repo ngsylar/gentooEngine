@@ -139,7 +139,7 @@ void Kid::UpdateEntity (float dt) {
     // remover
     if (input.KeyPress(Key::attack)) {
         attackMelee->direction = (lastDirectionX == 1)? KidAttackMelee::RIGHT : KidAttackMelee::LEFT;
-        attackMelee->enabled = true;
+        attackMelee->Enable();
     }
 
     switch (state) {

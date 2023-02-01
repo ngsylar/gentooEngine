@@ -3,7 +3,6 @@
 
 Attack::Attack (GameObject& associated, GameObject* externalAssociated): Component(associated) {
     type = ComponentType::_Attack;
-    enabled = true;
 
     if (externalAssociated != nullptr) {
         this->externalAssociated = Game::GetInstance().GetCurrentState().GetObjectPtr(externalAssociated);
@@ -17,13 +16,6 @@ Attack::Attack (GameObject& associated, GameObject* externalAssociated): Compone
     }
 }
 
-Attack::~Attack () {
-    if (usingExternalAssociated) {
-        delete(collider);
-        delete(sprite);
-    }
-}
-
 // sprite is only configurable if an external associated is used
 void Attack::OpenSprite (
     std::string file, int frameCount, float frameTime, bool frameOneshot, bool selfDestruction
@@ -31,12 +23,16 @@ void Attack::OpenSprite (
     if (not usingExternalAssociated or (usingExternalAssociated and externalAssociated.expired()))
         return;
 
-    if (sprite == nullptr)
+    if (sprite == nullptr) {
         sprite = new Sprite(associated);
+        associated.AddComponent(sprite);
+    }
     sprite->Open(file, frameCount, frameTime, frameOneshot, selfDestruction);
 
-    if (collider == nullptr)
+    if (collider == nullptr) {
         collider = new Collider(associated, COLLIDER_TRIGGER_TRUE);
+        associated.AddComponent(collider);
+    }
     collider->Reset();
 }
 
@@ -51,8 +47,10 @@ void Attack::SetupCollider (Vec2 offset, Vec2 size) {
         associated.box.w = size.x;
         associated.box.h = size.y;
     }
-    if (collider == nullptr)
+    if (collider == nullptr) {
         collider = new Collider(associated, COLLIDER_TRIGGER_TRUE);
+        associated.AddComponent(collider);
+    }
 
     if (sprite != nullptr)
         collider->SetBox(offset, size);
@@ -63,38 +61,26 @@ void Attack::Awaken () {}
 void Attack::Start () {}
 
 void Attack::Update (float dt) {
-    if (usingExternalAssociated and externalAssociated.expired())
+    if (usingExternalAssociated and externalAssociated.expired()) {
+        associated.RequestDelete();
         return;
-
-    if (enabled)
-        UpdateAttack(dt);
-    else return;
-
-    if (usingExternalAssociated) {
-        sprite->Update(dt);
-        collider->Update(dt);
     }
+
+    UpdateAttack(dt);
 
     if (lifetime.HasResetTime()) {
         lifetime.Update(dt);
         if (lifetime.IsOver()) {
             lifetime.Reset();
-            enabled = false;
+            associated.enabled = false;
         }
     }
 }
 
 void Attack::UpdateAttack (float dt) {}
 
-void Attack::Render () {
-    if (enabled and usingExternalAssociated and (not externalAssociated.expired())) {
-        sprite->Render();
-        collider->Render();
-    }
-}
-
 void Attack::NotifyCollision (GameObject& other) {
-    if (not enabled)
+    if ((not externalAssociated.expired()) and (&other == externalAssociated.lock().get()))
         return;
 
     EntityMachine* entity = (EntityMachine*)other.GetComponent(ComponentType::_EntityMachine);

@@ -17,6 +17,7 @@ class GameObject {
         ComponentType contains;
 
     public:
+        bool enabled;
         std::string label;
         int layer;
         Rect box;

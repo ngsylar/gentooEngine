@@ -3,13 +3,12 @@
 #define GRAVITY 900
 #define LIMITSPD 400
 
-RigidBody::RigidBody(GameObject& associated, bool isTrigger)
+RigidBody::RigidBody(GameObject& associated)
 : Component(associated), 
 friction(1,1), 
 speed(0,0)
 {
     type = ComponentType::_RigidBody;
-    this->isTrigger = isTrigger;
     gravity = GRAVITY;
     limitspeed = LIMITSPD;
 }
@@ -55,13 +54,14 @@ void RigidBody::ResetFriction() {
 //Inheritance
 #define REPULSION_FACTOR 1e-4
 void RigidBody::NotifyCollision(GameObject& other) {
-    RigidBody* rbB = (RigidBody*)other.GetComponent(ComponentType::_RigidBody);
-    if (isTrigger or ((rbB != nullptr) and (rbB->isTrigger))) return;
+    Collider* A = (Collider*)associated.GetComponent(ComponentType::_Collider);
+    Collider* B = (Collider*)other.GetComponent(ComponentType::_Collider);
+    RigidBody* Brb = (RigidBody*)other.GetComponent(ComponentType::_RigidBody);
+
+    if (A->isTrigger or ((Brb != nullptr) or (B->isTrigger))) return;
     for (std::string label : triggerLabels)
         if (other.label == label) return;
 
-    Collider* A = (Collider*)associated.GetComponent(ComponentType::_Collider);
-    Collider* B = (Collider*)other.GetComponent(ComponentType::_Collider);
     Rect intersection = A->box.GetIntersection(B->box);
     
     if (intersection.h>intersection.w) {

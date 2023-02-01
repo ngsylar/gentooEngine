@@ -9,6 +9,7 @@ class KidAttackMelee: public Attack {
         AttackDirection direction;
 
         KidAttackMelee(GameObject& associated, GameObject* externalAssociated);
+        void Enable();
         void Awaken();
         void UpdateAttack(float dt);
 };

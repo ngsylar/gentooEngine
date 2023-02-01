@@ -1,6 +1,7 @@
 #include "GentooEngine.h"
 
 GameObject::GameObject (int layer, std::string label) {
+    enabled = true;
     isDead = false;
     awake = false;
     angleDeg = 0.0f;
@@ -34,27 +35,26 @@ void GameObject::Awaken () {
 }
 
 void GameObject::Start () {
-    for (int i=0; i < (int)components.size(); i++) {
+    for (int i=0; i < (int)components.size(); i++)
         components[i]->Start();
-    }
 }
 
 void GameObject::Update (float dt) {
-    for (int i=0; i < (int)components.size(); i++) {
+    if (not enabled) return;
+    for (int i=0; i < (int)components.size(); i++)
         components[i]->Update(dt);
-    }
 }
 
 void GameObject::LateUpdate (float dt) {
-    for (int i=0; i < (int)components.size(); i++) {
+    if (not enabled) return;
+    for (int i=0; i < (int)components.size(); i++)
         components[i]->LateUpdate(dt);
-    }
 }
 
 void GameObject::Render () {
-    for (int i=0; i < (int)components.size(); i++) {
+    if (not enabled) return;
+    for (int i=0; i < (int)components.size(); i++)
         components[i]->Render();
-    }
 }
 
 bool GameObject::Contains (ComponentType type) {
@@ -86,12 +86,11 @@ void GameObject::RemoveComponent (Component* cpt) {
     if (cpt == nullptr)
         return;
 
-    for (int i=((int)components.size())-1; i >= 0; i--) {
+    for (int i=((int)components.size())-1; i >= 0; i--)
         if (components[i].get() == cpt) {
             contains = contains ^ cpt->type;
             components.erase(components.begin()+i);
         }
-    }
 }
 
 Component* GameObject::GetComponent (std::string type) {
@@ -113,15 +112,13 @@ Component* GameObject::GetComponent (ComponentType type) {
 }
 
 void GameObject::NotifyCollision (GameObject& other) {
-    for (int i=0; i < (int)components.size(); i++) {
+    for (int i=0; i < (int)components.size(); i++)
         components[i]->NotifyCollision(other);
-    }
 }
 
 void GameObject::NotifyNoCollision (GameObject& other) {
-    for (int i=0; i < (int)components.size(); i++) {
+    for (int i=0; i < (int)components.size(); i++)
         components[i]->NotifyNoCollision(other);
-    }
 }
 
 void GameObject::SignalTerrain () {

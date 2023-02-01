@@ -15,13 +15,11 @@ class Attack: public Component {
 
     public:
         Timer lifetime;
-        bool enabled;
 
         Attack(
             GameObject& associated,
             GameObject* externalAssociated=nullptr
         );
-        ~Attack();
         void OpenSprite(
             std::string file,
             int frameCount=1,
@@ -34,7 +32,6 @@ class Attack: public Component {
         virtual void Start();
         void Update(float dt);
         virtual void UpdateAttack(float dt);
-        void Render();
         void NotifyCollision(GameObject& other);
         bool UsingInternalAssociated();
         bool UsingExternalAssociated();

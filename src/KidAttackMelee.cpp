@@ -11,7 +11,11 @@ KidAttackMelee::KidAttackMelee (
 ): Attack(associated, externalAssociated) {
     this->externalAssociated = Game::GetInstance().GetCurrentState().GetObjectPtr(externalAssociated);
     lifetime.SetResetTime(0.16f);
-    enabled = false;
+    associated.enabled = false;
+}
+
+void KidAttackMelee::Enable () {
+    associated.enabled = true;
 }
 
 void KidAttackMelee::Awaken () {
