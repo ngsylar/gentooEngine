@@ -9,6 +9,7 @@ Sprite::Sprite (GameObject& associated): Component(associated) {
     frameCount = 0;
     currentFrame = 0;
     frameOneshot = false;
+    oneshotIsDone = false;
     selfDestruction = false;
     parallaxFactor = Vec2(1.0f, 1.0f);
     textureFlip = SDL_FLIP_NONE;
@@ -73,6 +74,7 @@ void Sprite::SetBlendMode (SDL_BlendMode blendMode) {
 void Sprite::SetFrame (int frame) {
     currentFrame = frame % frameCount;
     clipRect.x = currentFrame * frameWidth;
+    oneshotIsDone = false;
 }
 
 void Sprite::SetFrameTime (float frameTime) {
@@ -88,6 +90,14 @@ void Sprite::SetFrameCount (int frameCount) {
     clipRect.w = frameWidth;
 
     associated.box.w = (float)frameWidth * scale.x;
+}
+
+void Sprite::SetFrameOneshot (bool oneshot) {
+    frameOneshot = oneshot;
+}
+
+void Sprite::SetSelfDestruction (bool destruct) {
+    selfDestruction = destruct;
 }
 
 Vec2 Sprite::GetScale () {
@@ -108,20 +118,18 @@ void Sprite::Flip (Axis axis) {
 }
 
 void Sprite::Update (float dt) {
-    if (frameTimer.HasResetTime()) {
+    if ((not oneshotIsDone) and frameTimer.HasResetTime()) {
         frameTimer.Update(dt);
 
         if (frameTimer.IsOver()) {
-            if ((currentFrame == frameCount) and frameOneshot) {
-                frameTimer.SetResetTime(0.0f);
-
+            if ((currentFrame == (frameCount-1)) and frameOneshot) {
+                oneshotIsDone = true;
                 if (selfDestruction)
                     associated.RequestDelete();
-
-            } else {
-                SetFrame(currentFrame+1);
-                frameTimer.Reset();
+                return;
             }
+            SetFrame(currentFrame+1);
+            frameTimer.Reset();
         }
     }
 }

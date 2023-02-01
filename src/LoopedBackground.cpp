@@ -4,7 +4,7 @@ LoopedBackground::LoopedBackground (
     GameObject& associated, std::string fileName, int layerCount, Vec2 parallaxFactor
 ): Component(associated) {
     sprite = new Sprite(associated, fileName);
-    renderingCount = (layerCount * 2) - 1;
+    renderingCount = (layerCount << 1) - 1;
     middlePositionId = renderingCount >> 1;
     halfSizes[HORIZONTAL] = ((layerCount - 1) * (int)associated.box.w) >> 1;
     halfSizes[VERTICAL] = ((layerCount - 1) * (int)associated.box.h) >> 1;
@@ -17,7 +17,7 @@ LoopedBackground::~LoopedBackground () {
 }
 
 void LoopedBackground::SetLayerCount (int layerCount) {
-    renderingCount = (layerCount * 2) - 1;
+    renderingCount = (layerCount << 1) - 1;
     middlePositionId = renderingCount >> 1;
     halfSizes[HORIZONTAL] = ((layerCount - 1) * (int)associated.box.w) >> 1;
     halfSizes[VERTICAL] = ((layerCount - 1) * (int)associated.box.h) >> 1;
@@ -44,9 +44,9 @@ void LoopedBackground::FixLeaks () {
         floor((cameraDistance.x / halfSizes[HORIZONTAL]) * sign[HORIZONTAL]),
         floor((cameraDistance.y / halfSizes[VERTICAL]) * sign[VERTICAL])
     );
-    if ((int)rectsDistance.x % 2 != 0) rectsDistance.x++;
-    if ((int)rectsDistance.y % 2 != 0) rectsDistance.y++;
-    
+    if (((int)rectsDistance.x & 1) != 0) rectsDistance.x++;
+    if (((int)rectsDistance.y & 1) != 0) rectsDistance.y++;
+
     associated.box.x += rectsDistance.x * halfSizes[HORIZONTAL] * sign[HORIZONTAL];
     associated.box.y += rectsDistance.y * halfSizes[VERTICAL] * sign[VERTICAL];
 }

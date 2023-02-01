@@ -23,7 +23,7 @@ class Sprite: public Component {
         Vec2 scale;
         Timer frameTimer;
         int frameWidth, frameCount, currentFrame;
-        bool frameOneshot, selfDestruction;
+        bool frameOneshot, oneshotIsDone, selfDestruction;
 
     public:
         enum Axis {HORIZONTAL, VERTICAL};
@@ -55,6 +55,8 @@ class Sprite: public Component {
         void SetFrame(int frame);
         void SetFrameTime(float frameTime);
         void SetFrameCount(int frameCount);
+        void SetFrameOneshot(bool frameOneshot);
+        void SetSelfDestruction(bool selfDestruction);
         Vec2 GetScale();
         int GetWidth();
         int GetHeight();

@@ -8,12 +8,15 @@
 #define SPRITE_FALL                 "assets/img/kid/fall.png"
 #define SPRITE_ATTACK               "assets/img/kid/attack.png"
 
-#define SPRITE_IDLE_FRAMES          8, 0.05f
-#define SPRITE_WALK_FRAMES          8, 0.05f
+#define SPRITE_IDLE_FRAMES          6, 0.05f
+// #define SPRITE_WALK_FRAMES          8, 0.05f
 #define SPRITE_RUN_FRAMES           8, 0.05f
-#define SPRITE_JUMP_FRAMES          8, 0.05f
-#define SPRITE_FALL_FRAMES          8, 0.05f
-#define SPRITE_ATTACK_FRAMES        8, 0.05f
+#define SPRITE_BRAKE_FRAMES         3, 0.05f
+#define SPRITE_JUMP_FRAMES          5, 0.05f
+#define SPRITE_FALL_FRAMES          3, 0.05f
+#define SPRITE_LAND_FRAMES          3, 0.05f
+#define SPRITE_ATTACK_FRAMES        1, 0.05f
+#define SPRITE_DAMAGE_FRAMES        1, 0.05f
 
 #define ACCELERATION_RUN            800.0f
 #define SPEED_RUN                   140.0f
@@ -63,13 +66,13 @@ Kid::Kid (GameObject& associated): EntityMachine(associated) {
 }
 
 void Kid::Awaken () {
-    Sprite* spriteIdle = new Sprite(associated, SPRITE_IDLE);
+    Sprite* spriteIdle = new Sprite(associated, SPRITE_IDLE, SPRITE_IDLE_FRAMES);
     // Sprite* spriteWalk = new Sprite(associated, SPRITE_WALK, 6, 0.15);
     Sprite* spriteRun = new Sprite(associated, SPRITE_RUN, SPRITE_RUN_FRAMES);
-    Sprite* spriteJump = new Sprite(associated, SPRITE_IDLE);
-    Sprite* spriteFall = new Sprite(associated, SPRITE_IDLE);
+    Sprite* spriteJump = new Sprite(associated, SPRITE_JUMP, SPRITE_JUMP_FRAMES, SPRITE_ONESHOT_TRUE);
+    Sprite* spriteFall = new Sprite(associated, SPRITE_FALL, SPRITE_FALL_FRAMES, SPRITE_ONESHOT_TRUE);
     // Sprite* spriteAttack = new Sprite(associated, SPRITE_ATTACK, 5, 0.12, true);
-    Sprite* spriteDamage = new Sprite(associated, SPRITE_IDLE);
+    Sprite* spriteDamage = new Sprite(associated, SPRITE_IDLE, SPRITE_IDLE_FRAMES);
 
     AddSpriteState(Idle, spriteIdle);
     // AddSpriteState(Walking, spriteWalk);
@@ -113,7 +116,6 @@ void Kid::LateUpdate (float dt) {};
 
 void Kid::UpdateEntity (float dt) {
     InputManager& input = InputManager::GetInstance();
-    EntityState previousState = state;
 
     if (isInvincible) {
         invincibilityTimer.Update(dt);
@@ -222,9 +224,6 @@ void Kid::UpdateEntity (float dt) {
         default: break;
     }
 
-    // sprite state and direction based change
-    if (state != previousState)
-        sprites[state].get()->SetFrame(0);
     if (directionXhasChanged)
         textureFlip = (directionX == 1)? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL;
 }
@@ -249,20 +248,30 @@ bool Kid::NewStateRule (EntityState newState) {
 
 void Kid::NotifyCollision (GameObject& other) {
     rigidBody->NotifyCollision(other);
-    
-    // hits the ground
-    if ((state == Falling) and rigidBody->ImpactDown()) {
-        state = Idle;
-        rigidBody->SetSpeedOnX(0.0f);
-        isGrounded = true;
-    }
-    // hits the ceiling
-    if ((state == Jumping) and rigidBody->ImpactUp())
-        hitCeiling = true;
 
-    // hits a wall
-    if ((state == Injured) and (rigidBody->ImpactLeft() or rigidBody->ImpactRight()))
-        hitWall = true;
+    switch (state) {
+        case Falling:
+            // hits the ground
+            if (rigidBody->ImpactDown()) {
+                state = Idle;
+                rigidBody->SetSpeedOnX(0.0f);
+                isGrounded = true;
+            } break;
+
+        case Jumping:
+            // hits the ceiling
+            if (rigidBody->ImpactUp())
+                hitCeiling = true;
+            break;
+        
+        case Injured:
+            // hits a wall
+            if (rigidBody->ImpactLeft() or rigidBody->ImpactRight())
+                hitWall = true;
+            break;
+
+        default: break;
+    }
 }
 
 bool Kid::Is (ComponentType type) {
