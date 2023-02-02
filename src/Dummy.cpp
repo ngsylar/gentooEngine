@@ -29,7 +29,7 @@ void Dummy::StartEntity() {
     AddSpriteState(EntityState::Running, Run);
     AddSpriteState(EntityState::Jumping, Jump);
     AddSpriteState(EntityState::Falling, Fall);
-    AddSpriteState(EntityState::Attacking, Attack);
+    AddSpriteState(EntityState::AttackingOnGround, Attack);
 
     RigidBody* Rig = new RigidBody(associated);
     Collider* Col = new Collider(associated);

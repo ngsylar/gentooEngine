@@ -66,9 +66,9 @@ void RigidBody::NotifyCollision(GameObject& other) {
     
     if (intersection.h>intersection.w) {
         //hit left or right
-            left = intersection.x>A->box.x;
-            right = !left;
-            associated.box.x += (intersection.w + REPULSION_FACTOR)*(left?(-1):1);
+            right = intersection.x>A->box.x;
+            left = !right;
+            associated.box.x += (intersection.w + REPULSION_FACTOR)*(right?(-1):1);
             SetSpeedOnX(0);
     } else {
         if(intersection.y > A->box.y)

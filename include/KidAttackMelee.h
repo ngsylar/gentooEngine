@@ -7,9 +7,13 @@ class KidAttackMelee: public Attack {
     public:
         enum AttackDirection {LEFT, RIGHT, UP, DOWN};
         AttackDirection direction;
+        float originPositionX;
 
-        KidAttackMelee(GameObject& associated, GameObject* externalAssociated);
-        void Enable();
+        KidAttackMelee(
+            GameObject& associated,
+            GameObject* externalAssociated
+        );
+        void Enable(float originPositionX);
         void Awaken();
         void UpdateAttack(float dt);
 };

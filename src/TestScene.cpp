@@ -88,7 +88,7 @@ void TestScene0::LoadAssets () {
     rawPlat->AddComponent(platcoll);
     // platcoll->isTrigger = true;
 
-    rawPlat = new GameObject(LAYER_BLACK_SQUARE);
+    rawPlat = new GameObject(LAYER_BLACK_SQUARE, "Ground");
     platSpr = new Sprite(*rawPlat, SPRITE_BLACK_SQUARE);
     rawPlat->AddComponent(platSpr);
     AddObject(rawPlat);
@@ -126,7 +126,7 @@ void TestScene0::LoadAssets () {
     AddObject(rawSquare);
     square = GetObjectPtr(rawSquare);
     rawSquare->AddComponent(new EnemyArmadillo(*rawSquare));
-    rawSquare->box.SetPosition(400,100);
+    rawSquare->box.SetPosition(250,rawPlat->box.y-rawSquare->box.h-100);
 }
 
 void TestScene0::Start () {

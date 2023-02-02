@@ -10,11 +10,13 @@ KidAttackMelee::KidAttackMelee (
     GameObject& associated, GameObject* externalAssociated
 ): Attack(associated, externalAssociated) {
     this->externalAssociated = Game::GetInstance().GetCurrentState().GetObjectPtr(externalAssociated);
+    this->originPositionX = 0.0f;
     lifetime.SetResetTime(0.16f);
     associated.enabled = false;
 }
 
-void KidAttackMelee::Enable () {
+void KidAttackMelee::Enable (float originPositionX) {
+    this->originPositionX = originPositionX;
     associated.enabled = true;
 }
 

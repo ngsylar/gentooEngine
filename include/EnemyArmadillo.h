@@ -11,11 +11,17 @@ class EnemyArmadillo: public EntityMachine {
         RigidBody* rigidBody;
         Collider* collider;
         int movementDirection;
-        bool flipIsReady;
         Vec2 currentRoute;
+        int hp;
+
+        // Automatic Factors
+        float damageOriginX;
+        int damageDirectionX;
 
         // Collision Faces
         bool isGrounded, hitWall;
+
+        bool NewStateRule(EntityState newState);
 
     public:
         EnemyArmadillo(GameObject& associated);

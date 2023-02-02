@@ -4,7 +4,9 @@
 
 #define SPRITE_RUN          "assets/img/enemy1.png"
 
-#define SPEED_RUN           75.0f
+#define SPEED_RUN           60.0f
+#define FORCE_DAMAGE        400.0f
+#define IMPULSE_DAMAGE      70.0f
 
 #define COLLIDER_POSITION   0.0f, 14.0f
 #define COLLIDER_BOX_SIZE   29.0f, 19.0f
@@ -13,7 +15,7 @@ EnemyArmadillo::EnemyArmadillo (GameObject& associated): EntityMachine(associate
     type = type | ComponentType::_EnemyArmadillo;
     associated.label = "Enemy";
     movementDirection = -1;
-    flipIsReady = true;
+    hp = 2;
 
     isGrounded = false;
     hitWall = false;
@@ -31,6 +33,7 @@ void EnemyArmadillo::Awaken () {
     rigidBody = new RigidBody(associated);
     associated.AddComponent(rigidBody);
     rigidBody->triggerLabels.push_back("Player");
+    rigidBody->triggerLabels.push_back("Enemy");
 
     collider = new Collider(associated);
     associated.AddComponent(collider);
@@ -57,26 +60,47 @@ void EnemyArmadillo::UpdateEntity (float dt) {
                 bool foundEdgeLeft = collider->box.x < currentRoute.x;
                 bool foundEdgeRight = collider->box.x+collider->box.w > currentRoute.y;
                 if (foundEdgeLeft or foundEdgeRight or hitWall) {
-                    if (flipIsReady) {
-                        movementDirection *= -1;
-                        rigidBody->SetSpeedOnX(SPEED_RUN * movementDirection);
-                        FlipSprite(Sprite::HORIZONTAL);
-                        flipIsReady = false;
-                        hitWall = false;
-                    }
-                } else if (not flipIsReady)
-                    flipIsReady = true;
+                    movementDirection *= -1;
+                    rigidBody->SetSpeedOnX(SPEED_RUN * movementDirection);
+                    FlipSprite(Sprite::HORIZONTAL);
+                    hitWall = false;
+                }
             } break;
 
         case Injured:
-            SDL_Log("AAAAAAAAAI");
-            state = Running;
+            if (fabs(associated.box.x - damageOriginX) >= IMPULSE_DAMAGE)
+                SetState(Running);
             break;
 
         case Dying:
             break;
 
         default: break;
+    }
+}
+
+bool EnemyArmadillo::NewStateRule (EntityState newState) {
+    if (newState == state)
+        return false;
+
+    // auxiliar variables
+    std::weak_ptr<GameObject> player;
+
+    switch (newState) {
+        case Running:
+            rigidBody->SetSpeedOnX(SPEED_RUN * movementDirection);
+            return true;
+
+        case Injured:
+            player = Game::GetInstance().GetCurrentState().GetObjectPtr("Player");
+            if (player.expired()) return false;
+            damageOriginX = associated.box.x;
+            damageDirectionX = (player.lock()->box.x < associated.box.x)? 1 : -1;
+            rigidBody->SetSpeedOnX(FORCE_DAMAGE * damageDirectionX);
+            hp--;
+            return true;
+
+        default: return true;
     }
 }
 
@@ -88,6 +112,10 @@ void EnemyArmadillo::NotifyCollision (GameObject& other) {
         currentRoute = Vec2(groundCollider->box.x, groundCollider->box.x+groundCollider->box.w);
         isGrounded = true;
     }
-    if (rigidBody->ImpactLeft() or rigidBody->ImpactRight())
+    if (rigidBody->ImpactLeft() or rigidBody->ImpactRight()) {
         hitWall = true;
+        if (state == Injured) {
+            SetState(Running);
+        }
+    }
 }

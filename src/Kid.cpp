@@ -8,23 +8,25 @@
 #define SPRITE_FALL                 "assets/img/kid/fall.png"
 #define SPRITE_ATTACK               "assets/img/kid/attack.png"
 
-#define SPRITE_IDLE_FRAMES          6, 0.05f
+#define SPRITE_IDLE_FRAMES          6, 0.1f
 // #define SPRITE_WALK_FRAMES          8, 0.05f
-#define SPRITE_RUN_FRAMES           8, 0.05f
+#define SPRITE_RUN_FRAMES           8, 0.075f
 #define SPRITE_BRAKE_FRAMES         3, 0.05f
-#define SPRITE_JUMP_FRAMES          5, 0.05f
-#define SPRITE_FALL_FRAMES          3, 0.05f
+#define SPRITE_JUMP_FRAMES          5, 0.1f
+#define SPRITE_FALL_FRAMES          3, 0.1f
 #define SPRITE_LAND_FRAMES          3, 0.05f
 #define SPRITE_ATTACK_FRAMES        1, 0.05f
 #define SPRITE_DAMAGE_FRAMES        1, 0.05f
 
 #define ACCELERATION_RUN            800.0f
-#define SPEED_RUN                   140.0f
-#define SPEED_ONAIR                 120.0f
+#define SPEED_RUN                   120.0f
+#define SPEED_ONAIR                 100.0f
+#define SPEED_ATTACK                300.0f
 #define FORCE_JUMP                  300.0f
 #define FORCE_MASS                  460.0f
 #define FORCE_DAMAGE_X              -400.0f
 #define FORCE_DAMAGE_Y              -140.0f
+#define IMPULSE_ATTACK_X            20.0f
 #define IMPULSE_DAMAGE              70.0f
 
 #define COLLIDER_POSITION           0.0f, 9.0f
@@ -56,8 +58,8 @@ Kid::Kid (GameObject& associated): EntityMachine(associated) {
     lastDirectionX = 1;
 
     GameObject* attack = new GameObject(LayerDistance::_Player_Front);
-    attackMelee = new KidAttackMelee(*attack, &associated);
-    attack->AddComponent(attackMelee);
+    attackOnGround = new KidAttackMelee(*attack, &associated);
+    attack->AddComponent(attackOnGround);
     Game::GetInstance().GetCurrentState().AddObject(attack);
 
     isGrounded = false;
@@ -71,7 +73,7 @@ void Kid::Awaken () {
     Sprite* spriteRun = new Sprite(associated, SPRITE_RUN, SPRITE_RUN_FRAMES);
     Sprite* spriteJump = new Sprite(associated, SPRITE_JUMP, SPRITE_JUMP_FRAMES, SPRITE_ONESHOT_TRUE);
     Sprite* spriteFall = new Sprite(associated, SPRITE_FALL, SPRITE_FALL_FRAMES, SPRITE_ONESHOT_TRUE);
-    // Sprite* spriteAttack = new Sprite(associated, SPRITE_ATTACK, 5, 0.12, true);
+    Sprite* spriteAttackOnGround = new Sprite(associated, SPRITE_IDLE, SPRITE_IDLE_FRAMES);
     Sprite* spriteDamage = new Sprite(associated, SPRITE_IDLE, SPRITE_IDLE_FRAMES);
 
     AddSpriteState(Idle, spriteIdle);
@@ -79,7 +81,7 @@ void Kid::Awaken () {
     AddSpriteState(Running, spriteRun);
     AddSpriteState(Jumping, spriteJump);
     AddSpriteState(Falling, spriteFall);
-    // AddSpriteState(Attacking, spriteAttack);
+    AddSpriteState(AttackingOnGround, spriteAttackOnGround);
     AddSpriteState(Injured, spriteDamage);
 
     rigidBody = new RigidBody(associated);
@@ -136,20 +138,22 @@ void Kid::UpdateEntity (float dt) {
         state = Falling;
     }
 
-    // remover
-    if (input.KeyPress(Key::attack)) {
-        attackMelee->direction = (lastDirectionX == 1)? KidAttackMelee::RIGHT : KidAttackMelee::LEFT;
-        attackMelee->Enable();
-    }
-
     switch (state) {
         case Idle:
             // prevent movement when opposite directions are active
             if (directionX != 0)
                 state = Running;
-            
+
+            // start melee attack on ground
+            if (input.KeyPress(Key::attack)) {
+                state = AttackingOnGround;
+                attackOnGround->direction = (lastDirectionX == 1)? KidAttackMelee::RIGHT : KidAttackMelee::LEFT;
+                attackOnGround->Enable(associated.box.x);
+                rigidBody->SetSpeedOnX(SPEED_ATTACK * lastDirectionX);
+                break;
+            }
             // start jump
-            if (input.KeyPress(Key::jump)) {
+            else if (input.KeyPress(Key::jump)) {
                 state = Jumping;
                 rigidBody->SetGravity(0.0f);
                 isGrounded = false;
@@ -171,6 +175,14 @@ void Kid::UpdateEntity (float dt) {
                 speedRunIncrease = (speedRunIncrease < SPEED_RUN)?
                     speedRunIncrease + (ACCELERATION_RUN * dt) : SPEED_RUN;
                 rigidBody->SetSpeedOnX(directionX * speedRunIncrease);
+            }
+            // start melee attack on ground
+            if (input.KeyPress(Key::attack)) {
+                state = AttackingOnGround;
+                attackOnGround->direction = (lastDirectionX == 1)? KidAttackMelee::RIGHT : KidAttackMelee::LEFT;
+                attackOnGround->Enable(associated.box.x);
+                rigidBody->SetSpeedOnX(SPEED_ATTACK * lastDirectionX);
+                break;
             }
             // start jump
             if (input.KeyPress(Key::jump)) {
@@ -207,8 +219,12 @@ void Kid::UpdateEntity (float dt) {
 
             break;
         
-        // case Attacking:
-        //     break;
+        case AttackingOnGround:
+            if (fabs(associated.box.x - attackOnGround->originPositionX) >= IMPULSE_ATTACK_X) {
+                state = Idle; // remover
+                rigidBody->SetSpeedOnX(0.0f);
+            }
+            break;
         
         case Injured:
             if (collider->box.GetPosition().DistanceTo(damageOrigin) > IMPULSE_DAMAGE) {
@@ -240,6 +256,7 @@ bool Kid::NewStateRule (EntityState newState) {
             rigidBody->ResetGravity();
             isInvincible = true;
             rigidBody->triggerLabels.push_back("Enemy");
+            hp--;
             return true;
 
         default: return true;
@@ -264,6 +281,14 @@ void Kid::NotifyCollision (GameObject& other) {
                 hitCeiling = true;
             break;
         
+        case AttackingOnGround:
+            if (rigidBody->ImpactLeft() or rigidBody->ImpactRight()) {
+                state = Idle; // remover
+                attackOnGround->originPositionX = associated.box.x + IMPULSE_ATTACK_X;
+                rigidBody->SetSpeedOnX(0.0f);
+            }
+            break;
+
         case Injured:
             // hits a wall
             if (rigidBody->ImpactLeft() or rigidBody->ImpactRight())

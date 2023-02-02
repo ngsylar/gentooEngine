@@ -16,7 +16,7 @@ class Kid: public EntityMachine {
         bool isInvincible;
         int hp;
 
-        KidAttackMelee* attackMelee;
+        KidAttackMelee* attackOnGround;
 
         // Automatic Factors
         Vec2 damageOrigin;
