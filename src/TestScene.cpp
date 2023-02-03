@@ -52,8 +52,8 @@ void TestScene0::LoadAssets () {
     rawPlat->AddComponent(platSpr);
     AddObject(rawPlat);
     mini_platform = GetObjectPtr(rawPlat);
-    platSpr->SetScale(7.5f, 0.5f);
-    // platSpr->SetScale(50, 0.5f);
+    // platSpr->SetScale(7.5f, 0.5f);
+    platSpr->SetScale(50, 0.5f);
     rawPlat->box.SetPosition(256, 250);
     rawPlat->AddComponent(new Collider(*rawPlat));
     // rawPlat->AddComponent(new PlatformCamera(*rawPlat, PlatformCamera::DOWN, 0.0f));

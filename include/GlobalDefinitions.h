@@ -91,7 +91,7 @@ enum EntityState {
 
     // Leave declaration below as the last element,
     // it is the index for how many valid states there are
-    __TOTAL,
+    _statesCount,
 
     // Declaration below is for initialization
     None = 0xFF,

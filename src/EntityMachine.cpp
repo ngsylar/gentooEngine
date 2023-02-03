@@ -5,8 +5,8 @@ EntityMachine::EntityMachine (GameObject& associated): Component(associated) {
     type = ComponentType::_EntityMachine;
     state = EntityState::None;
     
-    sprites.resize(EntityState::__TOTAL);
-    for(int i=0; i < EntityState::__TOTAL; i++)
+    sprites.resize(EntityState::_statesCount);
+    for(int i=0; i < EntityState::_statesCount; i++)
         sprites[i] = nullptr;
 
     textureFlip = SDL_FLIP_NONE;

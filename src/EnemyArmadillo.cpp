@@ -26,9 +26,9 @@ void EnemyArmadillo::Awaken () {
     Sprite* spriteDamage = new Sprite(associated, SPRITE_RUN);
     Sprite* spriteDie = new Sprite(associated, SPRITE_RUN);
 
-    AddSpriteState(Running, spriteRun);
-    AddSpriteState(Injured, spriteDamage);
-    AddSpriteState(Dying, spriteDie);
+    AddSpriteState(EntityState::Running, spriteRun);
+    AddSpriteState(EntityState::Injured, spriteDamage);
+    AddSpriteState(EntityState::Dying, spriteDie);
 
     rigidBody = new RigidBody(associated);
     associated.AddComponent(rigidBody);
@@ -44,8 +44,7 @@ void EnemyArmadillo::Awaken () {
 }
 
 void EnemyArmadillo::Start () {
-    state = Running;
-    rigidBody->SetSpeedOnX(SPEED_RUN * movementDirection);
+    SetState(EntityState::Running);
 }
 
 void EnemyArmadillo::LateUpdate (float dt) {}
@@ -55,7 +54,7 @@ void EnemyArmadillo::UpdateEntity (float dt) {
         isGrounded = false;
 
     switch (state) {
-        case Running:
+        case EntityState::Running:
             if (isGrounded) {
                 bool foundEdgeLeft = collider->box.x < currentRoute.x;
                 bool foundEdgeRight = collider->box.x+collider->box.w > currentRoute.y;
@@ -67,12 +66,12 @@ void EnemyArmadillo::UpdateEntity (float dt) {
                 }
             } break;
 
-        case Injured:
+        case EntityState::Injured:
             if (fabs(associated.box.x - damageOriginX) >= IMPULSE_DAMAGE)
-                SetState(Running);
+                SetState(EntityState::Running);
             break;
 
-        case Dying:
+        case EntityState::Dying:
             break;
 
         default: break;
@@ -87,11 +86,11 @@ bool EnemyArmadillo::NewStateRule (EntityState newState) {
     std::weak_ptr<GameObject> player;
 
     switch (newState) {
-        case Running:
+        case EntityState::Running:
             rigidBody->SetSpeedOnX(SPEED_RUN * movementDirection);
             return true;
 
-        case Injured:
+        case EntityState::Injured:
             player = Game::GetInstance().GetCurrentState().GetObjectPtr("Player");
             if (player.expired()) return false;
             damageOriginX = associated.box.x;
@@ -114,8 +113,7 @@ void EnemyArmadillo::NotifyCollision (GameObject& other) {
     }
     if (rigidBody->ImpactLeft() or rigidBody->ImpactRight()) {
         hitWall = true;
-        if (state == Injured) {
-            SetState(Running);
-        }
+        if (state == EntityState::Injured)
+            SetState(EntityState::Running);
     }
 }
