@@ -211,7 +211,7 @@ void Kid::UpdateEntity (float dt) {
 
             // jump is performed
             if (input.KeyRelease(Key::jump) or jumpTimer.IsOver() or hitCeiling) {
-                state = EntityState::Falling;
+                FormatState(EntityState::Falling);
                 rigidBody->SetSpeedOnY(0.0f);
                 rigidBody->ResetGravity();
                 jumpTimer.Reset();
@@ -238,10 +238,10 @@ void Kid::UpdateEntity (float dt) {
         case EntityState::Injured:
             if (collider->box.GetPosition().DistanceTo(damageOrigin) > damageImpulse) {
                 rigidBody->SetSpeed(Vec2(lastDirectionX * damageForce.x * 0.5f, damageForce.y));
-                state = EntityState::Falling;
+                FormatState(EntityState::Falling);
             }
             if (hitWall) {
-                state = EntityState::Falling;
+                FormatState(EntityState::Falling);
                 hitWall = false;
             }
             break;
