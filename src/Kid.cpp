@@ -39,7 +39,8 @@
 #define ATTACK_SWORD_IMPULSE                    70.0f
 #define ATTACK_SWORD_DAMAGE                     1
 
-#define COLLIDER_POSITION                       0.0f, 9.0f
+#define COLLIDER_POSITION_ONGROUND              0.0f, 9.0f
+#define COLLIDER_POSITION_ONAIR                 0.0f, 5.0f
 #define COLLIDER_BOX_SIZE                       16.0f, 29.0f
 
 #define CAMERABOX_RECT                          16.0f, 19.0f, 16.0f, 28.0f
@@ -101,7 +102,7 @@ void Kid::Awaken () {
     associated.AddComponent(rigidBody);
 
     collider = new Collider(associated);
-    collider->SetBox(Vec2(COLLIDER_POSITION), Vec2(COLLIDER_BOX_SIZE));
+    collider->SetBox(Vec2(COLLIDER_POSITION_ONGROUND), Vec2(COLLIDER_BOX_SIZE));
     associated.AddComponent(collider);
 
     cameraBox = new GameObject(associated.layer);
@@ -267,13 +268,19 @@ bool Kid::NewStateRule (EntityState newState, int argsc, float argsv[]) {
 
     switch (newState) {
         case EntityState::Idle:
+            collider->SetBox(Vec2(COLLIDER_POSITION_ONGROUND), Vec2(COLLIDER_BOX_SIZE));
             rigidBody->SetSpeedOnX(0.0f);
             return true;
 
         case EntityState::Jumping:
+            collider->SetBox(Vec2(COLLIDER_POSITION_ONAIR), Vec2(COLLIDER_BOX_SIZE));
             rigidBody->SetGravity(0.0f);
             jumpSpeedDecrease = 0.0f;
             isGrounded = false;
+            return true;
+        
+        case EntityState::Falling:
+            collider->SetBox(Vec2(COLLIDER_POSITION_ONAIR), Vec2(COLLIDER_BOX_SIZE));
             return true;
 
         case EntityState::AttackingSwordOnGround:

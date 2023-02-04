@@ -5,6 +5,7 @@
 #define SPRITE_RUN          "assets/img/enemy1.png"
 
 #define SPEED_RUN           60.0f
+#define IMPULSE_MASS        10.0f
 
 #define ATTACK_FORCE        400.0f, 140.0f
 #define ATTACK_IMPULSE      70.0f
@@ -98,7 +99,7 @@ bool EnemyArmadillo::NewStateRule (EntityState newState, int argsc, float argsv[
             player = Game::GetInstance().GetCurrentState().GetObjectPtr("Player");
             if (player.expired()) return false;
             damageOriginX = associated.box.x;
-            damageImpulse = argsv[Attack::_Impulse];
+            damageImpulse = argsv[Attack::_Impulse] - IMPULSE_MASS;
             damageDirectionX = (player.lock()->box.x < associated.box.x)? 1 : -1;
             rigidBody->SetSpeedOnX(argsv[Attack::_ForceX] * damageDirectionX);
             hp -= argsv[Attack::_Damage];

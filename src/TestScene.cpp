@@ -41,7 +41,8 @@ TestScene0::TestScene0 () {
     // AddObject(bg);
 
     GameObject* bg = new GameObject(SCENE_TEST_LAYER, SCENE_TEST_LABEL);
-    lbg = new LoopedBackground(*bg, "assets/img/fundo_teletobis.png", 2, Vec2(0.25f,0.25f));
+    // lbg = new LoopedBackground(*bg, "assets/img/fundo_teletobis.png", 2, Vec2(0.25f,0.25f));
+    lbg = new LoopedBackground(*bg, "assets/img/fundoverde.png", 2, Vec2(0.25f,0.25f));
     bg->AddComponent(lbg);
     AddObject(bg);
 }
