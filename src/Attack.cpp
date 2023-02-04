@@ -1,9 +1,11 @@
 #include "GentooEngine.h"
 #include "Attack.h"
 
-Attack::Attack (GameObject& associated, GameObject* externalAssociated, int damage): Component(associated) {
+Attack::Attack (GameObject& associated, GameObject* externalAssociated): Component(associated) {
     type = ComponentType::_Attack;
-    this->damage = damage;
+    force = Vec2(400.0f, 0.0f);
+    impulse = 70.0f;
+    damage = 1;
 
     if (externalAssociated != nullptr) {
         this->externalAssociated = Game::GetInstance().GetCurrentState().GetObjectPtr(externalAssociated);
@@ -57,7 +59,9 @@ void Attack::SetupCollider (Vec2 offset, Vec2 size) {
         collider->SetBox(offset, size);
 }
 
-void Attack::SetDamage (int damage) {
+void Attack::SetProperties (Vec2 force, float impulse, int damage) {
+    this->force = force;
+    this->impulse = impulse;
     this->damage = damage;
 }
 
@@ -89,8 +93,10 @@ void Attack::NotifyCollision (GameObject& other) {
         return;
 
     EntityMachine* entity = (EntityMachine*)other.GetComponent(ComponentType::_EntityMachine);
-    if (entity != nullptr)
-        entity->SetState(EntityState::Injured, damage);
+    if (entity != nullptr) {
+        float argsv[4] = {force.x, force.y, impulse, (float)damage};
+        entity->FormatState(EntityState::Injured, 4, argsv);
+    }
 }
 
 bool Attack::UsingInternalAssociated () {

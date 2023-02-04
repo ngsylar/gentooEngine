@@ -15,13 +15,13 @@ class EnemyArmadillo: public EntityMachine {
         int hp;
 
         // Automatic Factors
-        float damageOriginX;
+        float damageOriginX, damageImpulse;
         int damageDirectionX;
 
         // Collision Faces
         bool isGrounded, hitWall;
 
-        bool NewStateRule(EntityState newState, int& argument);
+        bool NewStateRule(EntityState newState, int argsc, float argsv[]);
 
     public:
         EnemyArmadillo(GameObject& associated);

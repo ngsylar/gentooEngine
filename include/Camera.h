@@ -23,8 +23,6 @@ class Camera {
             std::array<Timer, 2> stopwatch;
         };
 
-        static void FreeMethod(Component* component);
-
     public:
         enum Axis {X, Y};
         enum FocusDirection {LEFT, RIGHT, UP, DOWN, NONE};

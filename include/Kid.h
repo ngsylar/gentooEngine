@@ -20,10 +20,11 @@ class Kid: public EntityMachine {
         KidAttackMelee* swordAttackOnGround;
 
         // Automatic Factors
-        bool performingAttack;
-        float speedRunIncrease, speedJumpDecrease;
-        bool speedRunReset, impulseAttackCancel;
-        Vec2 originDamage;
+        bool attackPerforming;
+        float runSpeedIncrease, jumpSpeedDecrease;
+        bool runSpeedReset, attackImpulseCancel;
+        Vec2 damageOrigin, damageForce;
+        float damageImpulse;
         int lastDirectionX;
 
         // Collision Faces
@@ -31,11 +32,9 @@ class Kid: public EntityMachine {
 
         // Camera Assistants
         GameObject* cameraBox;
-        Timer cameraGroundedTimer, cameraShakeTimer;
-        std::queue<Vec2> cameraShakeQueue;
-        Vec2 cameraShakeReset;
+        Timer cameraGroundedTimer;
 
-        bool NewStateRule(EntityState newState, int& argument);
+        bool NewStateRule(EntityState newState, int argsc, float argsv[]);
 
         // Camera Assistants
         void* CameraEffects();
@@ -48,9 +47,6 @@ class Kid: public EntityMachine {
         void UpdateEntity(float dt);
         void NotifyCollision(GameObject& other);
         bool Is(ComponentType type);
-
-        // Camera Assistants
-        void CameraStartShake();
 };
 
 #endif

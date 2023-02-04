@@ -5,8 +5,10 @@
 #define SPRITE_RUN          "assets/img/enemy1.png"
 
 #define SPEED_RUN           60.0f
-#define FORCE_DAMAGE        400.0f
-#define IMPULSE_DAMAGE      70.0f
+
+#define ATTACK_FORCE        400.0f, 140.0f
+#define ATTACK_IMPULSE      70.0f
+#define ATTACK_DAMAGE       1
 
 #define COLLIDER_POSITION   0.0f, 14.0f
 #define COLLIDER_BOX_SIZE   29.0f, 19.0f
@@ -40,7 +42,7 @@ void EnemyArmadillo::Awaken () {
     collider->SetBox(Vec2(COLLIDER_POSITION), Vec2(COLLIDER_BOX_SIZE));
 
     Attack* attack = new Attack(associated);
-    attack->SetDamage(1);
+    attack->SetProperties(Vec2(ATTACK_FORCE), ATTACK_IMPULSE, ATTACK_DAMAGE);
     associated.AddComponent(attack);
 }
 
@@ -69,8 +71,8 @@ void EnemyArmadillo::UpdateEntity (float dt) {
             } break;
 
         case EntityState::Injured:
-            if (fabs(associated.box.x - damageOriginX) >= IMPULSE_DAMAGE)
-                SetState(EntityState::Running);
+            if (fabs(associated.box.x - damageOriginX) >= damageImpulse)
+                FormatState(EntityState::Running);
             break;
 
         case EntityState::Dying:
@@ -80,7 +82,7 @@ void EnemyArmadillo::UpdateEntity (float dt) {
     }
 }
 
-bool EnemyArmadillo::NewStateRule (EntityState newState, int& argument) {
+bool EnemyArmadillo::NewStateRule (EntityState newState, int argsc, float argsv[]) {
     if (newState == state)
         return false;
 
@@ -96,9 +98,10 @@ bool EnemyArmadillo::NewStateRule (EntityState newState, int& argument) {
             player = Game::GetInstance().GetCurrentState().GetObjectPtr("Player");
             if (player.expired()) return false;
             damageOriginX = associated.box.x;
+            damageImpulse = argsv[Attack::_Impulse];
             damageDirectionX = (player.lock()->box.x < associated.box.x)? 1 : -1;
-            rigidBody->SetSpeedOnX(FORCE_DAMAGE * damageDirectionX);
-            hp -= argument;
+            rigidBody->SetSpeedOnX(argsv[Attack::_ForceX] * damageDirectionX);
+            hp -= argsv[Attack::_Damage];
             return true;
 
         default: return true;
@@ -116,6 +119,6 @@ void EnemyArmadillo::NotifyCollision (GameObject& other) {
     if (rigidBody->ImpactLeft() or rigidBody->ImpactRight()) {
         hitWall = true;
         if (state == EntityState::Injured)
-            SetState(EntityState::Running);
+            FormatState(EntityState::Running);
     }
 }

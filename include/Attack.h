@@ -12,15 +12,17 @@ class Attack: public Component {
         bool usingExternalAssociated;
         Collider* collider;
         Sprite* sprite;
+        Vec2 force;
+        float impulse;
         int damage;
 
     public:
+        enum Argument {_ForceX, _ForceY, _Impulse, _Damage};
         Timer lifetime;
 
         Attack(
             GameObject& associated,
-            GameObject* externalAssociated=nullptr,
-            int damage=1
+            GameObject* externalAssociated=nullptr
         );
         void OpenSprite(
             std::string file,
@@ -30,12 +32,12 @@ class Attack: public Component {
             bool selfDestruction=false
         );
         void SetupCollider(Vec2 offset, Vec2 size);
-        void SetDamage(int damage);
+        void SetProperties(Vec2 force, float impulse, int damage);
         virtual void Awaken();
         virtual void Start();
         void Update(float dt);
         virtual void UpdateAttack(float dt);
-        void NotifyCollision(GameObject& other);
+        virtual void NotifyCollision(GameObject& other);
         bool UsingInternalAssociated();
         bool UsingExternalAssociated();
         bool Is(std::string type);

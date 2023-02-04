@@ -34,9 +34,11 @@ bool EntityMachine::HasState (EntityState compare) {
     return (sprites[compare].get() != nullptr);
 }
 
-void EntityMachine::SetState (EntityState newState, int argument) {
-    if (NewStateRule(newState, argument))
+bool EntityMachine::FormatState (EntityState newState, int argsc, float argsv[]) {
+    if (NewStateRule(newState, argsc, argsv)) {
         state = newState;
+        return true;
+    } return false;
 }
 
 EntityState EntityMachine::GetCurrentState () {
@@ -88,7 +90,7 @@ void EntityMachine::LateUpdateEntity (float dt) {}
 
 void EntityMachine::RenderEntity () {}
 
-bool EntityMachine::NewStateRule (EntityState newState, int& argument) {
+bool EntityMachine::NewStateRule (EntityState newState, int argsc, float argsv[]) {
     return true;
 }
 

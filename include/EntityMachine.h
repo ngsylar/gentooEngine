@@ -10,7 +10,7 @@ class EntityMachine: public Component {
         std::vector<std::unique_ptr<Sprite>> sprites;
         SDL_RendererFlip textureFlip;
 
-        virtual bool NewStateRule(EntityState newState, int& argument);
+        virtual bool NewStateRule(EntityState newState, int argsc, float argsv[]);
         void FlipSprite(Sprite::Axis axis);
 
     public:
@@ -19,9 +19,9 @@ class EntityMachine: public Component {
         void AddSpriteState(EntityState newState, Sprite* newSheet);
         void RemoveState(EntityState state);
         bool HasState(EntityState compare);
-        void SetState(EntityState newState, int argument=0);
+        bool FormatState(EntityState newState, int argsc=0, float argsv[]=nullptr);
         EntityState GetCurrentState();
-        
+
         // Inheritance
         virtual void Awaken();
         virtual void Start();
@@ -36,6 +36,7 @@ class EntityMachine: public Component {
         virtual void LateUpdateEntity(float dt);
         virtual void RenderEntity();
 
+        // Collision and Type
         virtual void NotifyCollision(GameObject& other);
         virtual void NotifyNoCollision(GameObject& other);
         virtual bool Is(ComponentType type);
