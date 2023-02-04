@@ -1,8 +1,9 @@
 #include "GentooEngine.h"
 #include "Attack.h"
 
-Attack::Attack (GameObject& associated, GameObject* externalAssociated): Component(associated) {
+Attack::Attack (GameObject& associated, GameObject* externalAssociated, int damage): Component(associated) {
     type = ComponentType::_Attack;
+    this->damage = damage;
 
     if (externalAssociated != nullptr) {
         this->externalAssociated = Game::GetInstance().GetCurrentState().GetObjectPtr(externalAssociated);

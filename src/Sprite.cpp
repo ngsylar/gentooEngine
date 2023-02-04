@@ -8,8 +8,8 @@ Sprite::Sprite (GameObject& associated): Component(associated) {
     frameWidth = 0;
     frameCount = 0;
     currentFrame = 0;
-    frameOneshot = false;
-    oneshotIsDone = false;
+    oneshot = false;
+    oneshotIsOver = false;
     selfDestruction = false;
     parallaxFactor = Vec2(1.0f, 1.0f);
     textureFlip = SDL_FLIP_NONE;
@@ -42,7 +42,7 @@ void Sprite::Open (
 
     this->frameCount = frameCount;
     frameTimer = Timer(frameTime);
-    frameOneshot = oneshot;
+    this->oneshot = oneshot;
     selfDestruction = destruct;
 
     frameWidth = width / frameCount;
@@ -74,7 +74,7 @@ void Sprite::SetBlendMode (SDL_BlendMode blendMode) {
 void Sprite::SetFrame (int frame) {
     currentFrame = frame % frameCount;
     clipRect.x = currentFrame * frameWidth;
-    oneshotIsDone = false;
+    oneshotIsOver = false;
 }
 
 void Sprite::SetFrameTime (float frameTime) {
@@ -92,8 +92,8 @@ void Sprite::SetFrameCount (int frameCount) {
     associated.box.w = (float)frameWidth * scale.x;
 }
 
-void Sprite::SetFrameOneshot (bool oneshot) {
-    frameOneshot = oneshot;
+void Sprite::SetOneshot (bool oneshot) {
+    this->oneshot = oneshot;
 }
 
 void Sprite::SetSelfDestruction (bool destruct) {
@@ -112,23 +112,27 @@ int Sprite::GetHeight () {
     return (height * (int)scale.y);
 }
 
+bool Sprite::OneshotIsOver () {
+    return oneshotIsOver;
+}
+
 void Sprite::Flip (Axis axis) {
     SDL_RendererFlip flip = (axis == HORIZONTAL) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_VERTICAL;
     textureFlip = SDL_RendererFlip(textureFlip ^ flip);
 }
 
 void Sprite::Update (float dt) {
-    if ((not oneshotIsDone) and frameTimer.HasResetTime()) {
+    if ((not oneshotIsOver) and frameTimer.HasResetTime()) {
         frameTimer.Update(dt);
 
         if (frameTimer.IsOver()) {
-            if ((currentFrame == (frameCount-1)) and frameOneshot) {
-                oneshotIsDone = true;
+            if ((++currentFrame == frameCount) and oneshot) {
+                oneshotIsOver = true;
                 if (selfDestruction)
                     associated.RequestDelete();
                 return;
             }
-            SetFrame(currentFrame+1);
+            SetFrame(currentFrame);
             frameTimer.Reset();
         }
     }

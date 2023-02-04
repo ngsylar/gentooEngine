@@ -12,13 +12,15 @@ class Attack: public Component {
         bool usingExternalAssociated;
         Collider* collider;
         Sprite* sprite;
+        int damage;
 
     public:
         Timer lifetime;
 
         Attack(
             GameObject& associated,
-            GameObject* externalAssociated=nullptr
+            GameObject* externalAssociated=nullptr,
+            int damage=1
         );
         void OpenSprite(
             std::string file,

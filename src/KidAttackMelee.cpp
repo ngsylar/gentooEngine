@@ -1,10 +1,9 @@
 #include "GentooEngine.h"
 #include "KidAttackMelee.h"
 
-#define SPRITE "assets/img/attackPHoffset28_2.png"
-
-#define OFFSET_X_DEFAULT 28.0f
-#define OFFSET_Y_DEFAULT 2.0f
+#define COLLIDER_OFFSET_X   24.0f
+#define COLLIDER_OFFSET_Y   6.0f
+#define COLLIDER_SIZE       26.0f, 44.0f
 
 KidAttackMelee::KidAttackMelee (
     GameObject& associated, GameObject* externalAssociated
@@ -15,13 +14,13 @@ KidAttackMelee::KidAttackMelee (
     associated.enabled = false;
 }
 
-void KidAttackMelee::Enable (float originPositionX) {
-    this->originPositionX = originPositionX;
-    associated.enabled = true;
+void KidAttackMelee::Awaken () {
+    SetupCollider(Vec2(), Vec2(COLLIDER_SIZE));
 }
 
-void KidAttackMelee::Awaken () {
-    OpenSprite(SPRITE);
+void KidAttackMelee::Perform (float originPositionX) {
+    this->originPositionX = originPositionX;
+    associated.enabled = true;
 }
 
 void KidAttackMelee::UpdateAttack (float dt) {
@@ -29,15 +28,15 @@ void KidAttackMelee::UpdateAttack (float dt) {
 
     switch (direction) {
         case LEFT:
-            sprite->textureFlip = SDL_FLIP_HORIZONTAL;
-            associated.box.x = externalBox.x + externalBox.w - OFFSET_X_DEFAULT - associated.box.w;
-            associated.box.y = externalBox.y + OFFSET_Y_DEFAULT;
+            if (sprite != nullptr) sprite->textureFlip = SDL_FLIP_HORIZONTAL;
+            associated.box.x = externalBox.x + externalBox.w - COLLIDER_OFFSET_X - associated.box.w;
+            associated.box.y = externalBox.y + COLLIDER_OFFSET_Y;
             break;
 
         case RIGHT:
-            sprite->textureFlip = SDL_FLIP_NONE;
-            associated.box.x = externalBox.x + OFFSET_X_DEFAULT;
-            associated.box.y = externalBox.y + OFFSET_Y_DEFAULT;
+            if (sprite != nullptr) sprite->textureFlip = SDL_FLIP_NONE;
+            associated.box.x = externalBox.x + COLLIDER_OFFSET_X;
+            associated.box.y = externalBox.y + COLLIDER_OFFSET_Y;
             break;
 
         case UP: break;

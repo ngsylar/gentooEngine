@@ -13,8 +13,8 @@ class KidAttackMelee: public Attack {
             GameObject& associated,
             GameObject* externalAssociated
         );
-        void Enable(float originPositionX);
         void Awaken();
+        void Perform(float originPositionX);
         void UpdateAttack(float dt);
 };
 

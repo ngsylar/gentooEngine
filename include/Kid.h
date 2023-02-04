@@ -16,11 +16,14 @@ class Kid: public EntityMachine {
         bool isInvincible;
         int hp;
 
-        KidAttackMelee* attackOnGround;
+        // Attack Types
+        KidAttackMelee* swordAttackOnGround;
 
         // Automatic Factors
-        Vec2 damageOrigin;
+        bool performingAttack;
         float speedRunIncrease, speedJumpDecrease;
+        bool speedRunReset, impulseAttackCancel;
+        Vec2 originDamage;
         int lastDirectionX;
 
         // Collision Faces

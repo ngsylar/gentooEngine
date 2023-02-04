@@ -23,7 +23,7 @@ class Sprite: public Component {
         Vec2 scale;
         Timer frameTimer;
         int frameWidth, frameCount, currentFrame;
-        bool frameOneshot, oneshotIsDone, selfDestruction;
+        bool oneshot, oneshotIsOver, selfDestruction;
 
     public:
         enum Axis {HORIZONTAL, VERTICAL};
@@ -37,7 +37,7 @@ class Sprite: public Component {
             std::string file,
             int frameCount=1,
             float frameTime=0.0f,
-            bool frameOneshot=false,
+            bool oneshot=false,
             bool selfDestruction=false
         );
         ~Sprite();
@@ -45,7 +45,7 @@ class Sprite: public Component {
             std::string file,
             int frameCount=1,
             float frameTime=0.0f,
-            bool frameOneshot=false,
+            bool oneshot=false,
             bool selfDestruction=false
         );
         void SetClip(int x, int y, int w, int h);
@@ -55,11 +55,12 @@ class Sprite: public Component {
         void SetFrame(int frame);
         void SetFrameTime(float frameTime);
         void SetFrameCount(int frameCount);
-        void SetFrameOneshot(bool frameOneshot);
+        void SetOneshot(bool oneshot);
         void SetSelfDestruction(bool selfDestruction);
         Vec2 GetScale();
         int GetWidth();
         int GetHeight();
+        bool OneshotIsOver();
         void Flip(Axis axis);
         void Update(float dt);
         void Render();

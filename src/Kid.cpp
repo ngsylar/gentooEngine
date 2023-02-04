@@ -1,48 +1,59 @@
 #include "GentooEngine.h"
 #include "Kid.h"
 
-#define SPRITE_IDLE                 "assets/img/kid/idle.png"
-#define SPRITE_WALK                 "assets/img/kid/walk.png"
-#define SPRITE_RUN                  "assets/img/kid/run.png"
-#define SPRITE_JUMP                 "assets/img/kid/jump.png"
-#define SPRITE_FALL                 "assets/img/kid/fall.png"
-#define SPRITE_ATTACK               "assets/img/kid/attack.png"
+float coisaLinda = 1000.0f; // remover
 
-#define SPRITE_IDLE_FRAMES          6, 0.1f
-// #define SPRITE_WALK_FRAMES          8, 0.05f
-#define SPRITE_RUN_FRAMES           8, 0.075f
-#define SPRITE_BRAKE_FRAMES         3, 0.05f
-#define SPRITE_JUMP_FRAMES          5, 0.1f
-#define SPRITE_FALL_FRAMES          3, 0.1f
-#define SPRITE_LAND_FRAMES          3, 0.05f
-#define SPRITE_ATTACK_FRAMES        1, 0.05f
-#define SPRITE_DAMAGE_FRAMES        1, 0.05f
+#define SPRITE_IDLE                             "assets/img/kid/idle.png"
+// #define SPRITE_WALK                             "assets/img/kid/walk.png"
+#define SPRITE_RUN                              "assets/img/kid/run.png"
+// #define SPRITE_BREAK                            "assets/img/kid/break.png"
+#define SPRITE_JUMP                             "assets/img/kid/jump.png"
+#define SPRITE_FALL                             "assets/img/kid/fall.png"
+// #define SPRITE_LAND                             "assets/img/kid/land.png"
+// #define SPRITE_DAMAGE                           "assets/img/kid/land.png"
+#define SPRITE_ATTACK_MELEEGROUND1              "assets/img/kid/attackmeleeground1.png"
+// #define SPRITE_ATTACK_MELEEGROUND1END           "assets/img/kid/attackmeleeground1end.png"
+// #define SPRITE_ATTACK_MELEEGROUND2              "assets/img/kid/attackmeleeground2.png"
+// #define SPRITE_ATTACK_MELEEGROUND2END           "assets/img/kid/attackmeleeground2end.png"
 
-#define ACCELERATION_RUN            800.0f
-#define SPEED_RUN                   120.0f
-#define SPEED_ONAIR                 100.0f
-#define SPEED_ATTACK                300.0f
-#define FORCE_JUMP                  300.0f
-#define FORCE_MASS                  460.0f
-#define FORCE_DAMAGE_X              -400.0f
-#define FORCE_DAMAGE_Y              -140.0f
-#define IMPULSE_ATTACK_X            20.0f
-#define IMPULSE_DAMAGE              70.0f
+#define SPRITE_IDLE_FRAMES                      6, 0.1f
+// #define SPRITE_WALK_FRAMES                      1, 0.1f
+#define SPRITE_RUN_FRAMES                       8, 0.075f
+// #define SPRITE_BRAKE_FRAMES                     3, 0.1f
+#define SPRITE_JUMP_FRAMES                      5, 0.1f
+#define SPRITE_FALL_FRAMES                      3, 0.1f
+// #define SPRITE_LAND_FRAMES                      3, 0.1f
+// #define SPRITE_DAMAGE_FRAMES                    1, 0.1f
+#define SPRITE_ATTACK_MELEEGROUND1_FRAMES       7, 0.1f
+// #define SPRITE_ATTACK_MELEEGROUND1END_FRAMES    1, 0.1f
+// #define SPRITE_ATTACK_MELEEGROUND2_FRAMES       1, 0.1f
+// #define SPRITE_ATTACK_MELEEGROUND2END_FRAMES    1, 0.1f
 
-#define COLLIDER_POSITION           0.0f, 9.0f
-#define COLLIDER_BOX_SIZE           16.0f, 29.0f
+#define ACCELERATION_RUN                        800.0f
+#define SPEED_RUN                               120.0f
+#define SPEED_ONAIR                             100.0f
+#define SPEED_ATTACK                            300.0f
+#define FORCE_JUMP                              300.0f
+#define FORCE_MASS                              460.0f
+#define FORCE_DAMAGE_X                          -400.0f
+#define FORCE_DAMAGE_Y                          -140.0f
+#define IMPULSE_ATTACK_X                        70.0f
+#define IMPULSE_DAMAGE                          70.0f
 
-#define CAMERABOX_RECT              16.0f, 19.0f, 16.0f, 28.0f
-#define CAMERABOX_SPACING           0.0f, 12.0f
-#define CINEMACHINE_LENGTH          14.0f, 86.0f
-#define CINEMACHINE_SLICES          8, 32, 2, 24
-#define CINEMACHINE_OFFSET          0.0f, -12.0f
-#define CINEMACHINE_SETUP           true, true, true, false, true, true, false, false
+#define COLLIDER_POSITION                       0.0f, 9.0f
+#define COLLIDER_BOX_SIZE                       16.0f, 29.0f
 
-#define CAMERA_SHAKE_COUNT          6
-#define CAMERA_SHAKE_RANGE          3
-#define CAMERA_SHAKE_RESET_TIME     0.03f
-#define CAMERA_GROUNDED_RESET_TIME  1.5f
+#define CAMERABOX_RECT                          16.0f, 19.0f, 16.0f, 28.0f
+#define CAMERABOX_SPACING                       0.0f, 12.0f
+#define CINEMACHINE_LENGTH                      14.0f, 86.0f
+#define CINEMACHINE_SLICES                      8, 32, 2, 24
+#define CINEMACHINE_OFFSET                      0.0f, -12.0f
+#define CINEMACHINE_SETUP                       true, true, true, false, true, true, false, false
+
+#define CAMERA_SHAKE_COUNT                      6
+#define CAMERA_SHAKE_RANGE                      3
+#define CAMERA_SHAKE_RESET_TIME                 0.03f
+#define CAMERA_GROUNDED_RESET_TIME              1.5f
 
 Kid::Kid (GameObject& associated): EntityMachine(associated) {
     type = type | ComponentType::_Kid;
@@ -53,13 +64,16 @@ Kid::Kid (GameObject& associated): EntityMachine(associated) {
     isInvincible = false;
     hp = 4;
 
+    performingAttack = false;
     speedRunIncrease = 0.0f;
     speedJumpDecrease = 0.0f;
+    speedRunReset = true;
+    impulseAttackCancel = false;
     lastDirectionX = 1;
 
     GameObject* attack = new GameObject(LayerDistance::_Player_Front);
-    attackOnGround = new KidAttackMelee(*attack, &associated);
-    attack->AddComponent(attackOnGround);
+    swordAttackOnGround = new KidAttackMelee(*attack, &associated);
+    attack->AddComponent(swordAttackOnGround);
     Game::GetInstance().GetCurrentState().AddObject(attack);
 
     isGrounded = false;
@@ -69,20 +83,19 @@ Kid::Kid (GameObject& associated): EntityMachine(associated) {
 
 void Kid::Awaken () {
     Sprite* spriteIdle = new Sprite(associated, SPRITE_IDLE, SPRITE_IDLE_FRAMES);
-    // Sprite* spriteWalk = new Sprite(associated, SPRITE_WALK, 6, 0.15);
     Sprite* spriteRun = new Sprite(associated, SPRITE_RUN, SPRITE_RUN_FRAMES);
     Sprite* spriteJump = new Sprite(associated, SPRITE_JUMP, SPRITE_JUMP_FRAMES, SPRITE_ONESHOT_TRUE);
     Sprite* spriteFall = new Sprite(associated, SPRITE_FALL, SPRITE_FALL_FRAMES, SPRITE_ONESHOT_TRUE);
-    Sprite* spriteAttackOnGround = new Sprite(associated, SPRITE_IDLE, SPRITE_IDLE_FRAMES);
     Sprite* spriteDamage = new Sprite(associated, SPRITE_IDLE, SPRITE_IDLE_FRAMES);
+    Sprite* spriteAttackSwordOnGround = new Sprite(
+        associated, SPRITE_ATTACK_MELEEGROUND1, SPRITE_ATTACK_MELEEGROUND1_FRAMES, SPRITE_ONESHOT_TRUE);
 
     AddSpriteState(EntityState::Idle, spriteIdle);
-    // AddSpriteState(EntityState::Walking, spriteWalk);
     AddSpriteState(EntityState::Running, spriteRun);
     AddSpriteState(EntityState::Jumping, spriteJump);
     AddSpriteState(EntityState::Falling, spriteFall);
-    AddSpriteState(EntityState::AttackingOnGround, spriteAttackOnGround);
     AddSpriteState(EntityState::Injured, spriteDamage);
+    AddSpriteState(EntityState::AttackingSwordOnGround, spriteAttackSwordOnGround);
 
     rigidBody = new RigidBody(associated);
     associated.AddComponent(rigidBody);
@@ -129,14 +142,24 @@ void Kid::UpdateEntity (float dt) {
     }
     // prevent movement when opposite directions are active
     int directionX = input.IsKeyDown(Key::moveRight) - input.IsKeyDown(Key::moveLeft);
-    bool directionXhasChanged = (directionX != 0) and (directionX != lastDirectionX);
-    if (directionXhasChanged) lastDirectionX = directionX;
+    bool changeDirectionX = (not performingAttack) and (directionX != 0) and (directionX != lastDirectionX);
+    if (changeDirectionX) lastDirectionX = directionX;
+    
+    // tolerance before reset run speed
+    speedRunReset = (directionX == 0)? true : false;
+    if (speedRunReset) speedRunIncrease = 0.0f;
 
     // tolerance before start falling
     if ((state != EntityState::Falling) and (rigidBody->GetSpeed().y > 100)) {
+        SetState(EntityState::Falling);
         isGrounded = false;
-        state = EntityState::Falling;
     }
+    // remover
+    if (rigidBody->GetSpeed().x != coisaLinda) {
+        coisaLinda = rigidBody->GetSpeed().x;
+        SDL_Log("%f", coisaLinda);
+    }
+    // SDL_Log("%d", speedRunReset);
 
     switch (state) {
         case EntityState::Idle:
@@ -146,12 +169,13 @@ void Kid::UpdateEntity (float dt) {
 
             // start melee attack on ground
             if (input.KeyPress(Key::attack)) {
-                SetState(EntityState::AttackingOnGround);
+                SetState(EntityState::AttackingSwordOnGround);
                 break;
             }
             // start jump
             else if (input.KeyPress(Key::jump))
                 SetState(EntityState::Jumping);
+
             break;
         
         // case EntityState::Walking:
@@ -159,10 +183,9 @@ void Kid::UpdateEntity (float dt) {
         
         case EntityState::Running:
             // movement is performed
-            if (directionX == 0) {
+            if (directionX == 0)
                 SetState(EntityState::Idle);
-                speedRunIncrease = 0.0f;
-            }
+
             // movement is performing
             else {
                 speedRunIncrease = (speedRunIncrease < SPEED_RUN)?
@@ -171,12 +194,13 @@ void Kid::UpdateEntity (float dt) {
             }
             // start melee attack on ground
             if (input.KeyPress(Key::attack)) {
-                SetState(EntityState::AttackingOnGround);
+                SetState(EntityState::AttackingSwordOnGround);
                 break;
             }
             // start jump
             else if (input.KeyPress(Key::jump))
                 SetState(EntityState::Jumping);
+
             break;
         
         case EntityState::Jumping:
@@ -199,21 +223,22 @@ void Kid::UpdateEntity (float dt) {
         
         case EntityState::Falling:
             // movement on air
-            if (directionX != 0)
-                rigidBody->SetSpeedOnX(directionX * SPEED_ONAIR);
-            else rigidBody->SetSpeedOnX(0.0f);
+            rigidBody->SetSpeedOnX(SPEED_ONAIR * directionX);
+            break;
+        
+        case EntityState::AttackingSwordOnGround:
+            if ((not impulseAttackCancel)
+                and (fabs(associated.box.x - swordAttackOnGround->originPositionX) >= IMPULSE_ATTACK_X)) {
+                rigidBody->SetSpeedOnX(0.0f);
+                impulseAttackCancel = true;
+            }
+            if (sprites[state]->OneshotIsOver())
+                SetState(EntityState::Idle);
 
             break;
         
-        case EntityState::AttackingOnGround:
-            if (fabs(associated.box.x - attackOnGround->originPositionX) >= IMPULSE_ATTACK_X) {
-                state = EntityState::Idle; // remover
-                rigidBody->SetSpeedOnX(0.0f);
-            }
-            break;
-        
         case EntityState::Injured:
-            if (collider->box.GetPosition().DistanceTo(damageOrigin) > IMPULSE_DAMAGE) {
+            if (collider->box.GetPosition().DistanceTo(originDamage) > IMPULSE_DAMAGE) {
                 rigidBody->SetSpeed(Vec2(lastDirectionX * FORCE_DAMAGE_X * 0.5f, FORCE_DAMAGE_Y));
                 state = EntityState::Falling;
             }
@@ -226,13 +251,22 @@ void Kid::UpdateEntity (float dt) {
         default: break;
     }
 
-    if (directionXhasChanged)
+    if (changeDirectionX)
         textureFlip = (directionX == 1)? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL;
 }
 
 bool Kid::NewStateRule (EntityState newState) {
     if (newState == state)
         return false;
+    
+    switch (state) {
+        case EntityState::AttackingSwordOnGround:
+            impulseAttackCancel = false;
+            performingAttack = false;
+            break;
+
+        default: break;
+    }
 
     switch (newState) {
         case EntityState::Idle:
@@ -244,16 +278,24 @@ bool Kid::NewStateRule (EntityState newState) {
             speedJumpDecrease = 0.0f;
             isGrounded = false;
             return true;
-        
-        case EntityState::AttackingOnGround:
-            attackOnGround->direction = (lastDirectionX == 1)? KidAttackMelee::RIGHT : KidAttackMelee::LEFT;
-            attackOnGround->Enable(associated.box.x);
-            rigidBody->SetSpeedOnX(SPEED_ATTACK * lastDirectionX);
+
+        case EntityState::AttackingSwordOnGround:
+            swordAttackOnGround->direction = (lastDirectionX == 1)?
+                KidAttackMelee::RIGHT : KidAttackMelee::LEFT;
+            swordAttackOnGround->Perform(associated.box.x);
+            
+            if (speedRunReset)
+                impulseAttackCancel = true;
+            if (not impulseAttackCancel)
+                rigidBody->SetSpeedOnX(SPEED_ATTACK * lastDirectionX);
+            else rigidBody->SetSpeedOnX(0.0f);
+            
+            performingAttack = true;
             return true;
 
         case EntityState::Injured:
             if (isInvincible) return false;
-            damageOrigin = collider->box.GetPosition();
+            originDamage = collider->box.GetPosition();
             rigidBody->SetSpeed(Vec2(lastDirectionX * FORCE_DAMAGE_X, FORCE_DAMAGE_Y));
             rigidBody->ResetGravity();
             isInvincible = true;
@@ -281,12 +323,11 @@ void Kid::NotifyCollision (GameObject& other) {
             if (rigidBody->ImpactUp())
                 hitCeiling = true;
             break;
-        
-        case EntityState::AttackingOnGround:
+
+        case EntityState::AttackingSwordOnGround:
             if (rigidBody->ImpactLeft() or rigidBody->ImpactRight()) {
-                state = EntityState::Idle; // remover
-                attackOnGround->originPositionX = associated.box.x + IMPULSE_ATTACK_X;
                 rigidBody->SetSpeedOnX(0.0f);
+                impulseAttackCancel = true;
             }
             break;
 
