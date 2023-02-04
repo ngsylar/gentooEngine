@@ -57,6 +57,10 @@ void Attack::SetupCollider (Vec2 offset, Vec2 size) {
         collider->SetBox(offset, size);
 }
 
+void Attack::SetDamage (int damage) {
+    this->damage = damage;
+}
+
 void Attack::Awaken () {}
 
 void Attack::Start () {}
@@ -86,7 +90,7 @@ void Attack::NotifyCollision (GameObject& other) {
 
     EntityMachine* entity = (EntityMachine*)other.GetComponent(ComponentType::_EntityMachine);
     if (entity != nullptr)
-        entity->SetState(EntityState::Injured);
+        entity->SetState(EntityState::Injured, damage);
 }
 
 bool Attack::UsingInternalAssociated () {

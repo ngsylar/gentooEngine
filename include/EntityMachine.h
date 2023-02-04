@@ -10,7 +10,7 @@ class EntityMachine: public Component {
         std::vector<std::unique_ptr<Sprite>> sprites;
         SDL_RendererFlip textureFlip;
 
-        virtual bool NewStateRule(EntityState newState);
+        virtual bool NewStateRule(EntityState newState, int& argument);
         void FlipSprite(Sprite::Axis axis);
 
     public:
@@ -19,7 +19,7 @@ class EntityMachine: public Component {
         void AddSpriteState(EntityState newState, Sprite* newSheet);
         void RemoveState(EntityState state);
         bool HasState(EntityState compare);
-        void SetState(EntityState newState);
+        void SetState(EntityState newState, int argument=0);
         EntityState GetCurrentState();
         
         // Inheritance

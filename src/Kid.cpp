@@ -1,8 +1,6 @@
 #include "GentooEngine.h"
 #include "Kid.h"
 
-float coisaLinda = 1000.0f; // remover
-
 #define SPRITE_IDLE                             "assets/img/kid/idle.png"
 // #define SPRITE_WALK                             "assets/img/kid/walk.png"
 #define SPRITE_RUN                              "assets/img/kid/run.png"
@@ -54,6 +52,8 @@ float coisaLinda = 1000.0f; // remover
 #define CAMERA_SHAKE_RANGE                      3
 #define CAMERA_SHAKE_RESET_TIME                 0.03f
 #define CAMERA_GROUNDED_RESET_TIME              1.5f
+
+// float coisaLinda = 1000.0f; // remover
 
 Kid::Kid (GameObject& associated): EntityMachine(associated) {
     type = type | ComponentType::_Kid;
@@ -154,12 +154,11 @@ void Kid::UpdateEntity (float dt) {
         SetState(EntityState::Falling);
         isGrounded = false;
     }
-    // remover
-    if (rigidBody->GetSpeed().x != coisaLinda) {
-        coisaLinda = rigidBody->GetSpeed().x;
-        SDL_Log("%f", coisaLinda);
-    }
-    // SDL_Log("%d", speedRunReset);
+    // // remover
+    // if (rigidBody->GetSpeed().x != coisaLinda) {
+    //     coisaLinda = rigidBody->GetSpeed().x;
+    //     SDL_Log("%f", coisaLinda);
+    // }
 
     switch (state) {
         case EntityState::Idle:
@@ -255,7 +254,7 @@ void Kid::UpdateEntity (float dt) {
         textureFlip = (directionX == 1)? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL;
 }
 
-bool Kid::NewStateRule (EntityState newState) {
+bool Kid::NewStateRule (EntityState newState, int& argument) {
     if (newState == state)
         return false;
     
@@ -300,7 +299,7 @@ bool Kid::NewStateRule (EntityState newState) {
             rigidBody->ResetGravity();
             isInvincible = true;
             rigidBody->triggerLabels.push_back("Enemy");
-            hp--;
+            hp -= argument;
             return true;
 
         default: return true;

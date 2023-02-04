@@ -21,7 +21,7 @@ class EnemyArmadillo: public EntityMachine {
         // Collision Faces
         bool isGrounded, hitWall;
 
-        bool NewStateRule(EntityState newState);
+        bool NewStateRule(EntityState newState, int& argument);
 
     public:
         EnemyArmadillo(GameObject& associated);

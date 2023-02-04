@@ -35,7 +35,7 @@ class Kid: public EntityMachine {
         std::queue<Vec2> cameraShakeQueue;
         Vec2 cameraShakeReset;
 
-        bool NewStateRule(EntityState newState);
+        bool NewStateRule(EntityState newState, int& argument);
 
         // Camera Assistants
         void* CameraEffects();

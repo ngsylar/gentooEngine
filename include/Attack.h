@@ -30,6 +30,7 @@ class Attack: public Component {
             bool selfDestruction=false
         );
         void SetupCollider(Vec2 offset, Vec2 size);
+        void SetDamage(int damage);
         virtual void Awaken();
         virtual void Start();
         void Update(float dt);

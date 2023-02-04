@@ -40,11 +40,13 @@ void EnemyArmadillo::Awaken () {
     collider->SetBox(Vec2(COLLIDER_POSITION), Vec2(COLLIDER_BOX_SIZE));
 
     Attack* attack = new Attack(associated);
+    attack->SetDamage(1);
     associated.AddComponent(attack);
 }
 
 void EnemyArmadillo::Start () {
-    SetState(EntityState::Running);
+    state = EntityState::Running;
+    rigidBody->SetSpeedOnX(SPEED_RUN * movementDirection);
 }
 
 void EnemyArmadillo::LateUpdate (float dt) {}
@@ -78,7 +80,7 @@ void EnemyArmadillo::UpdateEntity (float dt) {
     }
 }
 
-bool EnemyArmadillo::NewStateRule (EntityState newState) {
+bool EnemyArmadillo::NewStateRule (EntityState newState, int& argument) {
     if (newState == state)
         return false;
 
@@ -96,7 +98,7 @@ bool EnemyArmadillo::NewStateRule (EntityState newState) {
             damageOriginX = associated.box.x;
             damageDirectionX = (player.lock()->box.x < associated.box.x)? 1 : -1;
             rigidBody->SetSpeedOnX(FORCE_DAMAGE * damageDirectionX);
-            hp--;
+            hp -= argument;
             return true;
 
         default: return true;
