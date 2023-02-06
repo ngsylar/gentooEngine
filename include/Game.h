@@ -32,6 +32,8 @@ class Game {
         int frameStart;
         float dt;
 
+        bool noVSync;
+
         Game(
             std::string title, int width, int height,
             int logicalWidth=0, int logicalHeight=0);

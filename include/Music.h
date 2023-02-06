@@ -20,7 +20,7 @@ class Music {
         Music(std::string file);
         ~Music();
         void Open(std::string file);
-        void Play(int times=0);
+        void Play(int times=0, int fadeIn=0);
         void Play(std::string file, int times=0);
         void Stop(int msToStop=0);
         bool IsOpen();

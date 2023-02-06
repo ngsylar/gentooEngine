@@ -12,6 +12,7 @@ class ScreenFade: public Component {
         ScreenFilter _FadeFilter;
         bool _FadeIn;
         bool _Finished;
+        bool selfDestructible;
         float _StartPercent;
         float _FinishPercent;
         float _CurrPercent;
@@ -20,7 +21,8 @@ class ScreenFade: public Component {
 
     public:
         Color filterColor;
-        ScreenFade(GameObject& associated, Color filterColor, float start, float finish, float time);
+        bool HasFinished();
+        ScreenFade(GameObject& associated, Color filterColor, float start, float finish, float time, bool selfDestruct=false);
         ~ScreenFade();
         void RedirectFade(float finish);
         void SetTime(float time);

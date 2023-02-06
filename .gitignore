@@ -24,3 +24,7 @@ spike/
 
 #SDL Local
 sdl/
+
+#auto-TileMap files
+*-hash.txt
+*-rect.txt

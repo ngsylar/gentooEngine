@@ -2,7 +2,8 @@
 #include "EngineScreen.h"
 
 // include the game states here
-#include "TestScene.h"
+// #include "TestScene.h"
+#include "GameScene.h"
 
 int main (int argc, char* argv[]) {
     Game::GetInstance(WINDOW_TITLE, WINDOW_SIZE, GAME_RESOLUTION);
@@ -10,7 +11,7 @@ int main (int argc, char* argv[]) {
     // Game::GetInstance().Run();
 
     // add and run the game states here
-    Game::GetInstance().AddState(new TestScene5());
+    Game::GetInstance().AddState(new S1());
     Game::GetInstance().Run();
 
     Game::DeleteInstance();

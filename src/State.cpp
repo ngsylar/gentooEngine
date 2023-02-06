@@ -7,13 +7,14 @@ State::State () {
     awake = false;
     popRequested = false;
     quitRequested = false;
-    
+
     //FPS Counter
     Text * FPSText = new Text(FPSObj, " ", FONT_LED, 24, Text::SHADED, Color("#00FF00").ColorSDL());
     CameraFollower* FPSFollow = new CameraFollower(FPSObj);
     FPSFollow->offset = Vec2(20,20);
     FPSObj.AddComponent(FPSText);
     FPSObj.AddComponent(FPSFollow);
+    stateMusic = nullptr;
 }
 
 State::~State () {
@@ -44,6 +45,8 @@ void State::UpdateBase (float dt) {
     InputManager& input = InputManager::GetInstance();
     Camera::pos -= Camera::masterOffset;
     stateDt = dt;
+
+    fpsLimiter.Update(dt);
     
     if (input.QuitRequested()) {
         quitRequested = true;
@@ -55,10 +58,8 @@ void State::UpdateBase (float dt) {
         debugMode = not debugMode;
 
     Update(dt);
-
     for (int i=0; i < (int)objectArray.size(); i++)
         objectArray[i]->Update(dt);
-
     DetectCollisions();
 
     for (int i=(int)objectArray.size()-1; i >= 0; i--)
@@ -73,8 +74,11 @@ void State::UpdateBase (float dt) {
     
     // FPS Counter
     if (Game::GetInstance().GetCurrentState().Debugging()) {
-        Text* UpdateFPS =(Text*)FPSObj.GetComponent(ComponentType::_Text);
-        UpdateFPS->SetText(std::to_string((int)(1/dt))+" FPS");
+        if(fpsLimiter.IsOver()){
+            Text* UpdateFPS =(Text*)FPSObj.GetComponent(ComponentType::_Text);
+            UpdateFPS->SetText(std::to_string((int)(1/dt))+" FPS");
+            fpsLimiter.Reset();
+        }
         FPSObj.LateUpdate(0);
     }
 }
@@ -165,6 +169,18 @@ void State::ScheduleSort() {
     scheduleSortingLayer = true;
 }
 
+void State::RequestPop() {
+    popRequested = true;
+}
+
+void State::FadeIn() {
+    //Scene FadeIn
+    GameObject* FadeObj = new GameObject(LayerDistance::_ForeGround_VeryClose);
+    ScreenFade* Fade = new ScreenFade(*FadeObj, Color("#000000"),1, 0, STATE_FADE_TIME, true);
+    FadeObj->AddComponent(Fade);
+    AddObject(FadeObj);
+}
+
 void State::DetectCollisions () {
     bool thereIsCollision;
 
@@ -206,4 +222,8 @@ bool State::PopRequested () {
 
 bool State::QuitRequested () {
     return quitRequested;
+}
+
+Music* State::GetStateMusic () {
+    return stateMusic;
 }

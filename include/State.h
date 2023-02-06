@@ -2,6 +2,7 @@
 #define STATE_H
 
 #include "GameObject.h"
+#include "Timer.h"
 
 class State {
     protected:
@@ -10,6 +11,8 @@ class State {
         std::vector<std::weak_ptr<GameObject>> renderingArray;
         bool scheduleSortingLayer;
         GameObject FPSObj;
+        Timer fpsLimiter;
+        Music* stateMusic;
     
     public:
         float stateDt;
@@ -31,10 +34,13 @@ class State {
         virtual std::weak_ptr<GameObject> GetObjectPtr(GameObject* object);
         virtual std::weak_ptr<GameObject> GetObjectPtr(std::string label);
         void ScheduleSort();
+        void RequestPop();
+        void FadeIn();
         void DetectCollisions();
         bool Debugging();
         bool PopRequested();
         bool QuitRequested();
+        Music* GetStateMusic();
 };
 
 #endif

@@ -7,6 +7,7 @@ Text::Text (
 ): Component(associated) {
     texture = nullptr;
     font = nullptr;
+    offset = Vec2(0,0);
 
     fontFileName = fontFile;
     this->fontSize = fontSize;
@@ -19,8 +20,10 @@ Text::Text (
     flicker = true;
 
     this->text = text;
-    RemakeTexture();
     type = ComponentType::_Text;
+    alignment = Align::RIGHT;
+    wrap = 0; //Auto-wrap on \n characters
+    RemakeTexture();
 }
 
 Text::~Text () {
@@ -34,6 +37,10 @@ void Text::SetFontFile (std::string fontFileName) {
 
 void Text::SetFontSize (int fontSize) {
     this->fontSize = fontSize;
+}
+
+void Text::SetOffset (Vec2 offset) {
+    this->offset = offset;
     RemakeTexture();
 }
 
@@ -51,6 +58,15 @@ void Text::SetText (std::string text) {
     this->text = text;
     RemakeTexture();
 }
+void Text::SetWrap (int wrap) {
+    this->wrap = wrap;
+    RemakeTexture();
+}
+
+void Text::SetAlignment (Align alignment) {
+    this->alignment = alignment;
+    RemakeTexture();
+}
 
 void Text::RemakeTexture () {
     SDL_DestroyTexture(texture);
@@ -60,15 +76,17 @@ void Text::RemakeTexture () {
     if (font == nullptr) {
         return;
     }
+    TTF_SetFontWrappedAlign(font.get(), alignment);
+
     switch (style) {
         case SOLID:
-            surface = TTF_RenderText_Solid(font.get(), text.c_str(), color);
+            surface = TTF_RenderUTF8_Solid_Wrapped(font.get(), text.c_str(), color, wrap);
             break;
         case SHADED:
-            surface = TTF_RenderText_Shaded(font.get(), text.c_str(), color, TEXT_COLOR_BLACK);
+            surface = TTF_RenderUTF8_Shaded_Wrapped(font.get(), text.c_str(), color, TEXT_COLOR_BLACK, wrap);
             break;
         case BLENDED:
-            surface = TTF_RenderText_Blended(font.get(), text.c_str(), color);
+            surface = TTF_RenderUTF8_Blended_Wrapped(font.get(), text.c_str(), color, wrap);
             break;
         default: break;
     }
@@ -84,7 +102,8 @@ void Text::RemakeTexture () {
         return;
     }
 
-    associated.box.SetSize(surface->w, surface->h);
+    width = surface->w;
+    height = surface->h;
     SDL_FreeSurface(surface);
 }
 
@@ -115,10 +134,10 @@ void Text::Render () {
     if (texture == nullptr)
         return;
 
-    int x = (int)associated.box.x - Camera::pos.x;
-    int y = (int)associated.box.y - Camera::pos.y;
-    int w = (int)associated.box.w;
-    int h = (int)associated.box.h;
+    int x = (int)associated.box.x - Camera::pos.x + offset.x;
+    int y = (int)associated.box.y - Camera::pos.y + offset.y;
+    int w = width;
+    int h = height;
 
     SDL_Rect clipRect = SDL_Rect{0, 0, w, h};
     SDL_Rect destRect = SDL_Rect{x, y, w, h};

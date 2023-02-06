@@ -17,7 +17,11 @@
 class Text: public Component {
     public:
         enum Style {SOLID, SHADED, BLENDED};
-    
+        enum Align {
+            RIGHT = TTF_WRAPPED_ALIGN_RIGHT,
+            CENTER = TTF_WRAPPED_ALIGN_CENTER,
+            LEFT = TTF_WRAPPED_ALIGN_LEFT,
+        };
         Text(
             GameObject& associated,
             std::string text,
@@ -34,6 +38,9 @@ class Text: public Component {
         void SetStyle(Style style);
         void SetColor(SDL_Color color);
         void SetText(std::string text);
+        void SetOffset(Vec2 offset);
+        void SetAlignment(Align alignment);
+        void SetWrap(int wrap);
         void SetFlickTime(float displayTime, float concealTime);
         void Start();
         void Update(float dt);
@@ -42,6 +49,9 @@ class Text: public Component {
         bool Is(ComponentType type);
 
     private:
+        Align alignment;
+        Vec2 offset;
+        int width, height, wrap;
         std::shared_ptr<TTF_Font> font;
         SDL_Texture* texture;
         std::string fontFileName;

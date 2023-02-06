@@ -1,9 +1,10 @@
 #include "GentooEngine.h"
+#include "MathTools.h"
 
-ScreenFade::ScreenFade(GameObject& associated, Color filterColor, float start, float finish, float time)
+ScreenFade::ScreenFade(GameObject& associated, Color filterColor, float start, float finish, float time, bool selfDestruct)
 : Component(associated), _FadeFilter(associated, filterColor) {
     type = ComponentType::_ScreenFade;
-
+    selfDestructible = selfDestruct;
     _StartPercent = start;
     _CurrPercent = start;
     _FinishPercent = finish;
@@ -38,9 +39,15 @@ bool ScreenFade::Is(std::string type) {
 bool ScreenFade::Is(ComponentType type) {
     return (this->type & type);
 }
+bool ScreenFade::HasFinished() {
+    return _Finished;
+}
 
 void ScreenFade::Render(){
     _FadeFilter.Render();
+    if(selfDestructible and _Finished) {
+        associated.RequestDelete();
+    }
 }
 
 void ScreenFade::Update(float Dt) {
@@ -53,7 +60,7 @@ void ScreenFade::Update(float Dt) {
             _CurrPercent = _FinishPercent;
             _Finished = true;
         }
-        _FadeFilter.filterColor.A = 255 - 255*_CurrPercent;
+        _FadeFilter.filterColor.A = 255 - 255*SmootherStep(0.0f, 1.0f, _CurrPercent);
         _FadeFilter.Update(Dt);
     }
 }

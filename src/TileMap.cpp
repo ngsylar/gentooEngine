@@ -1,12 +1,12 @@
 #include "GentooEngine.h"
 
 TileMap::TileMap (
-    GameObject& associated, TileSet* tileSet, std::string file, float parallaxFactor
+    GameObject& associated, TileSet* tileSet, std::string file, float parallaxFactor, bool loadAsRaw
 ): Component(associated) {
 
     this->tileSet = tileSet;
     associated.box.SetSize(tileSet->GetTileWidth(), tileSet->GetTileHeight());
-    Load(file);
+    loadAsRaw ? LoadRaw(file) : Load(file);
     this->parallaxFactor = parallaxFactor;
     associated.label = "TileMap";
     type = ComponentType::_TileMap;
@@ -45,6 +45,36 @@ void TileMap::Load (std::string fileName) {
     _tileMatrix = Map;
 }
 
+void TileMap::LoadRaw(std::string fileName) {
+    std::ifstream TextMap(fileName+".txt");//todo change to .csv
+    if(!TextMap.is_open())
+    {
+        SDL_Log("Unable to open file: %s", fileName.c_str());
+        return;
+    }
+    std::string Entry;//Will collect the inputs for interpretation and storage
+    std::vector<std::vector<int>> Map;
+    while(!TextMap.eof()) {
+        std::getline(TextMap, Entry, '\n');
+        std::stringstream Line(Entry);
+        std::vector<int> LineVec;
+        for (int i; Line >> i;) {
+            LineVec.push_back(i+1);    
+            if (Line.peek() == ',' or Line.peek() == '\n') {
+                Line.ignore();
+            }
+        }
+        if (TextMap.eof()) {
+            break;
+        }
+        Map.emplace_back(LineVec);
+    }
+    mapWidth = (int) Map[0].size();
+    mapHeight = (int) Map.size();
+    TextMap.close();
+    _tileMatrix = Map;
+}
+
 void TileMap::LoadCollision(std::string fileName){
     
     int HashResult = Hash(_tileMatrix);
@@ -65,7 +95,7 @@ void TileMap::LoadCollision(std::string fileName){
     }
 
     for(int i = 0; i < (int)Block.size(); i++) {
-        GameObject* ColliderObj = new GameObject(2);
+        GameObject* ColliderObj = new GameObject(LayerDistance::_ForeGround_VeryClose);
         Collider *TileCollider = new Collider(*ColliderObj);
         ColliderObj->AddComponent(TileCollider);
         ColliderObj->SignalTerrain();

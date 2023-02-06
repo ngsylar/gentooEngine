@@ -9,6 +9,6 @@ void Attack::Start () {}
 
 void Attack::Update (float dt) {}
 
-void Attack::Awaken () {}
+// void Attack::Awaken () {}
 
 void Attack::NotifyCollision (GameObject& other) {}

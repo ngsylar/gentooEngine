@@ -15,8 +15,8 @@ void Music::Open (std::string file) {
     music = Resources::GetMusic(file);
 }
 
-void Music::Play (int times) {
-    if (Mix_PlayMusic(music.get(), times) == MUSIC_ERROR_PLAY)
+void Music::Play (int times, int fadeIn) {
+    if (Mix_FadeInMusic(music.get(), times, fadeIn) == MUSIC_ERROR_PLAY)
         SDL_Log("Mix_PlayMusic: %s", SDL_GetError());
 }
 

@@ -1,7 +1,7 @@
 #include "Rbody.h"
 
 #define GRAVITY 10
-#define LIMITSPD 300
+#define LIMITSPD 400
 
 RBody::RBody(GameObject& associated)
 : Component(associated), 
@@ -62,31 +62,32 @@ bool RBody::Is(std::string type){
 
 #define REPULSION_FACTOR 1e-4
 void RBody::NotifyCollision(GameObject& other) {
-    Collider* A = (Collider*)associated.GetComponent(ComponentType::_Collider);
-    Collider* B = (Collider*)other.GetComponent(ComponentType::_Collider);
-    Rect intersection = A->box.GetIntersection(B->box);
-    
-    if (intersection.h>intersection.w) {
-        //hit left or right
-            left = intersection.x>A->box.x;
-            right = !left;
-            associated.box.x += (intersection.w + REPULSION_FACTOR)*(left?(-1):1);
-            SetSpeedOnX(0);
-    } else {
-        if(intersection.y > A->box.y)
-        {
-            //hit floor
-            down = true;
-            ResetGravity();
-            SetSpeedOnY(0);
-            associated.box.y-= intersection.h + REPULSION_FACTOR;
+    if(other.Contains(ComponentType::_Terrain)) {
+        Collider* A = (Collider*)associated.GetComponent(ComponentType::_Collider);
+        Collider* B = (Collider*)other.GetComponent(ComponentType::_Collider);
+        Rect intersection = A->box.GetIntersection(B->box);
+        if (intersection.h>intersection.w or (intersection.w < 3.0f and intersection.h < 2.0f)) {
+            //hit left or right
+                left = intersection.x>A->box.x;
+                right = !left;
+                associated.box.x += (intersection.w + REPULSION_FACTOR)*(left?(-1):1);
+                SetSpeedOnX(0);
         } else {
-            //hit top
-            up = true;
-            associated.box.y += (intersection.h + REPULSION_FACTOR);
+            if(intersection.y > A->box.y)
+            {
+                //hit floor
+                down = true;
+                ResetGravity();
+                SetSpeedOnY(0);
+                associated.box.y-= intersection.h + REPULSION_FACTOR;
+            } else {
+                //hit top
+                up = true;
+                associated.box.y += (intersection.h + REPULSION_FACTOR);
+            }
         }
+        A->Update(0);
     }
-    A->Update(0);
 }
 
 void RBody::NotifyNoCollision(GameObject& other) {

@@ -1,9 +1,11 @@
 #include "GentooEngine.h"
+#include "ZoneTransition.h"
 
 Game* Game::instance = nullptr;
 
 Game::Game (std::string title, int width, int height, int logicalWidth, int logicalHeight) {
     int flags, opaudio;
+    noVSync = false;
 
     // Game instance
     if (instance != nullptr) {
@@ -15,7 +17,7 @@ Game::Game (std::string title, int width, int height, int logicalWidth, int logi
     this->height = height;
 
     // SDL
-    flags = SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_TIMER;
+    flags = SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER;
     if (SDL_Init(flags) != GAME_SUCCESS) {
         SDL_Log("SDL_Init: %s", SDL_GetError());
     } else SDL_Log("SDL_Init: OK");
@@ -49,7 +51,7 @@ Game::Game (std::string title, int width, int height, int logicalWidth, int logi
     window = SDL_CreateWindow(
         this->title.c_str(),
         SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-        this->width, this->height, WINDOW_FLAGS| SDL_WINDOW_MAXIMIZED// | SDL_WINDOW_BORDERLESS
+        this->width, this->height, WINDOW_FLAGS| SDL_WINDOW_MAXIMIZED //| SDL_WINDOW_BORDERLESS
     );
     if (window == nullptr) {
         SDL_Log("Unable to create window: %s", SDL_GetError());
@@ -62,6 +64,10 @@ Game::Game (std::string title, int width, int height, int logicalWidth, int logi
     );
     if (renderer == nullptr) {
         SDL_Log("Unable to start renderer: %s", SDL_GetError());
+    }
+
+    if (SDL_RenderSetVSync(renderer,1) != 0) {
+        noVSync = true;
     }
 
     // resolution
@@ -85,6 +91,12 @@ Game::~Game () {
         stateStack.pop();
     Resources::ClearAll();
 
+    Music* stateMusic = ZoneManager::GetCarriedMusic();
+    if(stateMusic != nullptr) {
+        stateMusic->Stop();
+        delete stateMusic;
+    }
+
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     Mix_CloseAudio();
@@ -100,6 +112,7 @@ void Game::CalculateDeltaTime () {
     int frameCurrent = SDL_GetTicks();
     dt = (float)(frameCurrent - frameStart) / 1000.0f;
     frameStart = frameCurrent;
+    dt>0.05?dt=0.05:dt;
 }
 
 float Game::GetDeltaTime () {
@@ -172,7 +185,10 @@ void Game::Run () {
             break;
 
         SDL_RenderPresent(renderer);
-        SDL_Delay(FpsToMs(60));
+        
+        if(noVSync) {
+            SDL_Delay(FpsToMs(60));
+        }
     }
 }
 
