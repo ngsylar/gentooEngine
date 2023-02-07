@@ -13,8 +13,8 @@ class Component;
 class GameObject {
     private:
         std::vector<std::unique_ptr<Component>> components;
-        bool awake, isDead;
         ComponentType contains;
+        bool awake, isDead;
 
     public:
         bool enabled;
@@ -41,14 +41,18 @@ class GameObject {
         void NotifyCollision(GameObject& other);
         void NotifyNoCollision(GameObject& other);
         
-        // sylar's extra layer rendering
         static bool CompareLayers(
             std::weak_ptr<GameObject>& goA,
             std::weak_ptr<GameObject>& goB
         );
 
-        //Magnific gambiarra
+        // Magnific gambiarra
         void SignalTerrain();
+
+        // melius colliders' pixel correction
+        // note: if pcf0 is true then apply (collider->box.x - 1)
+        //       if pcf1 is true then pcf1 is inverted
+        int pixelColliderFix0, pixelColliderFix1;
 };
 
 #endif

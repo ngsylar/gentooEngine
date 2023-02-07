@@ -21,6 +21,7 @@ class EntityMachine: public Component {
         bool HasState(EntityState compare);
         bool FormatState(EntityState newState, int argsc=0, float argsv[]=nullptr);
         EntityState GetCurrentState();
+        bool SpriteIsFlipped();
 
         // Inheritance
         virtual void Awaken();

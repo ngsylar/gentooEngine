@@ -84,6 +84,13 @@ void Attack::Update (float dt) {
             associated.enabled = false;
         }
     }
+    // melius colliders' pixel correction
+    associated.pixelColliderFix0 = (
+        usingExternalAssociated and
+        (not externalAssociated.expired()) and
+        (externalAssociated.lock()->pixelColliderFix0 ^
+        externalAssociated.lock()->pixelColliderFix1)
+    );
 }
 
 void Attack::UpdateAttack (float dt) {}

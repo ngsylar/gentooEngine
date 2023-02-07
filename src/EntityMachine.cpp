@@ -64,6 +64,9 @@ void EntityMachine::Update (float dt) {
 
     if (state != previousState)
         sprites[state].get()->SetFrame(0);
+
+    // melius colliders' pixel correction
+    associated.pixelColliderFix0 = (textureFlip ^ SDL_FLIP_HORIZONTAL)? 0 : 1;
 }
 
 void EntityMachine::LateUpdate (float dt) {
@@ -97,6 +100,10 @@ bool EntityMachine::NewStateRule (EntityState newState, int argsc, float argsv[]
 void EntityMachine::FlipSprite (Sprite::Axis axis) {
     SDL_RendererFlip flip = (axis == Sprite::HORIZONTAL) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_VERTICAL;
     textureFlip = SDL_RendererFlip(textureFlip ^ flip);
+}
+
+bool EntityMachine::SpriteIsFlipped () {
+    return ((textureFlip & SDL_FLIP_HORIZONTAL)? true : false);
 }
 
 void EntityMachine::NotifyCollision (GameObject& other) {}

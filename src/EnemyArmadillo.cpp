@@ -12,7 +12,7 @@
 #define ATTACK_DAMAGE       1
 
 #define COLLIDER_POSITION   0.0f, 14.0f
-#define COLLIDER_BOX_SIZE   29.0f, 19.0f
+#define COLLIDER_BOX_SIZE   21.0f, 19.0f
 
 EnemyArmadillo::EnemyArmadillo (GameObject& associated): EntityMachine(associated) {
     type = type | ComponentType::_EnemyArmadillo;

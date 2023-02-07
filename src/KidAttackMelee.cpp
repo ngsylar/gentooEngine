@@ -3,7 +3,7 @@
 
 #define COLLIDER_OFFSET_X       24.0f
 #define COLLIDER_OFFSET_Y       6.0f
-#define COLLIDER_SIZE           26.0f, 44.0f
+#define COLLIDER_SIZE           24.0f, 44.0f
 
 #define CAMERA_SHAKE_COUNT      6
 #define CAMERA_SHAKE_RANGE      3

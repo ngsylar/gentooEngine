@@ -80,27 +80,16 @@ void State::UpdateBase (float dt) {
 }
 
 void State::RenderBase () {
-    // sylar's extra layer rendering
     for (int i=(int)renderingArray.size()-1; i >= 0; i--) {
         if (renderingArray[i].expired())
             renderingArray.erase(renderingArray.begin()+i);
     }
-
     Render();
 
-    // // idj's original object rendering
-    // for (int i=0; i < (int)objectArray.size(); i++) {
-    //     objectArray[i]->Render();
-    // }
-
-    // sylar's extra layer rendering
     if (scheduleSortingLayer) {
         std::sort(renderingArray.begin(), renderingArray.end(), GameObject::CompareLayers);
         scheduleSortingLayer = false;
-    }
-    
-    // sylar's extra layer rendering
-    for (int i=0; i < (int)renderingArray.size(); i++) {
+    } for (int i=0; i < (int)renderingArray.size(); i++) {
         renderingArray[i].lock()->Render();
     }
 

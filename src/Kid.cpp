@@ -9,10 +9,10 @@
 #define SPRITE_FALL                             "assets/img/kid/fall.png"
 // #define SPRITE_LAND                             "assets/img/kid/land.png"
 // #define SPRITE_DAMAGE                           "assets/img/kid/land.png"
-#define SPRITE_ATTACK_MELEEGROUND1              "assets/img/kid/attackmeleeground1.png"
-// #define SPRITE_ATTACK_MELEEGROUND1END           "assets/img/kid/attackmeleeground1end.png"
-// #define SPRITE_ATTACK_MELEEGROUND2              "assets/img/kid/attackmeleeground2.png"
-// #define SPRITE_ATTACK_MELEEGROUND2END           "assets/img/kid/attackmeleeground2end.png"
+#define SPRITE_ATTACK_MELEEGROUND0              "assets/img/kid/attackmeleeground1.png"
+// #define SPRITE_ATTACK_MELEEGROUND0END           "assets/img/kid/attackmeleeground1end.png"
+// #define SPRITE_ATTACK_MELEEGROUND1              "assets/img/kid/attackmeleeground2.png"
+// #define SPRITE_ATTACK_MELEEGROUND1END           "assets/img/kid/attackmeleeground2end.png"
 
 #define SPRITE_IDLE_FRAMES                      6, 0.1f
 // #define SPRITE_WALK_FRAMES                      1, 0.1f
@@ -22,10 +22,10 @@
 #define SPRITE_FALL_FRAMES                      3, 0.1f
 // #define SPRITE_LAND_FRAMES                      3, 0.1f
 // #define SPRITE_DAMAGE_FRAMES                    1, 0.1f
-#define SPRITE_ATTACK_MELEEGROUND1_FRAMES       6, 0.1f
+#define SPRITE_ATTACK_MELEEGROUND0_FRAMES       6, 0.1f
+// #define SPRITE_ATTACK_MELEEGROUND0END_FRAMES    1, 0.1f
+// #define SPRITE_ATTACK_MELEEGROUND1_FRAMES       1, 0.1f
 // #define SPRITE_ATTACK_MELEEGROUND1END_FRAMES    1, 0.1f
-// #define SPRITE_ATTACK_MELEEGROUND2_FRAMES       1, 0.1f
-// #define SPRITE_ATTACK_MELEEGROUND2END_FRAMES    1, 0.1f
 
 #define ACCELERATION_RUN                        800.0f
 #define SPEED_RUN                               120.0f
@@ -80,6 +80,8 @@ Kid::Kid (GameObject& associated): EntityMachine(associated) {
     isGrounded = false;
     hitCeiling = false;
     hitWall = false;
+
+    associated.pixelColliderFix1 = true;
 }
 
 void Kid::Awaken () {
@@ -89,14 +91,14 @@ void Kid::Awaken () {
     Sprite* spriteFall = new Sprite(associated, SPRITE_FALL, SPRITE_FALL_FRAMES, SPRITE_ONESHOT_TRUE);
     Sprite* spriteDamage = new Sprite(associated, SPRITE_IDLE, SPRITE_IDLE_FRAMES);
     Sprite* spriteAttackSwordOnGround = new Sprite(
-        associated, SPRITE_ATTACK_MELEEGROUND1, SPRITE_ATTACK_MELEEGROUND1_FRAMES, SPRITE_ONESHOT_TRUE);
+        associated, SPRITE_ATTACK_MELEEGROUND0, SPRITE_ATTACK_MELEEGROUND0_FRAMES, SPRITE_ONESHOT_TRUE);
 
     AddSpriteState(EntityState::Idle, spriteIdle);
     AddSpriteState(EntityState::Running, spriteRun);
     AddSpriteState(EntityState::Jumping, spriteJump);
     AddSpriteState(EntityState::Falling, spriteFall);
     AddSpriteState(EntityState::Injured, spriteDamage);
-    AddSpriteState(EntityState::AttackingSwordOnGround, spriteAttackSwordOnGround);
+    AddSpriteState(EntityState::AttackingSwordOnGround_0, spriteAttackSwordOnGround);
 
     rigidBody = new RigidBody(associated);
     associated.AddComponent(rigidBody);
@@ -167,7 +169,7 @@ void Kid::UpdateEntity (float dt) {
 
             // start melee attack on ground
             if (input.KeyPress(Key::attack)) {
-                FormatState(EntityState::AttackingSwordOnGround);
+                FormatState(EntityState::AttackingSwordOnGround_0);
                 break;
             }
             // start jump
@@ -192,7 +194,7 @@ void Kid::UpdateEntity (float dt) {
             }
             // start melee attack on ground
             if (input.KeyPress(Key::attack)) {
-                FormatState(EntityState::AttackingSwordOnGround);
+                FormatState(EntityState::AttackingSwordOnGround_0);
                 break;
             }
             // start jump
@@ -224,7 +226,7 @@ void Kid::UpdateEntity (float dt) {
             rigidBody->SetSpeedOnX(SPEED_ONAIR * directionX);
             break;
         
-        case EntityState::AttackingSwordOnGround:
+        case EntityState::AttackingSwordOnGround_0:
             if ((not attackImpulseCancel) and
             (fabs(associated.box.x - swordAttackOnGround->originPositionX) >= IMPULSE_ATTACK_SWORD_X)) {
                 rigidBody->SetSpeedOnX(0.0f);
@@ -258,7 +260,7 @@ bool Kid::NewStateRule (EntityState newState, int argsc, float argsv[]) {
         return false;
     
     switch (state) {
-        case EntityState::AttackingSwordOnGround:
+        case EntityState::AttackingSwordOnGround_0:
             attackImpulseCancel = false;
             attackPerforming = false;
             break;
@@ -283,7 +285,7 @@ bool Kid::NewStateRule (EntityState newState, int argsc, float argsv[]) {
             collider->SetBox(Vec2(COLLIDER_POSITION_ONAIR), Vec2(COLLIDER_BOX_SIZE));
             return true;
 
-        case EntityState::AttackingSwordOnGround:
+        case EntityState::AttackingSwordOnGround_0:
             swordAttackOnGround->direction = (lastDirectionX == 1)?
                 KidAttackMelee::RIGHT : KidAttackMelee::LEFT;
             swordAttackOnGround->Perform(associated.box.x);
@@ -330,7 +332,7 @@ void Kid::NotifyCollision (GameObject& other) {
                 hitCeiling = true;
             break;
 
-        case EntityState::AttackingSwordOnGround:
+        case EntityState::AttackingSwordOnGround_0:
             if (rigidBody->ImpactLeft() or rigidBody->ImpactRight()) {
                 rigidBody->SetSpeedOnX(0.0f);
                 attackImpulseCancel = true;

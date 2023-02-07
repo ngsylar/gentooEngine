@@ -28,6 +28,10 @@ void Collider::Update (float dt) {
     if (associated.angleDeg)
         offsetDifference = offsetDifference.Rotate(Deg2Rad(associated.angleDeg));
     box.SetPosition(associated.box.GetPosition() + offsetDifference);
+
+    // melius colliders' pixel correction
+    if (associated.pixelColliderFix0 ^ associated.pixelColliderFix1)
+        box.x -= 1.0f;
 }
 
 void Collider::LateUpdate (float dt) {

@@ -9,13 +9,16 @@ GameObject::GameObject (int layer, std::string label) {
 
     this->label = label;
     this->layer = layer;
+
+    // melius colliders' pixel correction
+    pixelColliderFix0 = 0;
+    pixelColliderFix1 = 0;
 }
 
 GameObject::~GameObject () {
     components.clear();
 }
 
-// sylar's extra layer rendering
 bool GameObject::CompareLayers (
     std::weak_ptr<GameObject>& goA,
     std::weak_ptr<GameObject>& goB
