@@ -27,10 +27,12 @@ EnemyArmadillo::EnemyArmadillo (GameObject& associated): EntityMachine(associate
 void EnemyArmadillo::Awaken () {
     Sprite* spriteRun = new Sprite(associated, SPRITE_RUN);
     Sprite* spriteDamage = new Sprite(associated, SPRITE_RUN);
+    Sprite* spriteFall = new Sprite(associated, SPRITE_RUN);
     Sprite* spriteDie = new Sprite(associated, SPRITE_RUN);
 
     AddSpriteState(EntityState::Running, spriteRun);
     AddSpriteState(EntityState::Injured, spriteDamage);
+    AddSpriteState(EntityState::Falling, spriteFall);
     AddSpriteState(EntityState::Dying, spriteDie);
 
     rigidBody = new RigidBody(associated);
@@ -73,7 +75,7 @@ void EnemyArmadillo::UpdateEntity (float dt) {
 
         case EntityState::Injured:
             if (fabs(associated.box.x - damageOriginX) >= damageImpulse)
-                FormatState(EntityState::Running);
+                FormatState(EntityState::Falling);
             break;
 
         case EntityState::Dying:
@@ -105,6 +107,10 @@ bool EnemyArmadillo::NewStateRule (EntityState newState, int argsc, float argsv[
             hp -= argsv[Attack::_Damage];
             return true;
 
+        case EntityState::Falling:
+            rigidBody->SetSpeedOnX(rigidBody->GetSpeed().x * 0.4f);
+            return true;
+
         default: return true;
     }
 }
@@ -113,13 +119,15 @@ void EnemyArmadillo::NotifyCollision (GameObject& other) {
     rigidBody->NotifyCollision(other);
 
     if (rigidBody->ImpactDown() and (other.label == "Ground")) {
+        if (state == EntityState::Falling)
+            FormatState(EntityState::Running);
         Collider* groundCollider = (Collider*)other.GetComponent(ComponentType::_Collider);
         currentRoute = Vec2(groundCollider->box.x, groundCollider->box.x+groundCollider->box.w);
         isGrounded = true;
     }
     if (rigidBody->ImpactLeft() or rigidBody->ImpactRight()) {
-        hitWall = true;
         if (state == EntityState::Injured)
             FormatState(EntityState::Running);
+        hitWall = true;
     }
 }
