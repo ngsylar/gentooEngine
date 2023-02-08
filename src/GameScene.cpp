@@ -556,7 +556,7 @@ U4::U4() {
     
     BgObj = new GameObject(LayerDistance::_ForeGround_Close);
     Bg1 = new Sprite(*BgObj,U4_17);
-    Bg1->parallaxFactor = Vec2(1.8,1);
+    // Bg1->parallaxFactor = Vec2(1,1);
     BgObj->AddComponent(Bg1);
     AddObject(BgObj);
     BgObj->box.SetPurePosition(0,0);
@@ -564,7 +564,7 @@ U4::U4() {
     
     BgObj = new GameObject(LayerDistance::_ForeGround_Close);
     Bg1 = new Sprite(*BgObj,U4_17_2);
-    Bg1->parallaxFactor = Vec2(1.8,1);
+    // Bg1->parallaxFactor = Vec2(1.05,1);
     BgObj->AddComponent(Bg1);
     AddObject(BgObj);
     BgObj->box.SetPurePosition(0,0);

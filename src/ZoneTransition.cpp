@@ -49,7 +49,8 @@ void ZoneTransition::NotifyCollision (GameObject& other){
 
 //########################################
 
-Vec2 ZoneManager::spawnPosition = Vec2(13, 18);//1st map initial position
+// Vec2 ZoneManager::spawnPosition = Vec2(13, 18);//1st map initial position
+Vec2 ZoneManager::spawnPosition = Vec2(11, 15);//U3 close to U4
 Music* ZoneManager::levelMusic = nullptr;
 
 ZoneManager::ZoneManager() {

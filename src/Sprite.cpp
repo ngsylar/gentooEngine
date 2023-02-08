@@ -159,8 +159,8 @@ void Sprite::Update (float dt) {
 void Sprite::Render () {
     if (positionArray.empty())
         Render(
-            (int)associated.box.x - Camera::pos.x,
-            (int)associated.box.y - Camera::pos.y
+            (int)associated.box.x - (parallaxFactor.x * Camera::pos.x),
+            (int)associated.box.y - (parallaxFactor.y * Camera::pos.y)
         );
     else for (int i=0; i < (int)positionArray.size(); i++)
         Render(
