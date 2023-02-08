@@ -1,6 +1,6 @@
 #include "GentooEngine.h"
 #include "EnemyArmadillo.h"
-#include "Attack.h"
+#include "AttackGeneric.h"
 
 #define SPRITE_RUN          "assets/img/enemy1.png"
 
@@ -44,7 +44,7 @@ void EnemyArmadillo::Awaken () {
     associated.AddComponent(collider);
     collider->SetBox(Vec2(COLLIDER_POSITION), Vec2(COLLIDER_BOX_SIZE));
 
-    Attack* attack = new Attack(associated);
+    AttackGeneric* attack = new AttackGeneric(associated);
     attack->SetProperties(Vec2(ATTACK_FORCE), ATTACK_IMPULSE, ATTACK_DAMAGE);
     associated.AddComponent(attack);
 }
@@ -101,10 +101,10 @@ bool EnemyArmadillo::NewStateRule (EntityState newState, int argsc, float argsv[
             player = Game::GetInstance().GetCurrentState().GetObjectPtr("Player");
             if (player.expired()) return false;
             damageOriginX = associated.box.x;
-            damageImpulse = argsv[Attack::_Impulse] - IMPULSE_MASS;
+            damageImpulse = argsv[AttackGeneric::_Impulse] - IMPULSE_MASS;
             damageDirectionX = (player.lock()->box.x < associated.box.x)? 1 : -1;
-            rigidBody->SetSpeedOnX(argsv[Attack::_ForceX] * damageDirectionX);
-            hp -= argsv[Attack::_Damage];
+            rigidBody->SetSpeedOnX(argsv[AttackGeneric::_ForceX] * damageDirectionX);
+            hp -= argsv[AttackGeneric::_Damage];
             return true;
 
         case EntityState::Falling:

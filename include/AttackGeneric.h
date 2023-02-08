@@ -1,12 +1,12 @@
-#ifndef ATTACK_H
-#define ATTACK_H
+#ifndef ATTACK_GENERIC_H
+#define ATTACK_GENERIC_H
 
 #include "Component.h"
 #include "Collider.h"
 #include "Sprite.h"
 #include "Timer.h"
 
-class Attack: public Component {
+class AttackGeneric: public Component {
     protected:
         std::weak_ptr<GameObject> externalAssociated;
         bool usingExternalAssociated;
@@ -20,7 +20,7 @@ class Attack: public Component {
         enum Argument {_ForceX, _ForceY, _Impulse, _Damage};
         Timer lifetime;
 
-        Attack(
+        AttackGeneric(
             GameObject& associated,
             GameObject* externalAssociated=nullptr
         );

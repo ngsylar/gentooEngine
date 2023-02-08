@@ -7,11 +7,11 @@
 
 #define CAMERA_SHAKE_COUNT      6
 #define CAMERA_SHAKE_RANGE      3
-#define CAMERA_SHAKE_RESET_TIME 0.03f
+#define CAMERA_SHAKE_RESET_TIME 0.04f
 
 KidAttackMelee::KidAttackMelee (
     GameObject& associated, GameObject* externalAssociated
-): Attack(associated, externalAssociated) {
+): AttackGeneric(associated, externalAssociated) {
     this->externalAssociated = Game::GetInstance().GetCurrentState().GetObjectPtr(externalAssociated);
     this->originPositionX = 0.0f;
     lifetime.SetResetTime(0.16f);

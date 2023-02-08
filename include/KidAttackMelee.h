@@ -2,9 +2,9 @@
 #define KID_ATTACK_MELEE_H
 
 #include "Timer.h"
-#include "Attack.h"
+#include "AttackGeneric.h"
 
-class KidAttackMelee: public Attack {
+class KidAttackMelee: public AttackGeneric {
     private:
         Timer cameraShakeTimer;
         std::queue<Vec2> cameraShakeQueue;

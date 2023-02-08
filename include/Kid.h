@@ -18,6 +18,7 @@ class Kid: public EntityMachine {
 
         // Attack Types
         KidAttackMelee* swordAttackOnGround;
+        Timer hitTimer;
 
         // Automatic Factors
         bool attackPerforming;
@@ -45,6 +46,8 @@ class Kid: public EntityMachine {
         void Start();
         void LateUpdate(float dt);
         void UpdateEntity(float dt);
+        void AttackStart();
+        void AttackUpdate(float dt);
         void NotifyCollision(GameObject& other);
         bool Is(ComponentType type);
 };

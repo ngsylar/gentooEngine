@@ -9,10 +9,10 @@
 #define SPRITE_FALL                             "assets/img/kid/fall.png"
 // #define SPRITE_LAND                             "assets/img/kid/land.png"
 // #define SPRITE_DAMAGE                           "assets/img/kid/land.png"
-#define SPRITE_ATTACK_MELEEGROUND0              "assets/img/kid/attackmeleeground1.png"
-// #define SPRITE_ATTACK_MELEEGROUND0END           "assets/img/kid/attackmeleeground1end.png"
-// #define SPRITE_ATTACK_MELEEGROUND1              "assets/img/kid/attackmeleeground2.png"
-// #define SPRITE_ATTACK_MELEEGROUND1END           "assets/img/kid/attackmeleeground2end.png"
+#define SPRITE_ATTACK_SWORDGROUND0              "assets/img/kid/attackmeleeground1.png"
+// #define SPRITE_ATTACK_SWORDGROUND0END           "assets/img/kid/attackmeleeground1end.png"
+#define SPRITE_ATTACK_SWORDGROUND1              "assets/img/kid/attackmeleeground2.png"
+// #define SPRITE_ATTACK_SWORDGROUND1END           "assets/img/kid/attackmeleeground2end.png"
 
 #define SPRITE_IDLE_FRAMES                      6, 0.1f
 // #define SPRITE_WALK_FRAMES                      1, 0.1f
@@ -22,10 +22,10 @@
 #define SPRITE_FALL_FRAMES                      3, 0.1f
 // #define SPRITE_LAND_FRAMES                      3, 0.1f
 // #define SPRITE_DAMAGE_FRAMES                    1, 0.1f
-#define SPRITE_ATTACK_MELEEGROUND0_FRAMES       6, 0.1f
-// #define SPRITE_ATTACK_MELEEGROUND0END_FRAMES    1, 0.1f
-// #define SPRITE_ATTACK_MELEEGROUND1_FRAMES       1, 0.1f
-// #define SPRITE_ATTACK_MELEEGROUND1END_FRAMES    1, 0.1f
+#define SPRITE_ATTACK_SWORDGROUND0_FRAMES       6, 0.1f
+// #define SPRITE_ATTACK_SWORDGROUND0END_FRAMES    1, 0.1f
+#define SPRITE_ATTACK_SWORDGROUND1_FRAMES       7, 0.1f
+// #define SPRITE_ATTACK_SWORDGROUND1END_FRAMES    1, 0.1f
 
 #define ACCELERATION_RUN                        800.0f
 #define SPEED_RUN                               120.0f
@@ -38,6 +38,8 @@
 #define ATTACK_SWORD_FORCE                      400.0f, 0.0f
 #define ATTACK_SWORD_IMPULSE                    70.0f
 #define ATTACK_SWORD_DAMAGE                     1
+#define ATTACK_SWORD_HITTIME                    0.3f
+#define ATTACK_SWORD_ENDTIME                    0.6f
 
 #define COLLIDER_POSITION_ONGROUND              0.0f, 9.0f
 #define COLLIDER_POSITION_ONAIR                 0.0f, 5.0f
@@ -87,18 +89,21 @@ Kid::Kid (GameObject& associated): EntityMachine(associated) {
 void Kid::Awaken () {
     Sprite* spriteIdle = new Sprite(associated, SPRITE_IDLE, SPRITE_IDLE_FRAMES);
     Sprite* spriteRun = new Sprite(associated, SPRITE_RUN, SPRITE_RUN_FRAMES);
-    Sprite* spriteJump = new Sprite(associated, SPRITE_JUMP, SPRITE_JUMP_FRAMES, SPRITE_ONESHOT_TRUE);
-    Sprite* spriteFall = new Sprite(associated, SPRITE_FALL, SPRITE_FALL_FRAMES, SPRITE_ONESHOT_TRUE);
+    Sprite* spriteJump = new Sprite(associated, SPRITE_JUMP, SPRITE_JUMP_FRAMES, true);
+    Sprite* spriteFall = new Sprite(associated, SPRITE_FALL, SPRITE_FALL_FRAMES, true);
     Sprite* spriteDamage = new Sprite(associated, SPRITE_IDLE, SPRITE_IDLE_FRAMES);
-    Sprite* spriteAttackSwordOnGround = new Sprite(
-        associated, SPRITE_ATTACK_MELEEGROUND0, SPRITE_ATTACK_MELEEGROUND0_FRAMES, SPRITE_ONESHOT_TRUE);
+    Sprite* spriteSwordOnGround0 = new Sprite(
+        associated, SPRITE_ATTACK_SWORDGROUND0, SPRITE_ATTACK_SWORDGROUND0_FRAMES, true);
+    Sprite* spriteSwordOnGround1 = new Sprite(
+        associated, SPRITE_ATTACK_SWORDGROUND1, SPRITE_ATTACK_SWORDGROUND1_FRAMES, true);
 
     AddSpriteState(EntityState::Idle, spriteIdle);
     AddSpriteState(EntityState::Running, spriteRun);
     AddSpriteState(EntityState::Jumping, spriteJump);
     AddSpriteState(EntityState::Falling, spriteFall);
     AddSpriteState(EntityState::Injured, spriteDamage);
-    AddSpriteState(EntityState::AttackingSwordOnGround_0, spriteAttackSwordOnGround);
+    AddSpriteState(EntityState::AttackingSwordOnGround_0, spriteSwordOnGround0);
+    AddSpriteState(EntityState::AttackingSwordOnGround_1, spriteSwordOnGround1);
 
     rigidBody = new RigidBody(associated);
     associated.AddComponent(rigidBody);
@@ -145,13 +150,14 @@ void Kid::UpdateEntity (float dt) {
     int directionX = input.IsKeyDown(Key::moveRight) - input.IsKeyDown(Key::moveLeft);
     bool changeDirectionX = (not attackPerforming) and (directionX != 0) and (directionX != lastDirectionX);
     if (changeDirectionX) lastDirectionX = directionX;
-    
+
     // tolerance before reset run speed
     runSpeedReset = (directionX == 0)? true : false;
     if (runSpeedReset) runSpeedIncrease = 0.0f;
 
     // tolerance before start falling
-    if ((state != EntityState::Falling) and (rigidBody->GetSpeed().y > 100)) {
+    if ((state != EntityState::Falling) and (rigidBody->GetSpeed().y > 100) and 
+    ((not attackPerforming) or (attackPerforming and (hitTimer.GetTime() >= ATTACK_SWORD_HITTIME)))) {
         FormatState(EntityState::Falling);
         isGrounded = false;
     }
@@ -227,14 +233,13 @@ void Kid::UpdateEntity (float dt) {
             break;
         
         case EntityState::AttackingSwordOnGround_0:
-            if ((not attackImpulseCancel) and
-            (fabs(associated.box.x - swordAttackOnGround->originPositionX) >= IMPULSE_ATTACK_SWORD_X)) {
-                rigidBody->SetSpeedOnX(0.0f);
-                attackImpulseCancel = true;
-            }
-            if (sprites[state]->OneshotIsOver())
-                FormatState(EntityState::Idle);
+            AttackUpdate(dt);
+            if ((hitTimer.GetTime() >= ATTACK_SWORD_HITTIME) and input.KeyPress(Key::attack))
+                FormatState(EntityState::AttackingSwordOnGround_1);
+            break;
 
+        case EntityState::AttackingSwordOnGround_1:
+            AttackUpdate(dt);
             break;
         
         case EntityState::Injured:
@@ -264,6 +269,11 @@ bool Kid::NewStateRule (EntityState newState, int argsc, float argsv[]) {
             attackImpulseCancel = false;
             attackPerforming = false;
             break;
+        
+        case EntityState::AttackingSwordOnGround_1:
+            attackImpulseCancel = false;
+            attackPerforming = false;
+            break;
 
         default: break;
     }
@@ -286,33 +296,54 @@ bool Kid::NewStateRule (EntityState newState, int argsc, float argsv[]) {
             return true;
 
         case EntityState::AttackingSwordOnGround_0:
-            swordAttackOnGround->direction = (lastDirectionX == 1)?
-                KidAttackMelee::RIGHT : KidAttackMelee::LEFT;
-            swordAttackOnGround->Perform(associated.box.x);
-            
-            if (runSpeedReset)
-                attackImpulseCancel = true;
-            if (not attackImpulseCancel)
-                rigidBody->SetSpeedOnX(SPEED_ATTACK * lastDirectionX);
-            else rigidBody->SetSpeedOnX(0.0f);
-            
-            attackPerforming = true;
+            AttackStart();
+            return true;
+
+        case EntityState::AttackingSwordOnGround_1:
+            AttackStart();
             return true;
 
         case EntityState::Injured:
             if (isInvincible) return false;
             damageOrigin = collider->box.GetPosition();
-            damageForce = Vec2(-argsv[Attack::_ForceX], -argsv[Attack::_ForceY]);
-            damageImpulse = argsv[Attack::_Impulse];
+            damageForce = Vec2(-argsv[AttackGeneric::_ForceX], -argsv[AttackGeneric::_ForceY]);
+            damageImpulse = argsv[AttackGeneric::_Impulse];
             rigidBody->SetSpeed(Vec2(lastDirectionX * damageForce.x, damageForce.y));
             rigidBody->ResetGravity();
             isInvincible = true;
             rigidBody->triggerLabels.push_back("Enemy");
-            hp -= argsv[Attack::_Damage];
+            hp -= argsv[AttackGeneric::_Damage];
             return true;
 
         default: return true;
     }
+}
+
+void Kid::AttackStart () {
+    swordAttackOnGround->direction = (lastDirectionX == 1)?
+        KidAttackMelee::RIGHT : KidAttackMelee::LEFT;
+    swordAttackOnGround->Perform(associated.box.x);
+    
+    if (runSpeedReset)
+        attackImpulseCancel = true;
+    if (not attackImpulseCancel)
+        rigidBody->SetSpeedOnX(SPEED_ATTACK * lastDirectionX);
+    else rigidBody->SetSpeedOnX(0.0f);
+    
+    attackPerforming = true;
+    hitTimer.Reset();
+}
+
+void Kid::AttackUpdate (float dt) {
+    if ((not attackImpulseCancel) and
+    (fabs(associated.box.x - swordAttackOnGround->originPositionX) >= IMPULSE_ATTACK_SWORD_X)) {
+        rigidBody->SetSpeedOnX(0.0f);
+        attackImpulseCancel = true;
+    }
+    hitTimer.Update(dt);
+    float hitTime = hitTimer.GetTime();
+    if (hitTime >= ATTACK_SWORD_ENDTIME)
+        FormatState(EntityState::Idle);
 }
 
 void Kid::NotifyCollision (GameObject& other) {
@@ -336,8 +367,13 @@ void Kid::NotifyCollision (GameObject& other) {
             if (rigidBody->ImpactLeft() or rigidBody->ImpactRight()) {
                 rigidBody->SetSpeedOnX(0.0f);
                 attackImpulseCancel = true;
-            }
-            break;
+            } break;
+
+        case EntityState::AttackingSwordOnGround_1:
+            if (rigidBody->ImpactLeft() or rigidBody->ImpactRight()) {
+                rigidBody->SetSpeedOnX(0.0f);
+                attackImpulseCancel = true;
+            } break;
 
         case EntityState::Injured:
             // hits a wall
