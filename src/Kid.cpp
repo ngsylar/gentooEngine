@@ -152,8 +152,10 @@ void Kid::UpdateEntity (float dt) {
     if (runSpeedReset) runSpeedIncrease = 0.0f;
 
     // tolerance before start falling
-    if ((state != EntityState::Falling) and (rigidBody->GetSpeed().y > 100) and 
-    ((not attackPerforming) or (attackPerforming and (attackTimer.GetTime() >= ATTACK_SWORD_TIME_HIT)))) {
+    bool isNotFalling = (state != EntityState::Falling) and (state != EntityState::Injured);
+    bool isNotAttacking = (not attackPerforming);
+    bool isAttacking = attackPerforming and (attackTimer.GetTime() >= ATTACK_SWORD_TIME_HIT);
+    if (isNotFalling and (rigidBody->GetSpeed().y > 100) and (isNotAttacking or isAttacking)) {
         FormatState(EntityState::Falling);
         isGrounded = false;
     }
@@ -241,8 +243,17 @@ void Kid::UpdateEntity (float dt) {
         
         case EntityState::Injured:
             if (collider->box.GetPosition().DistanceTo(damageOrigin) > damageImpulse) {
-                rigidBody->SetSpeed(Vec2(lastDirectionX * damageForce.x * 0.5f, damageForce.y));
-                FormatState(EntityState::Falling);
+                if (rigidBody->GetSpeed().y == 0.0f)
+                    rigidBody->ResetGravity();
+
+                jumpSpeedDecrease += FORCE_MASS * 3.8f * dt * (-lastDirectionX);
+                rigidBody->SetSpeed(
+                    Vec2((damageForce.x * lastDirectionX) - jumpSpeedDecrease, rigidBody->GetSpeed().y)
+                );
+                if (std::signbit(rigidBody->GetSpeed().x) == std::signbit(lastDirectionX)) {
+                    rigidBody->SetSpeedOnX(0.0f);
+                    FormatState(EntityState::Falling);
+                }
             }
             if (hitWall) {
                 FormatState(EntityState::Falling);
@@ -270,6 +281,10 @@ bool Kid::NewStateRule (EntityState newState, int argsc, float argsv[]) {
         case EntityState::AttackingSwordOnGround_1:
             attackImpulseCancel = false;
             attackPerforming = false;
+            break;
+
+        case EntityState::Injured:
+            jumpSpeedDecrease = 0.0f;
             break;
 
         default: break;
@@ -301,12 +316,17 @@ bool Kid::NewStateRule (EntityState newState, int argsc, float argsv[]) {
             return true;
 
         case EntityState::Injured:
-            if (isInvincible) return false;
+            if (isInvincible)
+                return false;
+
             damageOrigin = collider->box.GetPosition();
             damageForce = Vec2(-argsv[AttackGeneric::_ForceX], -argsv[AttackGeneric::_ForceY]);
             damageImpulse = argsv[AttackGeneric::_Impulse];
+
+            jumpSpeedDecrease = 0.0f;
             rigidBody->SetSpeed(Vec2(lastDirectionX * damageForce.x, damageForce.y));
             rigidBody->ResetGravity();
+
             isInvincible = true;
             rigidBody->triggerLabels.push_back("Enemy");
             hp -= argsv[AttackGeneric::_Damage];
