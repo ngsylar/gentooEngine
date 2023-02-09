@@ -66,6 +66,7 @@ Kid::Kid (GameObject& associated): EntityMachine(associated) {
     jumpSpeedDecrease = 0.0f;
     attackPerforming = false;
     attackImpulseCancel = false;
+    damagePerforming = false;
     lastDirectionX = 1;
 
     GameObject* attack = new GameObject(LayerDistance::_Player_Front);
@@ -144,7 +145,8 @@ void Kid::UpdateEntity (float dt) {
     }
     // prevent movement when opposite directions are active
     int directionX = input.IsKeyDown(Key::moveRight) - input.IsKeyDown(Key::moveLeft);
-    bool changeDirectionX = (not attackPerforming) and (directionX != 0) and (directionX != lastDirectionX);
+    bool lockedDirection = attackPerforming or damagePerforming;
+    bool changeDirectionX = (not lockedDirection) and (directionX != 0) and (directionX != lastDirectionX);
     if (changeDirectionX) lastDirectionX = directionX;
 
     // tolerance before reset run speed
@@ -153,9 +155,9 @@ void Kid::UpdateEntity (float dt) {
 
     // tolerance before start falling
     bool isNotFalling = (state != EntityState::Falling) and (state != EntityState::Injured);
-    bool isNotAttacking = (not attackPerforming);
-    bool isAttacking = attackPerforming and (attackTimer.GetTime() >= ATTACK_SWORD_TIME_HIT);
-    if (isNotFalling and (rigidBody->GetSpeed().y > 100) and (isNotAttacking or isAttacking)) {
+    bool attackIsOver = attackPerforming and (attackTimer.GetTime() >= ATTACK_SWORD_TIME_HIT);
+    bool isNotAttacking = (not attackPerforming) or attackIsOver;
+    if (isNotFalling and (rigidBody->GetSpeed().y > 100) and isNotAttacking) {
         FormatState(EntityState::Falling);
         isGrounded = false;
     }
@@ -285,6 +287,7 @@ bool Kid::NewStateRule (EntityState newState, int argsc, float argsv[]) {
 
         case EntityState::Injured:
             jumpSpeedDecrease = 0.0f;
+            damagePerforming = false;
             break;
 
         default: break;
@@ -326,6 +329,7 @@ bool Kid::NewStateRule (EntityState newState, int argsc, float argsv[]) {
             jumpSpeedDecrease = 0.0f;
             rigidBody->SetSpeed(Vec2(lastDirectionX * damageForce.x, damageForce.y));
             rigidBody->ResetGravity();
+            damagePerforming = true;
 
             isInvincible = true;
             rigidBody->triggerLabels.push_back("Enemy");

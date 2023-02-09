@@ -163,6 +163,8 @@ void Sprite::Render (int startX, int startY) {
         (destRect.w >> 1) + (int)associated.box.offset.x,
         (destRect.h >> 1) + (int)associated.box.offset.y
     };
+    if (associated.label == "Player")
+        SDL_SetTextureColorMod(texture.get(), 0, 0, 0);
     int rendercpy = SDL_RenderCopyEx(
         Game::GetInstance().GetRenderer(),
         texture.get(), &clipRect, &destRect,
@@ -173,7 +175,7 @@ void Sprite::Render (int startX, int startY) {
     }
 }
 
-void Sprite::RenderWithNoOffset (int startX, int startY) {
+void Sprite::RenderWithoutOffset (int startX, int startY) {
     if (texture == nullptr)
         return;
 

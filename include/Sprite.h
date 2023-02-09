@@ -65,7 +65,7 @@ class Sprite: public Component {
         void Update(float dt);
         void Render();
         void Render(int startX, int startY);
-        void RenderWithNoOffset(int startX, int startY);
+        void RenderWithoutOffset(int startX, int startY);
         bool Is(std::string type);
         bool Is(ComponentType type);
 };

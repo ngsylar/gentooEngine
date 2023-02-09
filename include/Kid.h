@@ -20,7 +20,7 @@ class Kid: public EntityMachine {
         KidAttackMelee* swordAttackOnGround;
 
         // Automatic Factors
-        bool attackPerforming;
+        bool attackPerforming, damagePerforming;
         float runSpeedIncrease, jumpSpeedDecrease;
         bool runSpeedReset, attackImpulseCancel;
         Vec2 damageOrigin, damageForce;
