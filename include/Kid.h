@@ -12,13 +12,12 @@ class Kid: public EntityMachine {
     private:
         RigidBody* rigidBody;
         Collider* collider;
-        Timer jumpTimer, invincibilityTimer;
+        Timer jumpTimer, attackTimer, damageTimer, invincibilityTimer;
         bool isInvincible;
         int hp;
 
         // Attack Types
         KidAttackMelee* swordAttackOnGround;
-        Timer hitTimer;
 
         // Automatic Factors
         bool attackPerforming;

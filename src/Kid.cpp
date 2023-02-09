@@ -8,24 +8,19 @@
 #define SPRITE_JUMP                             "assets/img/kid/jump.png"
 #define SPRITE_FALL                             "assets/img/kid/fall.png"
 // #define SPRITE_LAND                             "assets/img/kid/land.png"
-// #define SPRITE_DAMAGE                           "assets/img/kid/land.png"
+#define SPRITE_DAMAGE                           "assets/img/kid/damage.png"
 #define SPRITE_ATTACK_SWORDGROUND0              "assets/img/kid/attackmeleeground1.png"
-// #define SPRITE_ATTACK_SWORDGROUND0END           "assets/img/kid/attackmeleeground1end.png"
 #define SPRITE_ATTACK_SWORDGROUND1              "assets/img/kid/attackmeleeground2.png"
-// #define SPRITE_ATTACK_SWORDGROUND1END           "assets/img/kid/attackmeleeground2end.png"
 
-#define SPRITE_IDLE_FRAMES                      6, 0.1f
+#define SPRITE_IDLE_FRAMES                      10, 0.1f
 // #define SPRITE_WALK_FRAMES                      1, 0.1f
 #define SPRITE_RUN_FRAMES                       8, 0.075f
 // #define SPRITE_BRAKE_FRAMES                     3, 0.1f
 #define SPRITE_JUMP_FRAMES                      5, 0.1f
 #define SPRITE_FALL_FRAMES                      3, 0.1f
 // #define SPRITE_LAND_FRAMES                      3, 0.1f
-// #define SPRITE_DAMAGE_FRAMES                    1, 0.1f
-#define SPRITE_ATTACK_SWORDGROUND0_FRAMES       6, 0.1f
-// #define SPRITE_ATTACK_SWORDGROUND0END_FRAMES    1, 0.1f
-#define SPRITE_ATTACK_SWORDGROUND1_FRAMES       7, 0.1f
-// #define SPRITE_ATTACK_SWORDGROUND1END_FRAMES    1, 0.1f
+#define SPRITE_ATTACK_SWORDGROUND0_FRAMES       10, 0.1f
+#define SPRITE_ATTACK_SWORDGROUND1_FRAMES       10, 0.1f
 
 #define ACCELERATION_RUN                        800.0f
 #define SPEED_RUN                               120.0f
@@ -36,10 +31,11 @@
 #define IMPULSE_ATTACK_SWORD_X                  40.0f
 
 #define ATTACK_SWORD_FORCE                      400.0f, 0.0f
-#define ATTACK_SWORD_IMPULSE                    70.0f
+#define ATTACK_SWORD_IMPULSE                    50.0f
 #define ATTACK_SWORD_DAMAGE                     1
-#define ATTACK_SWORD_HITTIME                    0.3f
-#define ATTACK_SWORD_ENDTIME                    0.6f
+#define ATTACK_SWORD_TIME_HIT                   0.3f
+#define ATTACK_SWORD_TIME_CANCEL                0.6f
+#define ATTACK_SWORD_TIME_END                   1.0f
 
 #define COLLIDER_POSITION_ONGROUND              0.0f, 9.0f
 #define COLLIDER_POSITION_ONAIR                 0.0f, 5.0f
@@ -91,7 +87,7 @@ void Kid::Awaken () {
     Sprite* spriteRun = new Sprite(associated, SPRITE_RUN, SPRITE_RUN_FRAMES);
     Sprite* spriteJump = new Sprite(associated, SPRITE_JUMP, SPRITE_JUMP_FRAMES, true);
     Sprite* spriteFall = new Sprite(associated, SPRITE_FALL, SPRITE_FALL_FRAMES, true);
-    Sprite* spriteDamage = new Sprite(associated, SPRITE_IDLE, SPRITE_IDLE_FRAMES);
+    Sprite* spriteDamage = new Sprite(associated, SPRITE_DAMAGE);
     Sprite* spriteSwordOnGround0 = new Sprite(
         associated, SPRITE_ATTACK_SWORDGROUND0, SPRITE_ATTACK_SWORDGROUND0_FRAMES, true);
     Sprite* spriteSwordOnGround1 = new Sprite(
@@ -157,7 +153,7 @@ void Kid::UpdateEntity (float dt) {
 
     // tolerance before start falling
     if ((state != EntityState::Falling) and (rigidBody->GetSpeed().y > 100) and 
-    ((not attackPerforming) or (attackPerforming and (hitTimer.GetTime() >= ATTACK_SWORD_HITTIME)))) {
+    ((not attackPerforming) or (attackPerforming and (attackTimer.GetTime() >= ATTACK_SWORD_TIME_HIT)))) {
         FormatState(EntityState::Falling);
         isGrounded = false;
     }
@@ -234,7 +230,8 @@ void Kid::UpdateEntity (float dt) {
         
         case EntityState::AttackingSwordOnGround_0:
             AttackUpdate(dt);
-            if ((hitTimer.GetTime() >= ATTACK_SWORD_HITTIME) and input.KeyPress(Key::attack))
+            if (attackTimer.IsBetween(ATTACK_SWORD_TIME_HIT, ATTACK_SWORD_TIME_CANCEL)
+            and input.KeyPress(Key::attack))
                 FormatState(EntityState::AttackingSwordOnGround_1);
             break;
 
@@ -331,7 +328,7 @@ void Kid::AttackStart () {
     else rigidBody->SetSpeedOnX(0.0f);
     
     attackPerforming = true;
-    hitTimer.Reset();
+    attackTimer.Reset();
 }
 
 void Kid::AttackUpdate (float dt) {
@@ -340,9 +337,9 @@ void Kid::AttackUpdate (float dt) {
         rigidBody->SetSpeedOnX(0.0f);
         attackImpulseCancel = true;
     }
-    hitTimer.Update(dt);
-    float hitTime = hitTimer.GetTime();
-    if (hitTime >= ATTACK_SWORD_ENDTIME)
+    attackTimer.Update(dt);
+    float hitTime = attackTimer.GetTime();
+    if (hitTime >= ATTACK_SWORD_TIME_END)
         FormatState(EntityState::Idle);
 }
 

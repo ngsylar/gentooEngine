@@ -15,6 +15,7 @@ class Timer {
         float GetResetTime();
         bool HasResetTime();
         bool IsOver();
+        bool IsBetween(float timeStart, float timeEnd);
 };
 
 #endif

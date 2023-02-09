@@ -65,9 +65,9 @@ Game::Game (std::string title, int width, int height, int logicalWidth, int logi
     if (renderer == nullptr) {
         SDL_Log("Unable to start renderer: %s", SDL_GetError());
     }
-    // if (SDL_RenderSetVSync(renderer,1) != 0) {
-    //     noVSync = true;
-    // }
+    if (SDL_RenderSetVSync(renderer,1) != 0) {
+        noVSync = true;
+    }
 
     // resolution
     resolution = Vec2(logicalWidth, logicalHeight);
@@ -200,7 +200,8 @@ void Game::Run () {
             break;
 
         SDL_RenderPresent(renderer);
-        if (noVSync) SDL_Delay(FpsToMs(60));
+        if (noVSync)
+            SDL_Delay(FpsToMs(60));
     }
 }
 

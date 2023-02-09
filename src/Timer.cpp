@@ -36,3 +36,7 @@ bool Timer::HasResetTime () {
 bool Timer::IsOver () {
     return (currentTime >= resetTime);
 }
+
+bool Timer::IsBetween (float timeStart, float timeEnd) {
+    return ((currentTime >= timeStart) and (currentTime <= timeEnd));
+}
