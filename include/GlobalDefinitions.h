@@ -6,6 +6,12 @@
 #define WINDOW_SIZE         455, 256
 #define GAME_RESOLUTION     455, 256
 
+// State fade definition
+#define STATE_FADE_TIME     0.5f
+
+// Tile dimension
+#define TILE_SIZE           28
+
 // GameObject Optimization enums for bitwise based operations
 enum ComponentType {
     // Engine Components
@@ -28,8 +34,8 @@ enum ComponentType {
     _Kid =              1 << 13,
     _EnemyArmadillo =   1 << 14,
     _Attack =           1 << 15,
-    // x = 1 << 16,
-    // x = 1 << 17,
+    _DialogueBox =      1 << 16,
+    _Terrain =          1 << 17,
     // x = 1 << 18,
     // x = 1 << 19,
     // x = 1 << 20,
@@ -37,7 +43,7 @@ enum ComponentType {
     // Testing Environment
     _Ball =             1 << 21,
     _RigidBodyLegacy =  1 << 22,
-    _Terrain =          1 << 30,
+    _Dummy =            1 << 23,
 
     //...
 };

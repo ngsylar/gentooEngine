@@ -15,18 +15,18 @@ void Music::Open (std::string file) {
     music = Resources::GetMusic(file);
 }
 
-void Music::Play (int times) {
-    if (Mix_PlayMusic(music.get(), times) == MUSIC_ERROR_PLAY)
+void Music::Play (int times, int fadeIn) {
+    if (Mix_FadeInMusic(music.get(), times, fadeIn) == MUSIC_ERROR_PLAY)
         SDL_Log("Mix_PlayMusic: %s", SDL_GetError());
 }
 
-void Music::Play (std::string file, int times) {
+void Music::Play (std::string file, int times, int fadeIn) {
     Open(file);
-    Play(times);
+    Play(times, fadeIn);
 }
 
-void Music::Stop (int msToStop) {
-    if (Mix_FadeOutMusic(msToStop) == MUSIC_ERROR_FADE)
+void Music::Stop (int fadeOut) {
+    if (Mix_FadeOutMusic(fadeOut) == MUSIC_ERROR_FADE)
         SDL_Log("Mix_PlayMusic: %s", SDL_GetError());
 }
 

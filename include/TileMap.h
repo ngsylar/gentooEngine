@@ -32,10 +32,12 @@ class TileMap: public Component {
             GameObject& associated,
             TileSet* tileSet,
             std::string file,
-            float parallaxFactor=1.0f
+            float parallaxFactor=1.0f,
+            bool loadAsRaw=false
         );
         ~TileMap();
         void Load(std::string fileName);
+        void LoadRaw(std::string fileName);
         void LoadCollision(std::string fileName);
         void SetTileSet(TileSet* tileSet);
         void Update(float dt);

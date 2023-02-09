@@ -8,6 +8,7 @@
 
 #include "Vec2.h"
 
+// Keyboard
 #define MOUSE_BUTTON_LEFT   SDL_BUTTON_LEFT
 #define MOUSE_BUTTON_MIDDLE SDL_BUTTON_MIDDLE
 #define MOUSE_BUTTON_RIGHT  SDL_BUTTON_RIGHT
@@ -64,6 +65,30 @@
 #define KEY_ARROW_DOWN      SDLK_DOWN
 #define KEY_ARROW_RIGHT     SDLK_RIGHT
 
+// Joypad
+#define STICK_DEADZONE      8000
+#define STICK_AXIS_LX       SDL_CONTROLLER_AXIS_LEFTX
+#define STICK_AXIS_LY       SDL_CONTROLLER_AXIS_LEFTY
+#define STICK_AXIS_RX       SDL_CONTROLLER_AXIS_RIGHTX
+#define STICK_AXIS_RY       SDL_CONTROLLER_AXIS_RIGHTY
+#define JOY_TRIGGER_L       SDL_CONTROLLER_AXIS_TRIGGERLEFT
+#define JOY_TRIGGER_R       SDL_CONTROLLER_AXIS_TRIGGERRIGHT
+#define JOY_A               SDL_CONTROLLER_BUTTON_A
+#define JOY_B               SDL_CONTROLLER_BUTTON_B
+#define JOY_X               SDL_CONTROLLER_BUTTON_X
+#define JOY_Y               SDL_CONTROLLER_BUTTON_Y
+#define JOY_BACK            SDL_CONTROLLER_BUTTON_BACK
+#define JOY_GUIDE           SDL_CONTROLLER_BUTTON_GUIDE
+#define JOY_START           SDL_CONTROLLER_BUTTON_START
+#define JOY_L3              SDL_CONTROLLER_BUTTON_LEFTSTICK
+#define JOY_R3              SDL_CONTROLLER_BUTTON_RIGHTSTICK
+#define JOY_L1              SDL_CONTROLLER_BUTTON_LEFTSHOULDER
+#define JOY_R1              SDL_CONTROLLER_BUTTON_RIGHTSHOULDER
+#define JOY_UP              SDL_CONTROLLER_BUTTON_DPAD_UP
+#define JOY_DOWN            SDL_CONTROLLER_BUTTON_DPAD_DOWN
+#define JOY_LEFT            SDL_CONTROLLER_BUTTON_DPAD_LEFT
+#define JOY_RIGHT           SDL_CONTROLLER_BUTTON_DPAD_RIGHT
+
 class InputManager {
     private:
         static InputManager* inputManager;
@@ -73,6 +98,12 @@ class InputManager {
         int mouseUpdate[6];
         int mouseX, mouseY;
         int updateCounter;
+
+        SDL_GameController* controller;
+        bool controllerState[21];
+        int controllerUpdate[21];
+        int axis[6];
+
         bool skipFrames, quitRequested;
     
     public:
@@ -90,6 +121,13 @@ class InputManager {
         Vec2 GetMousePosition();
         int GetMouseX();
         int GetMouseY();
+
+        bool ControllerPress(int key);
+        bool ControllerRelease(int key);
+        bool IsControllerDown(int key);
+        int GetAxisMotion(int Index);
+        // Vec2 GetLeftAxis()
+
         void DontSkipFrames();
         bool SkippingFrames();
         bool QuitRequested();

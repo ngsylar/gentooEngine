@@ -64,7 +64,7 @@ void RigidBody::NotifyCollision(GameObject& other) {
 
     Rect intersection = A->box.GetIntersection(B->box);
     
-    if (intersection.h>intersection.w) {
+    if ((intersection.h > intersection.w) or ((intersection.w < 3.0f) and (intersection.h < 2.0f))) {
         //hit left or right
             right = intersection.x>A->box.x;
             left = !right;

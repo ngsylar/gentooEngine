@@ -510,6 +510,7 @@ void TestScene5::Update (float dt) {
 #define MAP_BASE "assets/map/Test"
 
 #include "Dummy.h"
+#include "DialogueBox.h"
 
 TestScene6::TestScene6 () {
     GameObject* BgObj = new GameObject(SCENE_TEST_LAYER, SCENE_TEST_LABEL);
@@ -521,23 +522,17 @@ TestScene6::TestScene6 () {
     BgObj->box.SetSize(Bg1->GetWidth(), Bg1->GetHeight());
     
     GameObject* BgObj2 = new GameObject(0, SCENE_TEST_LABEL);
-    LoopedBackground* Bg2 = new LoopedBackground(*BgObj2,SPRITE_BG2,3,Vec2(0.3,0.3));
+    LoopedBackground* Bg2 = new LoopedBackground(*BgObj2,SPRITE_BG2,3,Vec2(0.4, 0.15));
     BgObj2->AddComponent(Bg2);
     AddObject(BgObj2);
     BgObj2->box.SetPosition(0,0); 
 }
 
-ScreenFade* Silk = nullptr;
+// ScreenFade* Silk = nullptr;
 #define CUSTOM_BLENDCOOL SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_SRC_ALPHA, SDL_BLENDFACTOR_ONE, SDL_BLENDOPERATION_ADD,\
             SDL_BLENDFACTOR_ONE_MINUS_SRC_COLOR, SDL_BLENDFACTOR_ONE_MINUS_DST_COLOR, SDL_BLENDOPERATION_ADD)
 
 void TestScene6::LoadAssets () {
-    // GameObject* rawSquare = new GameObject(LAYER_RED_SQUARE);
-    // AddObject(rawSquare);
-    // square = GetObjectPtr(rawSquare);
-    // rawSquare->AddComponent(new Kid(*rawSquare));
-    // rawSquare->box.SetPosition(20,10);
-
     //#####################################
     GameObject* TileObj = new GameObject(1);
     TileSet* Set = new TileSet(*TileObj, SPRITE_TILE, 32,32);
@@ -545,12 +540,12 @@ void TestScene6::LoadAssets () {
     tile->LoadCollision(MAP_BASE);
     TileObj->AddComponent(tile);
     AddObject(TileObj);
-    
-    GameObject* FadeObj = new GameObject(10);
-    ScreenFade* Fade = new ScreenFade(*FadeObj, Color("#000000"),0, 0, 1);
-    FadeObj->AddComponent(Fade);
-    AddObject(FadeObj);
-    Silk = Fade;
+
+    // GameObject* FadeObj = new GameObject(10);
+    // ScreenFade* Fade = new ScreenFade(*FadeObj, Color("#000000"),0, 0, 1);
+    // FadeObj->AddComponent(Fade);
+    // AddObject(FadeObj);
+    // Silk = Fade;
 
     GameObject* FireflyObj = new GameObject(11);
     Sprite* Firefly = new Sprite(*FireflyObj, SPRITE_FF, 25, 0.1);
@@ -566,18 +561,23 @@ void TestScene6::LoadAssets () {
     DummyObj->box.SetPosition(120, 70);
     AddObject(DummyObj);
     //#####################################
+
+    GameObject* dialogueObj = new GameObject(LayerDistance::_ForeGround_VeryClose);
+    DialogueBox* chat = new DialogueBox(*dialogueObj);
+    dialogueObj->AddComponent(chat);
+    AddObject(dialogueObj);
 }
 
 void TestScene6::Update (float dt) {
     if (InputManager::GetInstance().KeyPress(KEY_ESCAPE)) {
         Game::GetInstance().AddState(new TestScene0());
         popRequested = true;
-        Silk = nullptr;
+        // Silk = nullptr;
     }
-    if (InputManager::GetInstance().KeyPress(KEY_MINUS)) {
-        Silk->RedirectFade(0);
-    }
-    if (InputManager::GetInstance().KeyPress(KEY_EQUAL)) {
-        Silk->RedirectFade(0.85);
-    }
+    // if (InputManager::GetInstance().KeyPress(KEY_MINUS)) {
+    //     Silk->RedirectFade(0);
+    // }
+    // if (InputManager::GetInstance().KeyPress(KEY_EQUAL)) {
+    //     Silk->RedirectFade(0.85);
+    // }
 }

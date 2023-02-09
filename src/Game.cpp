@@ -1,9 +1,11 @@
 #include "GentooEngine.h"
+#include "ZoneTransition.h" // editar: pq isso ta aqui? ta doidao?
 
 Game* Game::instance = nullptr;
 
 Game::Game (std::string title, int width, int height, int logicalWidth, int logicalHeight) {
     int flags, opaudio;
+    noVSync = false;
 
     // Game instance
     if (instance != nullptr) {
@@ -15,7 +17,7 @@ Game::Game (std::string title, int width, int height, int logicalWidth, int logi
     this->height = height;
 
     // SDL
-    flags = SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_TIMER;
+    flags = SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER;
     if (SDL_Init(flags) != GAME_SUCCESS) {
         SDL_Log("SDL_Init: %s", SDL_GetError());
     } else SDL_Log("SDL_Init: OK");
@@ -63,6 +65,9 @@ Game::Game (std::string title, int width, int height, int logicalWidth, int logi
     if (renderer == nullptr) {
         SDL_Log("Unable to start renderer: %s", SDL_GetError());
     }
+    // if (SDL_RenderSetVSync(renderer,1) != 0) {
+    //     noVSync = true;
+    // }
 
     // resolution
     resolution = Vec2(logicalWidth, logicalHeight);
@@ -87,6 +92,13 @@ Game::~Game () {
         stateStack.pop();
     Resources::ClearAll();
 
+    // editar: que raio eh isso? pq isso ta aqui? ce... tu ta ficando doido?
+    Music* stateMusic = ZoneManager::GetCarriedMusic();
+    if(stateMusic != nullptr) {
+        stateMusic->Stop();
+        delete stateMusic;
+    }
+
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     Mix_CloseAudio();
@@ -102,6 +114,7 @@ void Game::CalculateDeltaTime () {
     int frameCurrent = SDL_GetTicks();
     dt = (float)(frameCurrent - frameStart) / 1000.0f;
     frameStart = frameCurrent;
+    dt>0.05?dt=0.05:dt;
 }
 
 float Game::GetDeltaTime () {
@@ -187,7 +200,7 @@ void Game::Run () {
             break;
 
         SDL_RenderPresent(renderer);
-        SDL_Delay(FpsToMs(60));
+        if (noVSync) SDL_Delay(FpsToMs(60));
     }
 }
 

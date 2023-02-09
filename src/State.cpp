@@ -8,12 +8,13 @@ State::State () {
     popRequested = false;
     quitRequested = false;
     
-    //FPS Counter
+    // FPS Counter
     Text * FPSText = new Text(FPSObj, " ", FONT_LED, 24, Text::SHADED, Color("#00FF00").ColorSDL());
     CameraFollower* FPSFollow = new CameraFollower(FPSObj);
     FPSFollow->offset = Vec2(20,20);
     FPSObj.AddComponent(FPSText);
     FPSObj.AddComponent(FPSFollow);
+    stateMusic = nullptr;
 }
 
 State::~State () {
@@ -72,10 +73,13 @@ void State::UpdateBase (float dt) {
         objectArray[i]->LateUpdate(dt);
     
     // FPS Counter
+    fpsLimiter.Update(dt);
     if (Game::GetInstance().GetCurrentState().Debugging()) {
-        Text* UpdateFPS =(Text*)FPSObj.GetComponent(ComponentType::_Text);
-        UpdateFPS->SetText(std::to_string((int)(1/dt))+" FPS");
-        FPSObj.LateUpdate(0);
+        if (fpsLimiter.IsOver()) {
+            Text* UpdateFPS =(Text*)FPSObj.GetComponent(ComponentType::_Text);
+            UpdateFPS->SetText(std::to_string((int)(1/dt))+" FPS");
+            fpsLimiter.Reset();
+        } FPSObj.LateUpdate(0);
     }
 }
 
@@ -187,8 +191,24 @@ void State::DetectCollisions () {
     }
 }
 
+void State::FadeIn() {
+    //Scene FadeIn
+    GameObject* FadeObj = new GameObject(LayerDistance::_ForeGround_VeryClose);
+    ScreenFade* Fade = new ScreenFade(*FadeObj, Color("#000000"),1, 0, STATE_FADE_TIME, true);
+    FadeObj->AddComponent(Fade);
+    AddObject(FadeObj);
+}
+
+Music* State::GetStateMusic () {
+    return stateMusic;
+}
+
 bool State::Debugging () {
     return debugMode;
+}
+
+void State::RequestPop() {
+    popRequested = true;
 }
 
 bool State::PopRequested () {

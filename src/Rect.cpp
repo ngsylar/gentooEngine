@@ -37,6 +37,26 @@ void Rect::SetPosition (Vec2 point) {
     y = (point.y - h*0.5f) - offset.y;
 }
 
+void Rect::SetPurePosition (float pX, float pY) {
+    x = pX - offset.x;
+    y = pY - offset.y;
+}
+
+void Rect::SetPurePosition (Vec2 point) {
+    x = point.x - offset.x;
+    y = point.y - offset.y;
+}
+
+void Rect::SetBottomPosition (float pX, float pY) {
+    x = (pX - w*0.5f) - offset.x;
+    y = (pY - h) - offset.y;
+}
+
+void Rect::SetBottomPosition (Vec2 point) {
+    x = (point.x - w*0.5f) - offset.x;
+    y = (point.y - h) - offset.y;
+}
+
 void Rect::Translate (float dX, float dY) {
     x += dX;
     y += dY;

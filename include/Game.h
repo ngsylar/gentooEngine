@@ -33,7 +33,9 @@ class Game {
         Vec2 resolution;
         int frameStart;
         float dt;
+
         Timer interruptionTimer;
+        bool noVSync;
 
         Game(
             std::string title, int width, int height,

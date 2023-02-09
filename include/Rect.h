@@ -18,9 +18,14 @@ class Rect {
         void SetSize(float w, float h);
         void SetPosition(float x, float y);
         void SetPosition(Vec2 point);
+        void SetPurePosition(float x, float y);
+        void SetPurePosition(Vec2 point);
+        void SetBottomPosition(float x, float y);
+        void SetBottomPosition(Vec2 point);
         void Translate(float x, float y);
         void Translate(Vec2 displacement);
         void RotateAround(Vec2 point, Vec2 axis, float angle);
+
         // Access
         Vec2 GetPosition();
         Rect GetIntersection(Rect& other);

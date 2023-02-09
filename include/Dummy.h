@@ -11,6 +11,7 @@ class Dummy: public EntityMachine {
         Timer jumpLimit;
         bool ceiling;
         float jumpDecrease;
+        float increaseSpd;
 
     public:
         Dummy(GameObject& associated);

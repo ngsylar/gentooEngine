@@ -9,8 +9,10 @@
 #define DUMMY_ATTACK "assets/img/Dummy/attack.png"
 
 Dummy::Dummy (GameObject& associated): EntityMachine(associated) {
+    type = ComponentType::_Dummy;
     HP = 100;
     lastDirection = 1;
+    increaseSpd = 0;
     jumpDecrease = 0;
     jumpLimit.SetResetTime(.8); 
     ceiling = false;
@@ -20,8 +22,8 @@ void Dummy::StartEntity() {
     Sprite* Idle = new Sprite(associated, DUMMY_IDLE, 4, 0.2);
     Sprite* Walk = new Sprite(associated, DUMMY_WALK, 6, 0.15);
     Sprite* Run = new Sprite(associated, DUMMY_RUN, 6, 0.08);
-    Sprite* Jump = new Sprite(associated, DUMMY_JUMP, 4, 0.08, true);
-    Sprite* Fall = new Sprite(associated, DUMMY_FALL, 2, 0.3, true);
+    Sprite* Jump = new Sprite(associated, DUMMY_JUMP, 4, 0.15, true);
+    Sprite* Fall = new Sprite(associated, DUMMY_FALL, 2, 0.2, true);
     Sprite* Attack = new Sprite(associated, DUMMY_ATTACK, 5, 0.12, true);
 
     AddSpriteState(EntityState::Idle, Idle);
@@ -46,28 +48,37 @@ void Dummy::StartEntity() {
     state = EntityState::Idle;
     associated.box.SetSize(Idle->GetWidth(), Idle->GetHeight());
     Col->box.SetPosition(associated.box.GetGlobalCenter());
-    Col->SetBox(Vec2(0,4), Vec2(16,26));
+    Col->SetBox(Vec2(0,3), Vec2(16,26));
 }
 
-#define JUMP_SPD 200
+#define JUMP_SPD 220
 #define JUMPDEC_FACTOR 200
-#define WALK_SPD 60
-#define RUN_SPD 120
-#define AIR_SPD 100
+#define WALK_SPD 80
+#define RUN_SPD 150
+#define AIR_SPD 120
+
+#define WALK_ACCEL 100
+#define RUN_ACCEL 200
 
 void Dummy::UpdateEntity(float dt) {
+    EntityState now = state;
+
     jumpLimit.Update(dt);
     InputManager& input = InputManager::GetInstance();
     RigidBody* Rigid = (RigidBody*)associated.GetComponent(ComponentType::_RigidBody);
-    int XDirection  = input.IsKeyDown(KEY_D) - input.IsKeyDown(KEY_A);
+    
+    //now taking controller and keyboard commands
+    int XDirection  = input.GetAxisMotion(STICK_AXIS_LX);
+    XDirection == 0 ? XDirection = input.IsControllerDown(JOY_RIGHT) - input.IsControllerDown(JOY_LEFT): XDirection;
+    XDirection == 0 ? XDirection = input.IsKeyDown(KEY_D) - input.IsKeyDown(KEY_A) : XDirection;
 
-    if(Rigid->GetSpeed().y > 100) { //Fall always starts from certain speed downwards
+    if((state != EntityState::Falling) and Rigid->GetSpeed().y > 100) { //Fall always starts from certain speed downwards
         state = EntityState::Falling;
     }
     switch (state) {
         case EntityState::Idle:
             if(XDirection != 0) { //Changing to walk or run
-                if(input.IsKeyDown(SDLK_LSHIFT)){
+                if(input.IsControllerDown(JOY_R1) or input.IsKeyDown(SDLK_LSHIFT)){
                     state = EntityState::Running;
                     sprites[state].get()->SetFrame(0);
                 } else {
@@ -77,7 +88,7 @@ void Dummy::UpdateEntity(float dt) {
             }
 
             //Jump trigger
-            if (input.KeyPress(KEY_SPACE)){
+            if (input.ControllerPress(JOY_A) or input.KeyPress(KEY_SPACE)){
                 state = EntityState::Jumping;
                 Rigid->SetGravity(0);
                 jumpLimit.Reset();
@@ -86,19 +97,22 @@ void Dummy::UpdateEntity(float dt) {
             break;
 
         case EntityState::Walking:
-            if(input.KeyPress(SDLK_LSHIFT)) {//Start to run
+            if(input.ControllerPress(JOY_R1) or input.KeyPress(SDLK_LSHIFT)) {//Start to run
                 state = EntityState::Running;
 
             } else if(XDirection == 0){//go to idle
                 Rigid->SetSpeedOnX(0);
                 state = EntityState::Idle;
-
+                increaseSpd = 0;
             } else {//Keep walking
-                Rigid->SetSpeedOnX(XDirection*WALK_SPD);
+                if(increaseSpd<WALK_SPD) {
+                    increaseSpd+=WALK_ACCEL*dt;
+                }
+                Rigid->SetSpeedOnX(XDirection* SmoothStep(0, WALK_SPD, increaseSpd) *WALK_SPD);
             }
 
             //Jump trigger
-            if (input.KeyPress(KEY_SPACE)){
+            if (input.ControllerPress(JOY_A) or input.KeyPress(KEY_SPACE)){
                 state = EntityState::Jumping;
                 Rigid->SetGravity(0);
                 jumpLimit.Reset();
@@ -109,15 +123,19 @@ void Dummy::UpdateEntity(float dt) {
             if(XDirection == 0){//Back to idle
                 Rigid->SetSpeedOnX(0);
                 state = EntityState::Idle;
+                increaseSpd = 0;
 
-            } else if(input.KeyRelease(SDLK_LSHIFT)) {//Start to walk
+            } else if(input.ControllerRelease(JOY_R1) or input.KeyRelease(SDLK_LSHIFT)) {//Start to walk
                 state = EntityState::Walking;
             } else {
-                    Rigid->SetSpeedOnX(XDirection*RUN_SPD);
+                    Rigid->SetSpeedOnX(XDirection* SmoothStep(0, RUN_SPD, increaseSpd) * RUN_SPD);
+                    if(increaseSpd<RUN_SPD) {
+                        increaseSpd+=RUN_ACCEL*dt;
+                    }
             }
             
             //Jump trigger
-            if (input.KeyPress(KEY_SPACE)){
+            if (input.ControllerPress(JOY_A) or input.KeyPress(KEY_SPACE)){
                 state = EntityState::Jumping;
                 Rigid->SetGravity(0);
                 jumpLimit.Reset();
@@ -129,7 +147,7 @@ void Dummy::UpdateEntity(float dt) {
             jumpDecrease+= JUMPDEC_FACTOR*dt;//decrease rate grows
 
             //Limitant factors to jump
-            if(input.KeyRelease(KEY_SPACE) or jumpLimit.IsOver() or ceiling){
+            if(input.ControllerRelease(JOY_A) or input.KeyRelease(KEY_SPACE) or jumpLimit.IsOver() or ceiling){
                 jumpDecrease = 0;
                 Rigid->ResetGravity();
                 Rigid->SetSpeedOnY(0);
@@ -154,6 +172,10 @@ void Dummy::UpdateEntity(float dt) {
 
         default:
             break;
+    }
+
+    if(now != state) {
+        sprites[state].get()->SetFrame(0);
     }
 
     lastDirection = (XDirection!=0?XDirection:lastDirection);
