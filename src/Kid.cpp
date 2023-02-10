@@ -63,7 +63,7 @@ Kid::Kid (GameObject& associated): EntityMachine(associated) {
     jumpTimer.SetResetTime(0.8f);
     invincibilityTimer.SetResetTime(1.25f);
     isInvincible = false;
-    hp = 4;
+    hp = 6;
 
     runSpeedIncrease = 0.0f;
     runSpeedReset = true;

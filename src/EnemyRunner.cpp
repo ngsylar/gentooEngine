@@ -1,8 +1,10 @@
 #include "GentooEngine.h"
-#include "EnemyArmadillo.h"
+#include "EnemyRunner.h"
 #include "AttackGeneric.h"
 
-#define SPRITE_RUN          "assets/img/armadillo/enemy1.png"
+#define SPRITE_RUN          "assets/img/monster1/idle.png"
+
+#define SPRITE_IDLE_FRAMES  12, 0.1f
 
 #define SPEED_RUN           60.0f
 #define IMPULSE_MASS        10.0f
@@ -11,24 +13,27 @@
 #define ATTACK_IMPULSE      50.0f
 #define ATTACK_DAMAGE       1
 
-#define COLLIDER_POSITION   0.0f, 14.0f
-#define COLLIDER_BOX_SIZE   21.0f, 19.0f
+#define COLLIDER_POSITION   -1.0f, 2.0f
+#define COLLIDER_BOX_SIZE   16.0f, 39.0f
 
-EnemyArmadillo::EnemyArmadillo (GameObject& associated): EntityMachine(associated) {
-    type = type | ComponentType::_EnemyArmadillo;
+EnemyRunner::EnemyRunner (GameObject& associated): EntityMachine(associated) {
+    type = type | ComponentType::_EnemyRunner;
     associated.label = "Enemy";
-    movementDirection = -1;
-    hp = 2;
+    movementDirection = 1;
+    hp = 3;
 
+    turnTimer.SetResetTime(0.4f);
     isGrounded = false;
     hitWall = false;
+
+    associated.pixelColliderFix1 = true;
 }
 
-void EnemyArmadillo::Awaken () {
-    Sprite* spriteRun = new Sprite(associated, SPRITE_RUN);
-    Sprite* spriteDamage = new Sprite(associated, SPRITE_RUN);
-    Sprite* spriteFall = new Sprite(associated, SPRITE_RUN);
-    Sprite* spriteDie = new Sprite(associated, SPRITE_RUN);
+void EnemyRunner::Awaken () {
+    Sprite* spriteRun = new Sprite(associated, SPRITE_RUN, SPRITE_IDLE_FRAMES);
+    Sprite* spriteDamage = new Sprite(associated, SPRITE_RUN, SPRITE_IDLE_FRAMES);
+    Sprite* spriteFall = new Sprite(associated, SPRITE_RUN, SPRITE_IDLE_FRAMES);
+    Sprite* spriteDie = new Sprite(associated, SPRITE_RUN, SPRITE_IDLE_FRAMES);
 
     AddSpriteState(EntityState::Running, spriteRun);
     AddSpriteState(EntityState::Injured, spriteDamage);
@@ -49,15 +54,15 @@ void EnemyArmadillo::Awaken () {
     associated.AddComponent(attack);
 }
 
-void EnemyArmadillo::Start () {
+void EnemyRunner::Start () {
     state = EntityState::Running;
     sprites[state].get()->SetFrame(0);
     rigidBody->SetSpeedOnX(SPEED_RUN * movementDirection);
 }
 
-void EnemyArmadillo::LateUpdate (float dt) {}
+void EnemyRunner::LateUpdate (float dt) {}
 
-void EnemyArmadillo::UpdateEntity (float dt) {
+void EnemyRunner::UpdateEntity (float dt) {
     if (isGrounded and (rigidBody->GetSpeed().y > 100))
         isGrounded = false;
 
@@ -66,10 +71,15 @@ void EnemyArmadillo::UpdateEntity (float dt) {
             if (isGrounded) {
                 bool foundEdgeLeft = collider->box.x < currentRoute.x;
                 bool foundEdgeRight = collider->box.x+collider->box.w > currentRoute.y;
-                if (foundEdgeLeft or foundEdgeRight or hitWall) {
+                turnTimer.Update(dt);
+
+                SDL_Log("%d", movementDirection);
+                if ((foundEdgeLeft or foundEdgeRight or hitWall) and turnTimer.IsOver()) {
                     movementDirection *= -1;
                     rigidBody->SetSpeedOnX(SPEED_RUN * movementDirection);
                     FlipSprite(Sprite::HORIZONTAL);
+                    
+                    turnTimer.Reset();
                     hitWall = false;
                 }
             } break;
@@ -86,7 +96,7 @@ void EnemyArmadillo::UpdateEntity (float dt) {
     }
 }
 
-bool EnemyArmadillo::NewStateRule (EntityState newState, int argsc, float argsv[]) {
+bool EnemyRunner::NewStateRule (EntityState newState, int argsc, float argsv[]) {
     if (newState == state)
         return false;
 
@@ -116,7 +126,7 @@ bool EnemyArmadillo::NewStateRule (EntityState newState, int argsc, float argsv[
     }
 }
 
-void EnemyArmadillo::NotifyCollision (GameObject& other) {
+void EnemyRunner::NotifyCollision (GameObject& other) {
     rigidBody->NotifyCollision(other);
 
     if (rigidBody->ImpactDown() and (other.label == "Ground")) {

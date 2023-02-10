@@ -32,11 +32,11 @@ enum ComponentType {
     // Game Components
     _PlatformCamera =   1 << 12,
     _Kid =              1 << 13,
-    _EnemyArmadillo =   1 << 14,
-    _Attack =           1 << 15,
-    _DialogueBox =      1 << 16,
-    _Terrain =          1 << 17,
-    // x = 1 << 18,
+    _Attack =           1 << 14,
+    _DialogueBox =      1 << 15,
+    _Terrain =          1 << 16,
+    _EnemyArmadillo =   1 << 17,
+    _EnemyRunner =      1 << 18,
     // x = 1 << 19,
     // x = 1 << 20,
 

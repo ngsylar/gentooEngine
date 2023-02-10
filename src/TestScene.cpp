@@ -3,6 +3,7 @@
 #include "TestObjects.h"
 #include "Kid.h"
 #include "EnemyArmadillo.h"
+#include "EnemyRunner.h"
 #include "PlatformCamera.h"
 
 #define SCENE_TEST_LABEL "TestScene"
@@ -123,11 +124,17 @@ void TestScene0::LoadAssets () {
     // rawPlat->AddComponent(new CameraBox(*rawPlat, rawSquare, 0, 10));
     // AddObject(rawPlat);
 
+    // rawSquare = new GameObject(LAYER_RED_SQUARE);
+    // AddObject(rawSquare);
+    // square = GetObjectPtr(rawSquare);
+    // rawSquare->AddComponent(new EnemyArmadillo(*rawSquare));
+    // rawSquare->box.SetPosition(250,rawPlat->box.y-rawSquare->box.h-100);
+
     rawSquare = new GameObject(LAYER_RED_SQUARE);
     AddObject(rawSquare);
     square = GetObjectPtr(rawSquare);
-    rawSquare->AddComponent(new EnemyArmadillo(*rawSquare));
-    rawSquare->box.SetPosition(250,rawPlat->box.y-rawSquare->box.h-100);
+    rawSquare->AddComponent(new EnemyRunner(*rawSquare));
+    rawSquare->box.SetPosition(230,rawPlat->box.y-rawSquare->box.h-100);
 }
 
 void TestScene0::Start () {
