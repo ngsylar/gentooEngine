@@ -100,10 +100,10 @@ void AttackGeneric::NotifyCollision (GameObject& other) {
         return;
 
     EntityMachine* entity = (EntityMachine*)other.GetComponent(ComponentType::_EntityMachine);
-    if (entity != nullptr) {
-        float argsv[4] = {force.x, force.y, impulse, (float)damage};
-        entity->FormatState(EntityState::Injured, 4, argsv);
-    }
+    if (entity == nullptr) return;
+
+    float argsv[5] = {force.x, force.y, impulse, (float)damage, collider->box.x};
+    entity->FormatState(EntityState::Injured, 4, argsv);
 }
 
 bool AttackGeneric::UsingInternalAssociated () {

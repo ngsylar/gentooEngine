@@ -336,9 +336,12 @@ bool Kid::NewStateRule (EntityState newState, int argsc, float argsv[]) {
             damageOrigin = collider->box.GetPosition();
             damageForce = Vec2(-argsv[AttackGeneric::_ForceX], -argsv[AttackGeneric::_ForceY]);
             damageImpulse = argsv[AttackGeneric::_Impulse];
-
             jumpSpeedDecrease = 0.0f;
-            rigidBody->SetSpeed(Vec2(lastDirectionX * damageForce.x, damageForce.y));
+
+            lastDirectionX = (argsv[AttackGeneric::_OriginX] < collider->box.x)? -1 : 1;
+            textureFlip = (lastDirectionX == 1)? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL;
+
+            rigidBody->SetSpeed(Vec2(damageForce.x * lastDirectionX, damageForce.y));
             rigidBody->ResetGravity();
             damagePerforming = true;
 
@@ -357,7 +360,7 @@ void Kid::AttackStart () {
     swordAttackOnGround->direction = (lastDirectionX == 1)?
         KidAttackMelee::RIGHT : KidAttackMelee::LEFT;
     swordAttackOnGround->Perform(associated.box.x);
-    
+
     if (runSpeedReset)
         attackImpulseCancel = true;
     if (not attackImpulseCancel)

@@ -22,9 +22,9 @@ spike/
 *.zip
 *.rar
 
-#SDL Local
+# SDL Local
 sdl/
 
-#auto-TileMap files
+# auto-TileMap
 *-hash.txt
 *-rect.txt

@@ -8,7 +8,7 @@
 #define IMPULSE_MASS        10.0f
 
 #define ATTACK_FORCE        400.0f, 140.0f
-#define ATTACK_IMPULSE      70.0f
+#define ATTACK_IMPULSE      50.0f
 #define ATTACK_DAMAGE       1
 
 #define COLLIDER_POSITION   0.0f, 14.0f
