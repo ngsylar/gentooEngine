@@ -52,6 +52,7 @@ class Sprite: public Component {
         void SetScale(float scaleX, float scaleY);
         void SetScale(float scale);
         void SetBlendMode(SDL_BlendMode blendMode);
+        void SetTextureColorMod(int red, int green, int blue);
         void SetFrame(int frame);
         void SetFrameTime(float frameTime);
         void SetFrameCount(int frameCount);

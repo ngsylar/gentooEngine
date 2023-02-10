@@ -51,6 +51,7 @@ void EnemyArmadillo::Awaken () {
 
 void EnemyArmadillo::Start () {
     state = EntityState::Running;
+    sprites[state].get()->SetFrame(0);
     rigidBody->SetSpeedOnX(SPEED_RUN * movementDirection);
 }
 

@@ -27,7 +27,8 @@
 #define SPEED_ONAIR                             100.0f
 #define SPEED_ATTACK                            300.0f
 #define FORCE_JUMP                              300.0f
-#define FORCE_MASS                              460.0f
+#define FORCE_JUMP_MASS                         460.0f
+#define FORCE_DAMAGE_MASS                       1748.0f
 #define IMPULSE_ATTACK_SWORD_X                  40.0f
 
 #define ATTACK_SWORD_FORCE                      400.0f, 0.0f
@@ -36,6 +37,8 @@
 #define ATTACK_SWORD_TIME_HIT                   0.3f
 #define ATTACK_SWORD_TIME_CANCEL                0.6f
 #define ATTACK_SWORD_TIME_END                   1.0f
+
+#define INVINCIBLE_FLICK_SPEED                  1200.0f
 
 #define COLLIDER_POSITION_ONGROUND              0.0f, 9.0f
 #define COLLIDER_POSITION_ONAIR                 0.0f, 5.0f
@@ -67,6 +70,7 @@ Kid::Kid (GameObject& associated): EntityMachine(associated) {
     attackPerforming = false;
     attackImpulseCancel = false;
     damagePerforming = false;
+    flickFactor = 255.0f;
     lastDirectionX = 1;
 
     GameObject* attack = new GameObject(LayerDistance::_Player_Front);
@@ -119,6 +123,7 @@ void Kid::Awaken () {
 
 void Kid::Start () {
     state = EntityState::Idle;
+    sprites[state].get()->SetFrame(0);
 
     Camera::Follow(
         cameraBox, Vec2(CINEMACHINE_LENGTH), CINEMACHINE_SLICES,
@@ -135,14 +140,9 @@ void Kid::LateUpdate (float dt) {};
 void Kid::UpdateEntity (float dt) {
     InputManager& input = InputManager::GetInstance();
 
-    if (isInvincible) {
-        invincibilityTimer.Update(dt);
-        if (invincibilityTimer.IsOver()) {
-            invincibilityTimer.Reset();
-            isInvincible = false;
-            rigidBody->triggerLabels.clear();
-        }
-    }
+    if (isInvincible)
+        InvincibleUpdate(dt);
+
     // prevent movement when opposite directions are active
     int directionX = input.IsKeyDown(Key::moveRight) - input.IsKeyDown(Key::moveLeft);
     bool lockedDirection = attackPerforming or damagePerforming;
@@ -171,7 +171,7 @@ void Kid::UpdateEntity (float dt) {
         case EntityState::Idle:
             // prevent movement when opposite directions are active
             if (directionX != 0)
-                state = EntityState::Running;
+                FormatState(EntityState::Running);
 
             // start melee attack on ground
             if (input.KeyPress(Key::attack)) {
@@ -212,7 +212,7 @@ void Kid::UpdateEntity (float dt) {
         case EntityState::Jumping:
             // jump is performing
             rigidBody->SetSpeedOnY(-FORCE_JUMP + jumpSpeedDecrease);
-            jumpSpeedDecrease += FORCE_MASS * dt;
+            jumpSpeedDecrease += FORCE_JUMP_MASS * dt;
             if (directionX != 0)
                 rigidBody->SetSpeedOnX(directionX * SPEED_ONAIR);
             jumpTimer.Update(dt);
@@ -248,7 +248,7 @@ void Kid::UpdateEntity (float dt) {
                 if (rigidBody->GetSpeed().y == 0.0f)
                     rigidBody->ResetGravity();
 
-                jumpSpeedDecrease += FORCE_MASS * 3.8f * dt * (-lastDirectionX);
+                jumpSpeedDecrease += FORCE_DAMAGE_MASS * dt * (-lastDirectionX);
                 rigidBody->SetSpeed(
                     Vec2((damageForce.x * lastDirectionX) - jumpSpeedDecrease, rigidBody->GetSpeed().y)
                 );
@@ -273,13 +273,13 @@ void Kid::UpdateEntity (float dt) {
 bool Kid::NewStateRule (EntityState newState, int argsc, float argsv[]) {
     if (newState == state)
         return false;
-    
+
     switch (state) {
         case EntityState::AttackingSwordOnGround_0:
             attackImpulseCancel = false;
             attackPerforming = false;
             break;
-        
+
         case EntityState::AttackingSwordOnGround_1:
             attackImpulseCancel = false;
             attackPerforming = false;
@@ -292,6 +292,8 @@ bool Kid::NewStateRule (EntityState newState, int argsc, float argsv[]) {
 
         default: break;
     }
+
+    sprites[newState]->SetTextureColorMod(flickFactor, flickFactor, flickFactor);
 
     switch (newState) {
         case EntityState::Idle:
@@ -365,6 +367,28 @@ void Kid::AttackUpdate (float dt) {
     float hitTime = attackTimer.GetTime();
     if (hitTime >= ATTACK_SWORD_TIME_END)
         FormatState(EntityState::Idle);
+}
+
+void Kid::InvincibleUpdate (float dt) {
+    // invincibility time
+    invincibilityTimer.Update(dt);
+    if (invincibilityTimer.IsOver()) {
+        invincibilityTimer.Reset();
+        isInvincible = false;
+        rigidBody->triggerLabels.clear();
+        flickFactor = 255.0f;
+        sprites[state]->SetTextureColorMod(255, 255, 255);
+        return;
+    }
+    // flick animation
+    flickFactor += flickDirection * INVINCIBLE_FLICK_SPEED * dt;
+    if (flickFactor >= 255.0f) {
+        flickDirection = -1.0f;
+        flickFactor = 255.0f;
+    } else if (flickFactor <= 0.0f) {
+        flickDirection = 1.0f;
+        flickFactor = 0.0f;
+    } sprites[state]->SetTextureColorMod(flickFactor, flickFactor, flickFactor);
 }
 
 void Kid::NotifyCollision (GameObject& other) {

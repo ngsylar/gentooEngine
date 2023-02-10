@@ -68,7 +68,13 @@ void Sprite::SetScale (float scale) {
 }
 
 void Sprite::SetBlendMode (SDL_BlendMode blendMode) {
+    if (texture.use_count() == 0) return;
     SDL_SetTextureBlendMode(texture.get(), blendMode);
+}
+
+void Sprite::SetTextureColorMod (int red, int green, int blue) {
+    if (texture.use_count() == 0) return;
+    SDL_SetTextureColorMod(texture.get(), red, green, blue);
 }
 
 void Sprite::SetFrame (int frame) {
@@ -163,8 +169,6 @@ void Sprite::Render (int startX, int startY) {
         (destRect.w >> 1) + (int)associated.box.offset.x,
         (destRect.h >> 1) + (int)associated.box.offset.y
     };
-    if (associated.label == "Player")
-        SDL_SetTextureColorMod(texture.get(), 0, 0, 0);
     int rendercpy = SDL_RenderCopyEx(
         Game::GetInstance().GetRenderer(),
         texture.get(), &clipRect, &destRect,

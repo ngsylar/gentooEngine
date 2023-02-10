@@ -37,6 +37,7 @@ bool EntityMachine::HasState (EntityState compare) {
 bool EntityMachine::FormatState (EntityState newState, int argsc, float argsv[]) {
     if (NewStateRule(newState, argsc, argsv)) {
         state = newState;
+        sprites[state].get()->SetFrame(0);
         return true;
     } return false;
 }
@@ -54,16 +55,17 @@ void EntityMachine::Start () {
 }
 
 void EntityMachine::Update (float dt) {
-    EntityState previousState = state;
+    // EntityState previousState = state;
 
     if ((state == EntityState::None) or (sprites[state].get() == nullptr))
         return;
-    sprites[state].get()->Update(dt);
 
     UpdateEntity(dt);
 
-    if (state != previousState)
-        sprites[state].get()->SetFrame(0);
+    sprites[state].get()->Update(dt);
+
+    // if (state != previousState)
+    //     sprites[state].get()->SetFrame(0);
 
     // melius colliders' pixel correction
     associated.pixelColliderFix0 = (textureFlip ^ SDL_FLIP_HORIZONTAL)? 0 : 1;
