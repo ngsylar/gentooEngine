@@ -7,7 +7,7 @@
 // #define SPRITE_BREAK                            "assets/img/kid/break.png"
 #define SPRITE_JUMP                             "assets/img/kid/jump.png"
 #define SPRITE_FALL                             "assets/img/kid/fall.png"
-// #define SPRITE_LAND                             "assets/img/kid/land.png"
+#define SPRITE_LAND                             "assets/img/kid/land.png"
 #define SPRITE_DAMAGE                           "assets/img/kid/damage.png"
 #define SPRITE_ATTACK_SWORDGROUND0              "assets/img/kid/attackmeleeground1.png"
 #define SPRITE_ATTACK_SWORDGROUND1              "assets/img/kid/attackmeleeground2.png"
@@ -18,7 +18,7 @@
 // #define SPRITE_BRAKE_FRAMES                     3, 0.1f
 #define SPRITE_JUMP_FRAMES                      5, 0.1f
 #define SPRITE_FALL_FRAMES                      3, 0.1f
-// #define SPRITE_LAND_FRAMES                      3, 0.1f
+#define SPRITE_LAND_FRAMES                      3, 0.1f
 #define SPRITE_ATTACK_SWORDGROUND0_FRAMES       10, 0.1f
 #define SPRITE_ATTACK_SWORDGROUND1_FRAMES       10, 0.1f
 
@@ -43,6 +43,7 @@
 #define COLLIDER_POSITION_ONGROUND              0.0f, 9.0f
 #define COLLIDER_POSITION_ONAIR                 0.0f, 5.0f
 #define COLLIDER_BOX_SIZE                       16.0f, 29.0f
+#define COLLIDER_POSITION_Y_REPULSION           4.0f
 
 #define CAMERABOX_RECT                          16.0f, 19.0f, 16.0f, 28.0f
 #define CAMERABOX_SPACING                       0.0f, 12.0f
@@ -92,6 +93,7 @@ void Kid::Awaken () {
     Sprite* spriteRun = new Sprite(associated, SPRITE_RUN, SPRITE_RUN_FRAMES);
     Sprite* spriteJump = new Sprite(associated, SPRITE_JUMP, SPRITE_JUMP_FRAMES, true);
     Sprite* spriteFall = new Sprite(associated, SPRITE_FALL, SPRITE_FALL_FRAMES, true);
+    Sprite* spriteLand = new Sprite(associated, SPRITE_LAND, SPRITE_LAND_FRAMES, true);
     Sprite* spriteDamage = new Sprite(associated, SPRITE_DAMAGE);
     Sprite* spriteSwordOnGround0 = new Sprite(
         associated, SPRITE_ATTACK_SWORDGROUND0, SPRITE_ATTACK_SWORDGROUND0_FRAMES, true);
@@ -102,6 +104,7 @@ void Kid::Awaken () {
     AddSpriteState(EntityState::Running, spriteRun);
     AddSpriteState(EntityState::Jumping, spriteJump);
     AddSpriteState(EntityState::Falling, spriteFall);
+    AddSpriteState(EntityState::Landing, spriteLand);
     AddSpriteState(EntityState::Injured, spriteDamage);
     AddSpriteState(EntityState::AttackingSwordOnGround_0, spriteSwordOnGround0);
     AddSpriteState(EntityState::AttackingSwordOnGround_1, spriteSwordOnGround1);
@@ -297,7 +300,6 @@ bool Kid::NewStateRule (EntityState newState, int argsc, float argsv[]) {
 
     switch (newState) {
         case EntityState::Idle:
-            collider->SetBox(Vec2(COLLIDER_POSITION_ONGROUND), Vec2(COLLIDER_BOX_SIZE));
             rigidBody->SetSpeedOnX(0.0f);
             return true;
 
@@ -310,6 +312,13 @@ bool Kid::NewStateRule (EntityState newState, int argsc, float argsv[]) {
         
         case EntityState::Falling:
             collider->SetBox(Vec2(COLLIDER_POSITION_ONAIR), Vec2(COLLIDER_BOX_SIZE));
+            return true;
+        
+        // editar: usar uma altura minima para entrar nesse estado
+        // para isso usar o ponto y a partir de falling e medir ate o ponto de impact down
+        case EntityState::Landing:
+            rigidBody->SetSpeedOnX(0.0f);
+            runSpeedIncrease = 0.0f;
             return true;
 
         case EntityState::AttackingSwordOnGround_0:
@@ -336,6 +345,8 @@ bool Kid::NewStateRule (EntityState newState, int argsc, float argsv[]) {
             isInvincible = true;
             rigidBody->triggerLabels.push_back("Enemy");
             hp -= argsv[AttackGeneric::_Damage];
+
+            ColliderReset();
             return true;
 
         default: return true;
@@ -398,6 +409,7 @@ void Kid::NotifyCollision (GameObject& other) {
         case EntityState::Falling:
             // hits the ground
             if (rigidBody->ImpactDown()) {
+                ColliderReset();
                 FormatState(EntityState::Idle);
                 isGrounded = true;
             } break;
@@ -428,6 +440,11 @@ void Kid::NotifyCollision (GameObject& other) {
 
         default: break;
     }
+}
+
+void Kid::ColliderReset () {
+    collider->SetBox(Vec2(COLLIDER_POSITION_ONGROUND), Vec2(COLLIDER_BOX_SIZE));
+    associated.box.y -= COLLIDER_POSITION_Y_REPULSION;
 }
 
 bool Kid::Is (ComponentType type) {

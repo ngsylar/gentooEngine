@@ -56,14 +56,13 @@ void RigidBody::ResetFriction() {
 void RigidBody::NotifyCollision(GameObject& other) {
     Collider* A = (Collider*)associated.GetComponent(ComponentType::_Collider);
     Collider* B = (Collider*)other.GetComponent(ComponentType::_Collider);
-    RigidBody* Brb = (RigidBody*)other.GetComponent(ComponentType::_RigidBody);
 
-    if (A->isTrigger or ((Brb != nullptr) or (B->isTrigger))) return;
+    if (A->isTrigger or B->isTrigger) return;
     for (std::string label : triggerLabels)
         if (other.label == label) return;
 
     Rect intersection = A->box.GetIntersection(B->box);
-    
+
     if ((intersection.h > intersection.w) or ((intersection.w < 3.0f) and (intersection.h < 2.0f))) {
         //hit left or right
             right = intersection.x>A->box.x;

@@ -89,6 +89,7 @@ enum EntityState {
     Running,
     Jumping,
     Falling,
+    Landing,
     Attacking,
     AttackingSwordOnGround_0,
     AttackingSwordOnGround_1,

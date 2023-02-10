@@ -36,6 +36,10 @@ class Kid: public EntityMachine {
         Timer cameraGroundedTimer;
 
         bool NewStateRule(EntityState newState, int argsc, float argsv[]);
+        void AttackStart();
+        void AttackUpdate(float dt);
+        void InvincibleUpdate(float dt);
+        void ColliderReset();
 
         // Camera Assistants
         void* CameraEffects();
@@ -46,9 +50,6 @@ class Kid: public EntityMachine {
         void Start();
         void LateUpdate(float dt);
         void UpdateEntity(float dt);
-        void AttackStart();
-        void AttackUpdate(float dt);
-        void InvincibleUpdate(float dt);
         void NotifyCollision(GameObject& other);
         bool Is(ComponentType type);
 };
