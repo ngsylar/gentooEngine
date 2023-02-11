@@ -15,6 +15,7 @@ class EnemyArmadillo: public EntityMachine {
         int hp;
 
         // Automatic Factors
+        Timer turnTimer;
         float damageOriginX, damageImpulse;
         int damageDirectionX;
 

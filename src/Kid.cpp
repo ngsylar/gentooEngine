@@ -85,6 +85,7 @@ Kid::Kid (GameObject& associated): EntityMachine(associated) {
     hitCeiling = false;
     hitWall = false;
 
+    // melius colliders' pixel correction
     associated.pixelColliderFix1 = true;
 }
 

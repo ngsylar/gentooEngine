@@ -81,6 +81,7 @@ void Sprite::SetFrame (int frame) {
     currentFrame = frame % frameCount;
     clipRect.x = currentFrame * frameWidth;
     oneshotIsOver = false;
+    frameTimer.Reset();
 }
 
 void Sprite::SetFrameTime (float frameTime) {
@@ -139,7 +140,6 @@ void Sprite::Update (float dt) {
                 return;
             }
             SetFrame(currentFrame);
-            frameTimer.Reset();
         }
     }
 }

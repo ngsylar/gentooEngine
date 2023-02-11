@@ -96,7 +96,7 @@ enum EntityState {
     AttackingSwordOnAir,
     CastingSpell,
     Injured,
-    Dying,
+    Dead,
 
     // Leave declaration below as the last element,
     // it is the index for how many valid states there are

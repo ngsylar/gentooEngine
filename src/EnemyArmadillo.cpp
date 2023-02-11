@@ -20,6 +20,7 @@ EnemyArmadillo::EnemyArmadillo (GameObject& associated): EntityMachine(associate
     movementDirection = -1;
     hp = 2;
 
+    turnTimer.SetResetTime(0.4f);
     isGrounded = false;
     hitWall = false;
 }
@@ -33,7 +34,7 @@ void EnemyArmadillo::Awaken () {
     AddSpriteState(EntityState::Running, spriteRun);
     AddSpriteState(EntityState::Injured, spriteDamage);
     AddSpriteState(EntityState::Falling, spriteFall);
-    AddSpriteState(EntityState::Dying, spriteDie);
+    AddSpriteState(EntityState::Dead, spriteDie);
 
     rigidBody = new RigidBody(associated);
     associated.AddComponent(rigidBody);
@@ -66,10 +67,14 @@ void EnemyArmadillo::UpdateEntity (float dt) {
             if (isGrounded) {
                 bool foundEdgeLeft = collider->box.x < currentRoute.x;
                 bool foundEdgeRight = collider->box.x+collider->box.w > currentRoute.y;
-                if (foundEdgeLeft or foundEdgeRight or hitWall) {
+                turnTimer.Update(dt);
+
+                if ((foundEdgeLeft or foundEdgeRight or hitWall) and turnTimer.IsOver()) {
                     movementDirection *= -1;
                     rigidBody->SetSpeedOnX(SPEED_RUN * movementDirection);
                     FlipSprite(Sprite::HORIZONTAL);
+
+                    turnTimer.Reset();
                     hitWall = false;
                 }
             } break;
@@ -79,7 +84,7 @@ void EnemyArmadillo::UpdateEntity (float dt) {
                 FormatState(EntityState::Falling);
             break;
 
-        case EntityState::Dying:
+        case EntityState::Dead:
             break;
 
         default: break;

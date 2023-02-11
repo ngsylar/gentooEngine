@@ -14,7 +14,7 @@ KidAttackMelee::KidAttackMelee (
 ): AttackGeneric(associated, externalAssociated) {
     this->externalAssociated = Game::GetInstance().GetCurrentState().GetObjectPtr(externalAssociated);
     this->originPositionX = 0.0f;
-    lifetime.SetResetTime(0.16f);
+    lifetime.SetResetTime(0.26f);
     associated.enabled = false;
 }
 
