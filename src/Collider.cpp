@@ -6,6 +6,8 @@ Collider::Collider (GameObject& associated, bool trigger): Component(associated)
     setManually = false;
 }
 
+// note: offset will increase a distance of the game object position
+//       boxSize sets the box size, wich grows in both senses
 void Collider::SetBox (Vec2 offset, Vec2 boxSize) {
     this->offset = offset;
     box.SetSize(boxSize.x, boxSize.y);

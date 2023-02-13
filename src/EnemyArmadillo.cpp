@@ -95,20 +95,15 @@ bool EnemyArmadillo::NewStateRule (EntityState newState, int argsc, float argsv[
     if (newState == state)
         return false;
 
-    // auxiliar variables
-    std::weak_ptr<GameObject> player;
-
     switch (newState) {
         case EntityState::Running:
             rigidBody->SetSpeedOnX(SPEED_RUN * movementDirection);
             return true;
 
         case EntityState::Injured:
-            player = Game::GetInstance().GetCurrentState().GetObjectPtr("Player");
-            if (player.expired()) return false;
             damageOriginX = associated.box.x;
             damageImpulse = argsv[AttackGeneric::_Impulse] - IMPULSE_MASS;
-            damageDirectionX = (player.lock()->box.x < associated.box.x)? 1 : -1;
+            damageDirectionX = (argsv[AttackGeneric::_OriginX] < associated.box.x)? 1 : -1;
             rigidBody->SetSpeedOnX(argsv[AttackGeneric::_ForceX] * damageDirectionX);
             hp -= argsv[AttackGeneric::_Damage];
             return true;

@@ -24,7 +24,7 @@ class Kid: public EntityMachine {
         float runSpeedIncrease, jumpSpeedDecrease;
         bool runSpeedReset, attackImpulseCancel;
         Vec2 damageOrigin, damageForce;
-        float damageImpulse;
+        float damageImpulse, attackOriginX;
         float flickFactor, flickDirection;
         int lastDirectionX;
 
@@ -51,6 +51,7 @@ class Kid: public EntityMachine {
         void LateUpdate(float dt);
         void UpdateEntity(float dt);
         void NotifyCollision(GameObject& other);
+        bool IsInvincible();
         bool Is(ComponentType type);
 };
 

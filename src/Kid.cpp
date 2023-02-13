@@ -112,6 +112,7 @@ void Kid::Awaken () {
 
     rigidBody = new RigidBody(associated);
     associated.AddComponent(rigidBody);
+    rigidBody->triggerLabels.push_back("Enemy");
 
     collider = new Collider(associated);
     collider->SetBox(Vec2(COLLIDER_POSITION_ONGROUND), Vec2(COLLIDER_BOX_SIZE));
@@ -279,12 +280,10 @@ bool Kid::NewStateRule (EntityState newState, int argsc, float argsv[]) {
         return false;
 
     switch (state) {
-        case EntityState::AttackingSwordOnGround_0:
-            attackImpulseCancel = false;
-            attackPerforming = false;
-            break;
-
-        case EntityState::AttackingSwordOnGround_1:
+        case EntityState::AttackingSwordOnGround_0: case EntityState::AttackingSwordOnGround_1:
+            if ((newState == EntityState::Injured) and (not swordAttackOnGround->lifetime.IsOver())
+            and (lastDirectionX == ((argsv[AttackGeneric::_OriginX] < collider->box.x)? -1 : 1)))
+                return false;
             attackImpulseCancel = false;
             attackPerforming = false;
             break;
@@ -322,17 +321,12 @@ bool Kid::NewStateRule (EntityState newState, int argsc, float argsv[]) {
             runSpeedIncrease = 0.0f;
             return true;
 
-        case EntityState::AttackingSwordOnGround_0:
-            AttackStart();
-            return true;
-
-        case EntityState::AttackingSwordOnGround_1:
+        case EntityState::AttackingSwordOnGround_0: case EntityState::AttackingSwordOnGround_1:
             AttackStart();
             return true;
 
         case EntityState::Injured:
-            if (isInvincible)
-                return false;
+            if (isInvincible) return false;
 
             damageOrigin = collider->box.GetPosition();
             damageForce = Vec2(-argsv[AttackGeneric::_ForceX], -argsv[AttackGeneric::_ForceY]);
@@ -347,7 +341,6 @@ bool Kid::NewStateRule (EntityState newState, int argsc, float argsv[]) {
             damagePerforming = true;
 
             isInvincible = true;
-            rigidBody->triggerLabels.push_back("Enemy");
             hp -= argsv[AttackGeneric::_Damage];
 
             ColliderReset();
@@ -360,7 +353,8 @@ bool Kid::NewStateRule (EntityState newState, int argsc, float argsv[]) {
 void Kid::AttackStart () {
     swordAttackOnGround->direction = (lastDirectionX == 1)?
         KidAttackMelee::RIGHT : KidAttackMelee::LEFT;
-    swordAttackOnGround->Perform(associated.box.x);
+    swordAttackOnGround->Perform();
+    attackOriginX = associated.box.x;
 
     if (runSpeedReset)
         attackImpulseCancel = true;
@@ -374,7 +368,7 @@ void Kid::AttackStart () {
 
 void Kid::AttackUpdate (float dt) {
     if ((not attackImpulseCancel) and
-    (fabs(associated.box.x - swordAttackOnGround->originPositionX) >= IMPULSE_ATTACK_SWORD_X)) {
+    (fabs(associated.box.x - attackOriginX) >= IMPULSE_ATTACK_SWORD_X)) {
         rigidBody->SetSpeedOnX(0.0f);
         attackImpulseCancel = true;
     }
@@ -390,7 +384,6 @@ void Kid::InvincibleUpdate (float dt) {
     if (invincibilityTimer.IsOver()) {
         invincibilityTimer.Reset();
         isInvincible = false;
-        rigidBody->triggerLabels.clear();
         flickFactor = 255.0f;
         sprites[state]->SetTextureColorMod(255, 255, 255);
         return;
@@ -424,13 +417,7 @@ void Kid::NotifyCollision (GameObject& other) {
                 hitCeiling = true;
             break;
 
-        case EntityState::AttackingSwordOnGround_0:
-            if (rigidBody->ImpactLeft() or rigidBody->ImpactRight()) {
-                rigidBody->SetSpeedOnX(0.0f);
-                attackImpulseCancel = true;
-            } break;
-
-        case EntityState::AttackingSwordOnGround_1:
+        case EntityState::AttackingSwordOnGround_0: case EntityState::AttackingSwordOnGround_1:
             if (rigidBody->ImpactLeft() or rigidBody->ImpactRight()) {
                 rigidBody->SetSpeedOnX(0.0f);
                 attackImpulseCancel = true;
@@ -449,6 +436,10 @@ void Kid::NotifyCollision (GameObject& other) {
 void Kid::ColliderReset () {
     collider->SetBox(Vec2(COLLIDER_POSITION_ONGROUND), Vec2(COLLIDER_BOX_SIZE));
     associated.box.y -= COLLIDER_POSITION_Y_REPULSION;
+}
+
+bool Kid::IsInvincible () {
+    return isInvincible;
 }
 
 bool Kid::Is (ComponentType type) {

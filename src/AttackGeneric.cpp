@@ -45,8 +45,6 @@ void AttackGeneric::SetupCollider (Vec2 offset, Vec2 size) {
         return;
 
     if (sprite == nullptr) {
-        associated.box.x = offset.x;
-        associated.box.y = offset.y;
         associated.box.w = size.x;
         associated.box.h = size.y;
     }
@@ -69,21 +67,28 @@ void AttackGeneric::Awaken () {}
 
 void AttackGeneric::Start () {}
 
+void AttackGeneric::Perform () {
+    associated.enabled = true;
+    lifetime.Reset();
+    PerformAttack();
+}
+
+void AttackGeneric::PerformAttack () {}
+
 void AttackGeneric::Update (float dt) {
     if (usingExternalAssociated and externalAssociated.expired()) {
         associated.RequestDelete();
         return;
     }
-
-    UpdateAttack(dt);
-
     if (lifetime.HasResetTime()) {
         lifetime.Update(dt);
         if (lifetime.IsOver()) {
-            lifetime.Reset();
             associated.enabled = false;
+            return;
         }
     }
+    UpdateAttack(dt);
+
     // melius colliders' pixel correction
     associated.pixelColliderFix0 = (
         usingExternalAssociated and
@@ -103,7 +108,7 @@ void AttackGeneric::NotifyCollision (GameObject& other) {
     if (entity == nullptr) return;
 
     float argsv[5] = {force.x, force.y, impulse, (float)damage, collider->box.x};
-    entity->FormatState(EntityState::Injured, 4, argsv);
+    entity->FormatState(EntityState::Injured, 5, argsv);
 }
 
 bool AttackGeneric::UsingInternalAssociated () {

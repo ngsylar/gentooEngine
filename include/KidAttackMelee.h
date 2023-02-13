@@ -18,7 +18,6 @@ class KidAttackMelee: public AttackGeneric {
     public:
         enum AttackDirection {LEFT, RIGHT, UP, DOWN};
         AttackDirection direction;
-        float originPositionX;
 
         KidAttackMelee(
             GameObject& associated,
@@ -27,7 +26,7 @@ class KidAttackMelee: public AttackGeneric {
         void SetProperties(Vec2 force, float impulse, int damage, float displacement);
         void Awaken();
         void Start();
-        void Perform(float originPositionX);
+        void Perform();
         void UpdateAttack(float dt);
         void NotifyCollision(GameObject& other);
 };

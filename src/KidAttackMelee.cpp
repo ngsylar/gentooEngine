@@ -5,6 +5,9 @@
 #define COLLIDER_OFFSET_Y       6.0f
 #define COLLIDER_SIZE           24.0f, 44.0f
 
+#define LIFETIME_START_TIME     0.09f
+#define LIFETIME_END_TIME       0.26f
+
 #define CAMERA_SHAKE_COUNT      6
 #define CAMERA_SHAKE_RANGE      3
 #define CAMERA_SHAKE_RESET_TIME 0.04f
@@ -13,7 +16,6 @@ KidAttackMelee::KidAttackMelee (
     GameObject& associated, GameObject* externalAssociated
 ): AttackGeneric(associated, externalAssociated) {
     this->externalAssociated = Game::GetInstance().GetCurrentState().GetObjectPtr(externalAssociated);
-    this->originPositionX = 0.0f;
     lifetime.SetResetTime(0.26f);
     associated.enabled = false;
 }
@@ -34,9 +36,9 @@ void KidAttackMelee::Start () {
     cameraShakeTimer.FalseStart();
 }
 
-void KidAttackMelee::Perform (float originPositionX) {
-    this->originPositionX = originPositionX;
+void KidAttackMelee::Perform () {
     associated.enabled = true;
+    lifetime.Reset();
 }
 
 void KidAttackMelee::UpdateAttack (float dt) {
@@ -55,10 +57,8 @@ void KidAttackMelee::UpdateAttack (float dt) {
             associated.box.y = externalBox.y + COLLIDER_OFFSET_Y;
             break;
 
-        case UP: break;
-
-        case DOWN: break;
-
+        // case UP: break;
+        // case DOWN: break;
         default: break;
     }
 }
@@ -69,19 +69,27 @@ void KidAttackMelee::NotifyCollision (GameObject& other) {
         return;
 
     EntityMachine* entity = (EntityMachine*)other.GetComponent(ComponentType::_EntityMachine);
-
     if (entity != nullptr) {
-        float argsv[4] = {force.x, force.y, impulse, (float)damage};
+        float argsv[5] = {force.x, force.y, impulse, (float)damage, self->box.x};
 
         RigidBody* rigidBody = (RigidBody*)self->GetComponent(ComponentType::_RigidBody);
         RigidBody* otherRigidBody = (RigidBody*)other.GetComponent(ComponentType::_RigidBody);
 
-        int otherDirection = (otherRigidBody != nullptr)? std::signbit(otherRigidBody->GetSpeed().x) : 0;
-        if ((otherDirection == direction) and (rigidBody->GetSpeed().x != 0.0f))
+        if (lifetime.GetTime() < LIFETIME_START_TIME) {
+            otherRigidBody->SetSpeedOnX(rigidBody->GetSpeed().x);
+            return;
+        }
+        Collider* otherCollider = (Collider*)other.GetComponent(ComponentType::_Collider);
+        float overlap = (direction == LEFT)?
+            ((otherCollider->box.x+otherCollider->box.w)-collider->box.x) :
+            ((collider->box.x+collider->box.w)-otherCollider->box.x);
+        if (overlap > 0.0f) argsv[_Impulse] += overlap;
+
+        if (rigidBody->GetSpeed().x != 0.0f)
             argsv[_Impulse] += displacement;
 
-        if (not entity->FormatState(EntityState::Injured, 4, argsv))
-            return;
+        // ensures that the collision will only happen once effectively
+        if (not entity->FormatState(EntityState::Injured, 5, argsv)) return;
     } else return;
 
     /*--------------------------------------------------------------------------------------------------*/
@@ -93,8 +101,8 @@ void KidAttackMelee::NotifyCollision (GameObject& other) {
     for (int i=0; i < CAMERA_SHAKE_COUNT; i++) {
         Vec2 shake = Vec2(
             rand()%shakeRange-CAMERA_SHAKE_RANGE,
-            rand()%shakeRange-CAMERA_SHAKE_RANGE
-        ); cameraShakeQueue.push(shake);
+            rand()%shakeRange-CAMERA_SHAKE_RANGE);
+        cameraShakeQueue.push(shake);
     }
     Camera::AddMethod(this, std::bind(&CameraShake, this));
 }
