@@ -16,7 +16,7 @@ class EnemyRunner: public EntityMachine {
         int hp;
 
         // Automatic Factors
-        Timer turnTimer;
+        Timer edgeTimer, toggleTimer, recoverTimer;
         float damageOriginX, damageImpulse;
         int damageDirectionX;
 

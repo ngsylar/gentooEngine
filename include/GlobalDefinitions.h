@@ -95,6 +95,7 @@ enum EntityState {
     AttackingSwordOnGround_1,
     AttackingSwordOnAir,
     CastingSpell,
+    Recovering,
     Injured,
     Dead,
 

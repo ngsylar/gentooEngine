@@ -2,17 +2,23 @@
 #include "EnemyArmadillo.h"
 #include "AttackGeneric.h"
 
-#define SPRITE_RUN          "assets/img/armadillo/enemy1.png"
+#define SPRITE_RUN              "assets/img/armadillo/run.png"
+#define SPRITE_DAMAGE           "assets/img/armadillo/damage.png"
+#define SPRITE_DEATH            "assets/img/armadillo/death.png"
 
-#define SPEED_RUN           60.0f
-#define IMPULSE_MASS        10.0f
+#define SPRITE_RUN_FRAMES       6, 0.1f
+#define SPRITE_DAMAGE_FRAMES    2, 0.1f
+#define SPRITE_DEATH_FRAMES     7, 0.1f
 
-#define ATTACK_FORCE        400.0f, 140.0f
-#define ATTACK_IMPULSE      50.0f
-#define ATTACK_DAMAGE       1
+#define SPEED_RUN               60.0f
+#define IMPULSE_MASS            10.0f
 
-#define COLLIDER_POSITION   0.0f, 14.0f
-#define COLLIDER_BOX_SIZE   21.0f, 19.0f
+#define ATTACK_FORCE            400.0f, 140.0f
+#define ATTACK_IMPULSE          50.0f
+#define ATTACK_DAMAGE           1
+
+#define COLLIDER_POSITION       0.0f, 14.0f
+#define COLLIDER_BOX_SIZE       21.0f, 19.0f
 
 EnemyArmadillo::EnemyArmadillo (GameObject& associated): EntityMachine(associated) {
     type = type | ComponentType::_EnemyArmadillo;
@@ -26,10 +32,10 @@ EnemyArmadillo::EnemyArmadillo (GameObject& associated): EntityMachine(associate
 }
 
 void EnemyArmadillo::Awaken () {
-    Sprite* spriteRun = new Sprite(associated, SPRITE_RUN);
-    Sprite* spriteDamage = new Sprite(associated, SPRITE_RUN);
-    Sprite* spriteFall = new Sprite(associated, SPRITE_RUN);
-    Sprite* spriteDie = new Sprite(associated, SPRITE_RUN);
+    Sprite* spriteRun = new Sprite(associated, SPRITE_RUN, SPRITE_RUN_FRAMES);
+    Sprite* spriteDamage = new Sprite(associated, SPRITE_DAMAGE, SPRITE_DAMAGE_FRAMES);
+    Sprite* spriteFall = new Sprite(associated, SPRITE_DAMAGE, SPRITE_DAMAGE_FRAMES);
+    Sprite* spriteDie = new Sprite(associated, SPRITE_DEATH, SPRITE_DEATH_FRAMES, true);
 
     AddSpriteState(EntityState::Running, spriteRun);
     AddSpriteState(EntityState::Injured, spriteDamage);
@@ -59,8 +65,10 @@ void EnemyArmadillo::Start () {
 void EnemyArmadillo::LateUpdate (float dt) {}
 
 void EnemyArmadillo::UpdateEntity (float dt) {
-    if (isGrounded and (rigidBody->GetSpeed().y > 100))
+    if (isGrounded and (rigidBody->GetSpeed().y > 100)) {
+        FormatState(EntityState::Falling);
         isGrounded = false;
+    }
 
     switch (state) {
         case EntityState::Running:
@@ -102,7 +110,8 @@ bool EnemyArmadillo::NewStateRule (EntityState newState, int argsc, float argsv[
 
         case EntityState::Injured:
             damageOriginX = associated.box.x;
-            damageImpulse = argsv[AttackGeneric::_Impulse] - IMPULSE_MASS;
+            damageImpulse = argsv[AttackGeneric::_Impulse]+argsv[AttackGeneric::_Displacement];
+            damageImpulse -= (damageImpulse * IMPULSE_MASS) / argsv[AttackGeneric::_Impulse];
             damageDirectionX = (argsv[AttackGeneric::_OriginX] < associated.box.x)? 1 : -1;
             rigidBody->SetSpeedOnX(argsv[AttackGeneric::_ForceX] * damageDirectionX);
             hp -= argsv[AttackGeneric::_Damage];

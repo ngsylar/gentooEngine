@@ -77,8 +77,8 @@ Kid::Kid (GameObject& associated): EntityMachine(associated) {
     GameObject* attack = new GameObject(LayerDistance::_Player_Front);
     swordAttackOnGround = new KidAttackMelee(*attack, &associated);
     swordAttackOnGround->SetProperties(
-        Vec2(ATTACK_SWORD_FORCE), ATTACK_SWORD_IMPULSE, ATTACK_SWORD_DAMAGE, IMPULSE_ATTACK_SWORD_X
-    ); attack->AddComponent(swordAttackOnGround);
+        Vec2(ATTACK_SWORD_FORCE), ATTACK_SWORD_IMPULSE, ATTACK_SWORD_DAMAGE, IMPULSE_ATTACK_SWORD_X);
+    attack->AddComponent(swordAttackOnGround);
     Game::GetInstance().GetCurrentState().AddObject(attack);
 
     isGrounded = false;
@@ -93,7 +93,7 @@ void Kid::Awaken () {
     Sprite* spriteIdle = new Sprite(associated, SPRITE_IDLE, SPRITE_IDLE_FRAMES);
     Sprite* spriteRun = new Sprite(associated, SPRITE_RUN, SPRITE_RUN_FRAMES);
     Sprite* spriteJump = new Sprite(associated, SPRITE_JUMP, SPRITE_JUMP_FRAMES, true);
-    Sprite* spriteFall = new Sprite(associated, SPRITE_FALL, SPRITE_FALL_FRAMES, true);
+    Sprite* spriteFall = new Sprite(associated, SPRITE_FALL, SPRITE_FALL_FRAMES);
     Sprite* spriteLand = new Sprite(associated, SPRITE_LAND, SPRITE_LAND_FRAMES, true);
     Sprite* spriteDamage = new Sprite(associated, SPRITE_DAMAGE);
     Sprite* spriteSwordOnGround0 = new Sprite(

@@ -17,7 +17,8 @@ class AttackGeneric: public Component {
         int damage;
 
     public:
-        enum Argument {_ForceX, _ForceY, _Impulse, _Damage, _OriginX, _OriginY};
+        enum Argument {_ForceX, _ForceY, _Impulse, _Damage, _OriginX, _OriginY, _Displacement};
+        bool ignoreEqualLabels;
         Timer lifetime;
 
         AttackGeneric(

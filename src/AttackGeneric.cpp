@@ -3,8 +3,8 @@
 
 AttackGeneric::AttackGeneric (GameObject& associated, GameObject* externalAssociated): Component(associated) {
     type = ComponentType::_Attack;
-    force = Vec2(400.0f, 0.0f);
-    impulse = 70.0f;
+    force = Vec2(400.0f, 140.0f);
+    impulse = 50.0f;
     damage = 1;
 
     if (externalAssociated != nullptr) {
@@ -17,6 +17,7 @@ AttackGeneric::AttackGeneric (GameObject& associated, GameObject* externalAssoci
         collider = (Collider*)associated.GetComponent(ComponentType::_Collider);
         sprite = nullptr;
     }
+    ignoreEqualLabels = true;
 }
 
 // sprite is only configurable if an external associated is used
@@ -101,7 +102,8 @@ void AttackGeneric::Update (float dt) {
 void AttackGeneric::UpdateAttack (float dt) {}
 
 void AttackGeneric::NotifyCollision (GameObject& other) {
-    if ((not externalAssociated.expired()) and (&other == externalAssociated.lock().get()))
+    if (((not externalAssociated.expired()) and (&other == externalAssociated.lock().get()))
+    or (ignoreEqualLabels and (associated.label == other.label)))
         return;
 
     EntityMachine* entity = (EntityMachine*)other.GetComponent(ComponentType::_EntityMachine);

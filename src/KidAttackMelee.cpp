@@ -5,8 +5,8 @@
 #define COLLIDER_OFFSET_Y       6.0f
 #define COLLIDER_SIZE           24.0f, 44.0f
 
-#define LIFETIME_START_TIME     0.09f
-#define LIFETIME_END_TIME       0.26f
+#define LIFETIME_START          0.09f
+#define LIFETIME_END            0.26f
 
 #define CAMERA_SHAKE_COUNT      6
 #define CAMERA_SHAKE_RANGE      3
@@ -16,7 +16,8 @@ KidAttackMelee::KidAttackMelee (
     GameObject& associated, GameObject* externalAssociated
 ): AttackGeneric(associated, externalAssociated) {
     this->externalAssociated = Game::GetInstance().GetCurrentState().GetObjectPtr(externalAssociated);
-    lifetime.SetResetTime(0.26f);
+    associated.label = externalAssociated->label;
+    lifetime.SetResetTime(LIFETIME_END);
     associated.enabled = false;
 }
 
@@ -70,23 +71,25 @@ void KidAttackMelee::NotifyCollision (GameObject& other) {
 
     EntityMachine* entity = (EntityMachine*)other.GetComponent(ComponentType::_EntityMachine);
     if (entity != nullptr) {
-        float argsv[5] = {force.x, force.y, impulse, (float)damage, self->box.x};
+        float argsv[7] = {force.x, force.y, impulse, (float)damage, self->box.x, self->box.y, 0.0f};
 
         RigidBody* rigidBody = (RigidBody*)self->GetComponent(ComponentType::_RigidBody);
         RigidBody* otherRigidBody = (RigidBody*)other.GetComponent(ComponentType::_RigidBody);
 
-        if (lifetime.GetTime() < LIFETIME_START_TIME) {
+        if (lifetime.GetTime() < LIFETIME_START) {
             otherRigidBody->SetSpeedOnX(rigidBody->GetSpeed().x);
             return;
         }
-        Collider* otherCollider = (Collider*)other.GetComponent(ComponentType::_Collider);
-        float overlap = (direction == LEFT)?
-            ((otherCollider->box.x+otherCollider->box.w)-collider->box.x) :
-            ((collider->box.x+collider->box.w)-otherCollider->box.x);
-        if (overlap > 0.0f) argsv[_Impulse] += overlap;
-
         if (rigidBody->GetSpeed().x != 0.0f)
-            argsv[_Impulse] += displacement;
+            argsv[_Displacement] = displacement;
+        else {
+
+            Collider* otherCollider = (Collider*)other.GetComponent(ComponentType::_Collider);
+            float overlap = (direction == LEFT)?
+                ((otherCollider->box.x+otherCollider->box.w)-collider->box.x) :
+                ((collider->box.x+collider->box.w)-otherCollider->box.x);
+            if (overlap > 0.0f) argsv[_Impulse] += overlap;
+        }
 
         // ensures that the collision will only happen once effectively
         if (not entity->FormatState(EntityState::Injured, 5, argsv)) return;
