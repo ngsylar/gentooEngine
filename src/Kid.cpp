@@ -11,6 +11,7 @@
 #define SPRITE_DAMAGE                           "assets/img/kid/damage.png"
 #define SPRITE_ATTACK_SWORDGROUND0              "assets/img/kid/attackmeleeground1.png"
 #define SPRITE_ATTACK_SWORDGROUND1              "assets/img/kid/attackmeleeground2.png"
+#define SPRITE_DEATH                            "assets/img/kid/death.png"
 
 #define SPRITE_IDLE_FRAMES                      10, 0.1f
 // #define SPRITE_WALK_FRAMES                      1, 0.1f
@@ -21,6 +22,7 @@
 #define SPRITE_LAND_FRAMES                      3, 0.1f
 #define SPRITE_ATTACK_SWORDGROUND0_FRAMES       10, 0.1f
 #define SPRITE_ATTACK_SWORDGROUND1_FRAMES       10, 0.1f
+#define SPRITE_DEATH_FRAMES                     7, 0.1f
 
 #define ACCELERATION_RUN                        800.0f
 #define SPEED_RUN                               120.0f
@@ -54,8 +56,6 @@
 
 #define CAMERA_GROUNDED_RESET_TIME              1.5f
 
-// float coisaLinda = 1000.0f; // remover
-
 GameObject* Kid::instance = nullptr;
 
 Kid::Kid (GameObject& associated): EntityMachine(associated) {
@@ -66,6 +66,7 @@ Kid::Kid (GameObject& associated): EntityMachine(associated) {
     jumpTimer.SetResetTime(0.8f);
     invincibilityTimer.SetResetTime(1.25f);
     isInvincible = false;
+    isDead = false;
     hp = 6;
 
     runSpeedIncrease = 0.0f;
@@ -111,6 +112,7 @@ void Kid::Awaken () {
         associated, SPRITE_ATTACK_SWORDGROUND0, SPRITE_ATTACK_SWORDGROUND0_FRAMES, true);
     Sprite* spriteSwordOnGround1 = new Sprite(
         associated, SPRITE_ATTACK_SWORDGROUND1, SPRITE_ATTACK_SWORDGROUND1_FRAMES, true);
+    Sprite* spriteDeath = new Sprite(associated, SPRITE_DEATH, SPRITE_DEATH_FRAMES, true);
 
     AddSpriteState(EntityState::Idle, spriteIdle);
     AddSpriteState(EntityState::Running, spriteRun);
@@ -120,6 +122,7 @@ void Kid::Awaken () {
     AddSpriteState(EntityState::Injured, spriteDamage);
     AddSpriteState(EntityState::AttackingSwordOnGround_0, spriteSwordOnGround0);
     AddSpriteState(EntityState::AttackingSwordOnGround_1, spriteSwordOnGround1);
+    AddSpriteState(EntityState::Dead, spriteDeath);
 
     rigidBody = new RigidBody(associated);
     associated.AddComponent(rigidBody);
@@ -154,6 +157,7 @@ void Kid::Start () {
 void Kid::LateUpdate (float dt) {};
 
 void Kid::UpdateEntity (float dt) {
+    if (state == EntityState::Dead) return;
     InputManager& input = InputManager::GetInstance();
 
     if (isInvincible)
@@ -177,11 +181,12 @@ void Kid::UpdateEntity (float dt) {
         FormatState(EntityState::Falling);
         isGrounded = false;
     }
-    // // remover
-    // if (rigidBody->GetSpeed().x != coisaLinda) {
-    //     coisaLinda = rigidBody->GetSpeed().x;
-    //     SDL_Log("%f", coisaLinda);
-    // }
+
+    // waits the falling before die
+    else if ((isNotFalling and (hp <= 0)) or isDead) {
+        Die();
+        return;
+    }
 
     switch (state) {
         case EntityState::Idle:
@@ -268,7 +273,7 @@ void Kid::UpdateEntity (float dt) {
                 rigidBody->SetSpeed(
                     Vec2((damageForce.x * lastDirectionX) - jumpSpeedDecrease, rigidBody->GetSpeed().y)
                 );
-                if (std::signbit(rigidBody->GetSpeed().x) == std::signbit(lastDirectionX)) {
+                if ((std::signbit(rigidBody->GetSpeed().x)==std::signbit(lastDirectionX)) and (hp > 0)) {
                     rigidBody->SetSpeedOnX(0.0f);
                     FormatState(EntityState::Falling);
                 }
@@ -410,6 +415,12 @@ void Kid::InvincibleUpdate (float dt) {
     } sprites[state]->SetTextureColorMod(flickFactor, flickFactor, flickFactor);
 }
 
+void Kid::Die () {
+    associated.RemoveComponent(rigidBody);
+    associated.RemoveComponent(collider);
+    FormatState(EntityState::Dead);
+}
+
 void Kid::NotifyCollision (GameObject& other) {
     rigidBody->NotifyCollision(other);
 
@@ -438,6 +449,9 @@ void Kid::NotifyCollision (GameObject& other) {
             // hits a wall
             if (rigidBody->ImpactLeft() or rigidBody->ImpactRight())
                 hitWall = true;
+            // hits the ground and dies
+            else if ((hp <= 0) and rigidBody->ImpactDown())
+                isDead = true;
             break;
 
         default: break;

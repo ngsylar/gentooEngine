@@ -8,7 +8,7 @@
 
 #define SPRITE_RUN_FRAMES       6, 0.1f
 #define SPRITE_DAMAGE_FRAMES    2, 0.1f
-#define SPRITE_DEATH_FRAMES     7, 0.1f
+#define SPRITE_DEATH_FRAMES     8, 0.1f
 
 #define SPEED_RUN               60.0f
 #define IMPULSE_MASS            10.0f
@@ -65,9 +65,21 @@ void EnemyArmadillo::Start () {
 void EnemyArmadillo::LateUpdate (float dt) {}
 
 void EnemyArmadillo::UpdateEntity (float dt) {
+    if (state == EntityState::Dead) {
+        if (sprites[state]->OneshotIsOver())
+            associated.RequestDelete();
+        return;
+    }
     if (isGrounded and (rigidBody->GetSpeed().y > 100)) {
         FormatState(EntityState::Falling);
         isGrounded = false;
+    }
+    else if (hp <= 0) {
+        associated.RemoveComponent(associated.GetComponent(ComponentType::_Attack));
+        associated.RemoveComponent(rigidBody);
+        associated.RemoveComponent(collider);
+        FormatState(EntityState::Dead);
+        return;
     }
 
     switch (state) {

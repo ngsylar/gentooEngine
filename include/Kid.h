@@ -14,7 +14,7 @@ class Kid: public EntityMachine {
         RigidBody* rigidBody;
         Collider* collider;
         Timer jumpTimer, attackTimer, damageTimer, invincibilityTimer;
-        bool isInvincible;
+        bool isInvincible, isDead;
         int hp;
 
         // Attack Types
@@ -46,6 +46,7 @@ class Kid: public EntityMachine {
         void AttackStart();
         void AttackUpdate(float dt);
         void InvincibleUpdate(float dt);
+        void Die();
         void ColliderReset();
 
         // Camera Assistants

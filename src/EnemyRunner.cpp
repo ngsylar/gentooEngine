@@ -92,10 +92,23 @@ void EnemyRunner::Start () {
 void EnemyRunner::LateUpdate (float dt) {}
 
 void EnemyRunner::UpdateEntity (float dt) {
+    if (state == EntityState::Dead) {
+        if (sprites[state]->OneshotIsOver())
+            associated.RequestDelete();
+        return;
+    }
     if (isGrounded and (rigidBody->GetSpeed().y > 100)) {
         FormatState(EntityState::Falling);
         isGrounded = false;
     }
+    else if (hp <= 0) {
+        associated.RemoveComponent(associated.GetComponent(ComponentType::_Attack));
+        associated.RemoveComponent(rigidBody);
+        associated.RemoveComponent(collider);
+        FormatState(EntityState::Dead);
+        return;
+    }
+
     GameObject* kid = Kid::GetInstance();
     if (kid and (state != EntityState::Attacking) and (state != EntityState::Injured)
     and (damageTaken < RECOVER_ACTIVATION_RECORD)) {
@@ -108,6 +121,7 @@ void EnemyRunner::UpdateEntity (float dt) {
         and (attackTarget.y < center.y+perception.y) and (attackTarget.y > center.y-perception.h))
             FormatState(EntityState::Attacking);
     }
+
     switch (state) {
         case EntityState::Idle:
             toggleTimer.Update(dt);
@@ -140,15 +154,11 @@ void EnemyRunner::UpdateEntity (float dt) {
         
         case EntityState::Attacking:
             attackTimer.Update(dt);
-            if (attackTimer.IsOver())
+            if (attackTimer.IsOver()) {
                 FormatState(EntityState::Idle);
-            else {
-                bool foundEdgeLeft = collider->box.x < currentRoute.x;
-                bool foundEdgeRight = collider->box.x+collider->box.w > currentRoute.y;
-                if (foundEdgeLeft or foundEdgeRight or hitWall) {
-                    hitWall = false;
-                    FormatState(EntityState::Idle);
-                }
+            } else if (hitWall) {
+                hitWall = false;
+                FormatState(EntityState::Idle);
             } break;
 
         case EntityState::Recovering:
