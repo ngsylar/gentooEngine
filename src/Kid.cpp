@@ -56,7 +56,10 @@
 
 // float coisaLinda = 1000.0f; // remover
 
+GameObject* Kid::instance = nullptr;
+
 Kid::Kid (GameObject& associated): EntityMachine(associated) {
+    instance = &associated;
     type = type | ComponentType::_Kid;
     associated.layer = LayerDistance::_Player;
     associated.label = "Player";
@@ -87,6 +90,14 @@ Kid::Kid (GameObject& associated): EntityMachine(associated) {
 
     // melius colliders' pixel correction
     associated.pixelColliderFix1 = true;
+}
+
+Kid::~Kid () {
+    instance = nullptr;
+}
+
+GameObject* Kid::GetInstance () {
+    return instance;
 }
 
 void Kid::Awaken () {
@@ -162,7 +173,7 @@ void Kid::UpdateEntity (float dt) {
     bool isNotFalling = (state != EntityState::Falling) and (state != EntityState::Injured);
     bool attackIsOver = attackPerforming and (attackTimer.GetTime() >= ATTACK_SWORD_TIME_HIT);
     bool isNotAttacking = (not attackPerforming) or attackIsOver;
-    if (isNotFalling and (rigidBody->GetSpeed().y > 100) and isNotAttacking) {
+    if (isNotFalling and isNotAttacking and (rigidBody->GetSpeed().y > 100)) {
         FormatState(EntityState::Falling);
         isGrounded = false;
     }

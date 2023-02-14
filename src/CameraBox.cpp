@@ -113,7 +113,6 @@ void CameraBox::Render () {
     if (not Game::GetInstance().GetCurrentState().Debugging()) return;
 
     Rect box( associated.box );
-    Vec2 center( box.GetPosition() );
     SDL_Point points[5];
 
     Vec2 point = Vec2(box.x, box.y) - Camera::pos;

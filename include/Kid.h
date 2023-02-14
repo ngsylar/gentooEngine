@@ -10,6 +10,7 @@
 
 class Kid: public EntityMachine {
     private:
+        static GameObject* instance;
         RigidBody* rigidBody;
         Collider* collider;
         Timer jumpTimer, attackTimer, damageTimer, invincibilityTimer;
@@ -19,14 +20,20 @@ class Kid: public EntityMachine {
         // Attack Types
         KidAttackMelee* swordAttackOnGround;
 
-        // Automatic Factors
+        // Automatic Signals
         bool attackPerforming, damagePerforming;
-        float runSpeedIncrease, jumpSpeedDecrease;
         bool runSpeedReset, attackImpulseCancel;
+
+        // Automatic Activation Values
+        float attackOriginX, fallOriginY;
         Vec2 damageOrigin, damageForce;
-        float damageImpulse, attackOriginX;
-        float flickFactor, flickDirection;
+        float damageImpulse;
+        float flickDirection;
         int lastDirectionX;
+
+        // Automatic Factors
+        float runSpeedIncrease, jumpSpeedDecrease;
+        float flickFactor;
 
         // Collision Faces
         bool isGrounded, hitCeiling, hitWall;
@@ -46,6 +53,8 @@ class Kid: public EntityMachine {
 
     public:
         Kid(GameObject& associated);
+        ~Kid();
+        static GameObject* GetInstance();
         void Awaken();
         void Start();
         void LateUpdate(float dt);

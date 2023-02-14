@@ -13,12 +13,17 @@ class EnemyRunner: public EntityMachine {
         Collider* collider;
         int movementDirection;
         Vec2 currentRoute;
+        Rect perceptionRange;   // note: x front, y above, w back, h below
         int hp;
 
+        // Behaviour
+        Timer toggleTimer, attackTimer, recoverTimer;
+
         // Automatic Factors
-        Timer edgeTimer, toggleTimer, recoverTimer;
+        Vec2 attackTarget;
+        Timer edgeTimer;
         float damageOriginX, damageImpulse;
-        int damageDirectionX;
+        int damageDirectionX, damageTaken;
 
         // Collision Faces
         bool isGrounded, hitWall;
@@ -31,6 +36,7 @@ class EnemyRunner: public EntityMachine {
         void Start();
         void LateUpdate(float dt);
         void UpdateEntity(float dt);
+        void RenderEntity();
         void NotifyCollision(GameObject& other);
 };
 
