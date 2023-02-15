@@ -61,6 +61,7 @@
 #include "CameraFollower.h"
 #include "CameraBox.h"
 #include "LoopedBackground.h"
+#include "Interactor.h"
 
 // Game Control Core
 #include "State.h"

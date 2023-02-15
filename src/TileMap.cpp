@@ -113,6 +113,8 @@ void TileMap::SetTileSet (TileSet* tileSet) {
 void TileMap::Update (float dt) {}
 
 void TileMap::Render () {
+    if (not Game::GetInstance().GetCurrentState().Debugging())
+        return;
     Vec2 Lower = Camera::pos;
     Vec2 Upper = Lower + Game::GetInstance().GetResolution();
     int Lx = floor(Lower.x)/tileSet->GetTileWidth()-4;//0;//
@@ -222,6 +224,7 @@ void TileMap::DumpCoord (const std::vector<RectInt>& Data, std::string File) {
     Output.close();
 }
 
+//Todo ignore blocks meant for half colliders
 void TileMap::BorderMarking (std::vector<std::vector<int>> &Map) {
     int Index = 1;
     for(int i = 0; i < (int)Map.size(); i++) {

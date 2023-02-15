@@ -65,9 +65,9 @@ Game::Game (std::string title, int width, int height, int logicalWidth, int logi
     if (renderer == nullptr) {
         SDL_Log("Unable to start renderer: %s", SDL_GetError());
     }
-    // if (SDL_RenderSetVSync(renderer,1) != 0) {
-    //     noVSync = true;
-    // }
+    if (SDL_RenderSetVSync(renderer,1) != 0) {
+        noVSync = true;
+    }
 
     // resolution
     resolution = Vec2(logicalWidth, logicalHeight);
@@ -91,13 +91,6 @@ Game::~Game () {
     while (not stateStack.empty())
         stateStack.pop();
     Resources::ClearAll();
-
-    // editar: que raio eh isso? pq isso ta aqui? ce... tu ta ficando doido?
-    Music* stateMusic = ZoneManager::GetCarriedMusic();
-    if(stateMusic != nullptr) {
-        stateMusic->Stop();
-        delete stateMusic;
-    }
 
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);

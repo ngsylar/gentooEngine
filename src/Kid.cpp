@@ -118,7 +118,7 @@ void Kid::Awaken () {
     cameraBox->AddComponent(cameraBoxComp);
     cameraBoxComp->AddMethod(this, std::bind(&CameraEffects, this));
     Game::GetInstance().GetCurrentState().AddObject(cameraBox);
-};
+}
 
 void Kid::Start () {
     state = EntityState::Idle;
@@ -130,10 +130,10 @@ void Kid::Start () {
     Camera::offset.y = 0;
 
     cameraGroundedTimer.SetResetTime(CAMERA_GROUNDED_RESET_TIME);
-};
+}
 
 // keep it empty so LateUpdateEntity is not called
-void Kid::LateUpdate (float dt) {};
+void Kid::LateUpdate (float dt) {}
 
 void Kid::UpdateEntity (float dt) {
     InputManager& input = InputManager::GetInstance();

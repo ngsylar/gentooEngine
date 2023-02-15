@@ -529,8 +529,8 @@ TestScene6::TestScene6 () {
 }
 
 // ScreenFade* Silk = nullptr;
-#define CUSTOM_BLENDCOOL SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_SRC_ALPHA, SDL_BLENDFACTOR_ONE, SDL_BLENDOPERATION_ADD,\
-            SDL_BLENDFACTOR_ONE_MINUS_SRC_COLOR, SDL_BLENDFACTOR_ONE_MINUS_DST_COLOR, SDL_BLENDOPERATION_ADD)
+#define CUSTOM_BLENDCOOL SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_ZERO, SDL_BLENDFACTOR_DST_COLOR, SDL_BLENDOPERATION_MINIMUM,\
+            SDL_BLENDFACTOR_SRC_ALPHA, SDL_BLENDFACTOR_DST_ALPHA, SDL_BLENDOPERATION_ADD)
 
 void TestScene6::LoadAssets () {
     //#####################################
@@ -562,10 +562,10 @@ void TestScene6::LoadAssets () {
     AddObject(DummyObj);
     //#####################################
 
-    GameObject* dialogueObj = new GameObject(LayerDistance::_ForeGround_VeryClose);
-    DialogueBox* chat = new DialogueBox(*dialogueObj);
-    dialogueObj->AddComponent(chat);
-    AddObject(dialogueObj);
+    // GameObject* dialogueObj = new GameObject(LayerDistance::_ForeGround_VeryClose);
+    // DialogueBox* chat = new DialogueBox(*dialogueObj);
+    // dialogueObj->AddComponent(chat);
+    // AddObject(dialogueObj);
 }
 
 void TestScene6::Update (float dt) {

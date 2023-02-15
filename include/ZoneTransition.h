@@ -5,6 +5,9 @@
 #include "State.h"
 
 enum Zone {
+    //House
+    _H1,
+    
     //Surface
     _S1,
     _S2,
@@ -64,6 +67,7 @@ class ZoneManager {
     public:
     
         ZoneManager();
+        ~ZoneManager();
         static void RequestZone(std::pair<Zone, ZoneExit> place, bool carryMusic);
         static Vec2 GetSpawnPosition();
         static Music* GetCarriedMusic();

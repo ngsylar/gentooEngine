@@ -1,5 +1,6 @@
 #include "ZoneTransition.h"
 #include "GameScene.h"
+#include "GameData.h"
 
 ZoneTransition::ZoneTransition (GameObject& associated, Rect collider, std::pair<Zone, ZoneExit> zoneExit, bool carryMusic)
 : Component(associated) {
@@ -9,7 +10,7 @@ ZoneTransition::ZoneTransition (GameObject& associated, Rect collider, std::pair
         collider.w*TILE_SIZE, collider.h*TILE_SIZE);
     associated.box = collider;
     this->zoneExit = zoneExit;
-    Collider* door = new Collider(associated);
+    Collider* door = new Collider(associated, true);
     door->box = collider;
     associated.AddComponent(door);
 }
@@ -35,8 +36,8 @@ bool ZoneTransition::Is (ComponentType type) {
 }
 
 void ZoneTransition::NotifyCollision (GameObject& other){
-    if(other.Contains(ComponentType::_Dummy) and !transitioning) {
-        GameObject* outObj = new GameObject(LayerDistance::_ForeGround_VeryClose);
+    if(other.Contains(ComponentType::_Kid) and !transitioning) {
+        GameObject* outObj = new GameObject(LayerDistance::_FadingLayer);
         fade = new ScreenFade(*outObj, Color("#000000"), 0, 1, STATE_FADE_TIME);
         outObj->AddComponent(fade);
         Game::GetInstance().GetCurrentState().AddObject(outObj);
@@ -49,8 +50,8 @@ void ZoneTransition::NotifyCollision (GameObject& other){
 
 //########################################
 
-// Vec2 ZoneManager::spawnPosition = Vec2(13, 18);//1st map initial position
-Vec2 ZoneManager::spawnPosition = Vec2(11, 15);//U3 close to U4
+Vec2 ZoneManager::spawnPosition = Vec2(13, 18);//1st map initial position
+// Vec2 ZoneManager::spawnPosition = Vec2(11, 15);//U3 close to U4
 Music* ZoneManager::levelMusic = nullptr;
 
 ZoneManager::ZoneManager() {
@@ -59,10 +60,21 @@ ZoneManager::ZoneManager() {
 
 void ZoneManager::RequestZone(std::pair<Zone, ZoneExit> place, bool carryMusic) {
     switch(place.first) {
+        case Zone::_H1:
+            if(place.second == ZoneExit::A) {//To S1-B
+                spawnPosition = Vec2(13, 18);
+                Game::GetInstance().AddState(new S1());
+            }
+            break;
+
         case Zone::_S1:
             if(place.second == ZoneExit::A) {//To S2-A
                 spawnPosition = Vec2(11, 15);
                 Game::GetInstance().AddState(new S2());
+            } 
+            else if(place.second == ZoneExit::B) {//to H1-A
+                spawnPosition = Vec2(16, 10);
+                Game::GetInstance().AddState(new H1());
             }
             break;
 
@@ -96,6 +108,7 @@ void ZoneManager::RequestZone(std::pair<Zone, ZoneExit> place, bool carryMusic) 
         case Zone::_S4:
             if(place.second == ZoneExit::A) {//to S3-B
                 spawnPosition = Vec2(53, 18);
+                GameData::changedS3Scenario = true;
                 Game::GetInstance().AddState(new S3());
             } 
             else if(place.second == ZoneExit::B) {//to U16-A
@@ -168,7 +181,7 @@ void ZoneManager::RequestZone(std::pair<Zone, ZoneExit> place, bool carryMusic) 
                 Game::GetInstance().AddState(new U4());
             } 
             else if(place.second == ZoneExit::B) {//to U1-B
-                spawnPosition = Vec2(18, 39);
+                spawnPosition = Vec2(18, 38);
                 Game::GetInstance().AddState(new U1());
             }
             break;
@@ -246,7 +259,7 @@ void ZoneManager::RequestZone(std::pair<Zone, ZoneExit> place, bool carryMusic) 
                 Game::GetInstance().AddState(new U8());
             } 
             else if(place.second == ZoneExit::B) {//to U12-A
-                spawnPosition = Vec2(19, 12);
+                spawnPosition = Vec2(19, 13);
                 Game::GetInstance().AddState(new U12());
             }
             break;
@@ -311,8 +324,17 @@ void ZoneManager::RequestZone(std::pair<Zone, ZoneExit> place, bool carryMusic) 
     } else if(carryMusic) {
         levelMusic = Game::GetInstance().GetCurrentState().GetStateMusic();
     }
-
+    GameData::MultiConditionalChecks();
     Game::GetInstance().GetCurrentState().RequestPop();
+}
+
+ZoneManager::~ZoneManager() {
+    if(levelMusic == nullptr) {
+        return;
+    }
+    levelMusic->Stop();
+    delete levelMusic;
+    levelMusic = nullptr;
 }
 
 Vec2 ZoneManager::GetSpawnPosition() {

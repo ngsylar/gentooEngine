@@ -6,17 +6,19 @@
 
 class DialogueBox : public Component {
     private:
-        std::string currentLine;
-        std::vector<std::string> Lines;
-        Text* dialogue;
+        std::string dialogueFile;
+        std::vector<std::string> dialogueLines;
+        Text* dialogueText;
+
         int counter;
         bool looped;
     public:
-        DialogueBox(GameObject& associated, bool looped=true);
+        static bool dialogueOngoing;
+        DialogueBox(GameObject& associated, std::string dialogueFile, bool looped = false);
         ~DialogueBox();
         void Start();
         void Update(float dt);
-        void LateUpdate(float dt);
+        void Render();
         bool Is(ComponentType type);
 
 };

@@ -38,6 +38,9 @@ class State {
         void DetectCollisions();
 
         void FadeIn();
+        void AddScenario(std::string file, LayerDistance layer, float parallax=0, bool align=false);
+        void AddAnimated(std::string file, LayerDistance layer, Vec2 position, int frames, float frameTime=0.1);
+        void AddSpikes(float x, float y, float w);
         Music* GetStateMusic();
 
         bool Debugging();

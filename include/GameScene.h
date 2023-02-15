@@ -6,6 +6,15 @@
 #include "State.h"
 
 //Surface levels
+class H1 : public State {
+    private:
+
+    public:
+        H1();
+        void LoadAssets();
+        void Update(float dt);
+};
+
 class S1 : public State {
     private:
 

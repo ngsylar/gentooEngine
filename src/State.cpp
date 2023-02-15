@@ -1,4 +1,5 @@
 #include "GentooEngine.h"
+#include "ZoneTransition.h"
 
 #define FONT_LED "./assets/font/led_real.ttf"
 
@@ -15,6 +16,7 @@ State::State () {
     FPSObj.AddComponent(FPSText);
     FPSObj.AddComponent(FPSFollow);
     stateMusic = nullptr;
+    fpsLimiter.SetResetTime(0.1);
 }
 
 State::~State () {
@@ -193,10 +195,52 @@ void State::DetectCollisions () {
 
 void State::FadeIn() {
     //Scene FadeIn
-    GameObject* FadeObj = new GameObject(LayerDistance::_ForeGround_VeryClose);
+    GameObject* FadeObj = new GameObject(LayerDistance::_FadingLayer);
     ScreenFade* Fade = new ScreenFade(*FadeObj, Color("#000000"),1, 0, STATE_FADE_TIME, true);
     FadeObj->AddComponent(Fade);
     AddObject(FadeObj);
+}
+
+void State::AddScenario(std::string file, LayerDistance layer, float parallax, bool align) {
+    GameObject* BgObj = new GameObject(layer);
+    Sprite* Bg1 = new Sprite(*BgObj,file);
+    BgObj->AddComponent(Bg1);
+    AddObject(BgObj);
+    if (parallax!=0) {
+        Bg1->parallaxFactor = Vec2(parallax,1);
+    }
+    if(align) {
+        BgObj->box.SetPurePosition(((Bg1->parallaxFactor.x - 1.0)*Bg1->GetWidth())/4,0);
+    } else {
+        BgObj->box.SetPurePosition(0,0);
+    }
+    BgObj->box.SetSize(Bg1->GetWidth(), Bg1->GetHeight());
+}
+
+void State::AddAnimated(std::string file, LayerDistance layer, Vec2 position, int frames, float frameTime) {
+    GameObject* animatedObj = new GameObject(layer);
+    Sprite* animated = new Sprite(*animatedObj, file, frames, frameTime);
+    animatedObj->AddComponent(animated);
+    animatedObj->box.SetSize(animated->GetWidth(), animated->GetHeight());
+    animatedObj->box.SetPurePosition(position.x*TILE_SIZE,position.y*TILE_SIZE);
+    AddObject(animatedObj);
+}
+
+void State::AddSpikes(float x, float y, float w) {
+    GameObject* spikeObj = new GameObject(LayerDistance::_Environment_Close);
+    spikeObj->box.SetPurePosition(x*TILE_SIZE, (y+0.5)*TILE_SIZE);
+    spikeObj->box.SetSize(w*TILE_SIZE, 0.5*TILE_SIZE);
+    Interactor* touchedSpike = new Interactor(*spikeObj);
+    touchedSpike->SetResult([](){
+        //TODO finish when having access to Kid self instance
+        //Vec2 place = ZoneManager::GetSpawnPosition()*TILE_SIZE;
+        //Add fadeout, once everything is black:
+        //KidObj->box.SetPosition(place.x, place.y-KID_HEIGHT);
+        //Add interactor on the same position to process fadein
+        SDL_Log("Spikes!");
+    });
+    spikeObj->AddComponent(touchedSpike);
+    AddObject(spikeObj);
 }
 
 Music* State::GetStateMusic () {

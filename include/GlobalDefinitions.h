@@ -12,6 +12,9 @@
 // Tile dimension
 #define TILE_SIZE           28
 
+//Kid height for placement
+#define KID_HEIGHT 29.0f
+
 // GameObject Optimization enums for bitwise based operations
 enum ComponentType {
     // Engine Components
@@ -28,6 +31,7 @@ enum ComponentType {
     _CameraFollower =    1 << 9,
     _CameraBox =        1 << 10,
     _LoopedBackground = 1 << 11,
+    _Interactor =       1 << 18,
 
     // Game Components
     _PlatformCamera =   1 << 12,
@@ -36,7 +40,6 @@ enum ComponentType {
     _Attack =           1 << 15,
     _DialogueBox =      1 << 16,
     _Terrain =          1 << 17,
-    // x = 1 << 18,
     // x = 1 << 19,
     // x = 1 << 20,
 
@@ -81,6 +84,7 @@ enum LayerDistance {
     _ForeGround,
     _ForeGround_Close,
     _ForeGround_VeryClose,
+    _FadingLayer,
 };
 
 enum EntityState {
