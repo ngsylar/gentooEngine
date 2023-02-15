@@ -119,6 +119,9 @@ void H1::Update(float dt) {
 #define TREE_2A "assets/img/animated/tree/2a/2a-Sheet.png"
 #define TREE_2B "assets/img/animated/tree/2b/2b-Sheet.png"
 #define TREE_2C "assets/img/animated/tree/2c/2c-Sheet.png"
+
+#define CHECKPOINT_ANIM "assets/img/animated/10_checkpoint_89x84.png"
+
 S1::S1() {
     AddScenario(S1_0, LayerDistance::_Background_FarAway);
     AddScenario(S1_2, LayerDistance::_Background, 0.4);
@@ -551,6 +554,19 @@ void S4::LoadAssets() {
     BObj->AddComponent(doorB);
     AddObject(BObj);
 
+    GameObject* checkObj = new GameObject(LayerDistance::_Environment);
+    Sprite* checkPoint = new Sprite(*checkObj, CHECKPOINT_ANIM, 6, 0.1);
+    checkObj->box.SetPurePosition(33.96*TILE_SIZE, 24.08*TILE_SIZE);
+    checkObj->box.SetSize(checkPoint->GetWidth(), checkPoint->GetHeight());
+    Interactor* checkSave = new Interactor(*checkObj);
+    checkSave->SetResult([](){
+        GameData::checkPoint = Zone::_S4;
+        GameData::revivePosition = Vec2(33,25);
+    });
+    checkObj->AddComponent(checkPoint);
+    checkObj->AddComponent(checkSave);
+    AddObject(checkObj);
+
 
     FadeIn();
 }
@@ -629,6 +645,19 @@ void U1::LoadAssets() {
     AddObject(CObj);
 
     AddSpikes(26,42,5);
+
+    GameObject* checkObj = new GameObject(LayerDistance::_Environment_Far);
+    Sprite* checkPoint = new Sprite(*checkObj, CHECKPOINT_ANIM, 6, 0.1);
+    checkObj->box.SetPurePosition(50.96*TILE_SIZE, 39.1*TILE_SIZE);
+    checkObj->box.SetSize(checkPoint->GetWidth(), checkPoint->GetHeight());
+    Interactor* checkSave = new Interactor(*checkObj);
+    checkSave->SetResult([](){
+        GameData::checkPoint = Zone::_U1;
+        GameData::revivePosition = Vec2(50,40);
+    });
+    checkObj->AddComponent(checkPoint);
+    checkObj->AddComponent(checkSave);
+    AddObject(checkObj);
 
     FadeIn();
 }
@@ -1233,6 +1262,19 @@ void U8::LoadAssets() {
     CObj->AddComponent(doorC);
     AddObject(CObj);
 
+    GameObject* checkObj = new GameObject(LayerDistance::_Environment_Far);
+    Sprite* checkPoint = new Sprite(*checkObj, CHECKPOINT_ANIM, 6, 0.1);
+    checkObj->box.SetPurePosition(12.96*TILE_SIZE, 17.1*TILE_SIZE);
+    checkObj->box.SetSize(checkPoint->GetWidth(), checkPoint->GetHeight());
+    Interactor* checkSave = new Interactor(*checkObj);
+    checkSave->SetResult([](){
+        GameData::checkPoint = Zone::_U8;
+        GameData::revivePosition = Vec2(12,18);
+    });
+    checkObj->AddComponent(checkPoint);
+    checkObj->AddComponent(checkSave);
+    AddObject(checkObj);
+
     FadeIn();
 }
 
@@ -1356,6 +1398,8 @@ void U9::Update(float dt) {
 #define U10_16 "assets/img/U10/Mapa_02_A10_16.png"
 #define U10_17 "assets/img/U10/Mapa_02_A10_17.png"
 
+#define U10_STATUE_ANIM "assets/img/animated/estatua-Sheet.png"
+#define U10_CACHOEIRA_ANIM "assets/img/U10/mapa_A10_7_cachoeira-Sheet.png"
 
 U10::U10() {
     AddScenario(U10_0, LayerDistance::_Background_FarAway);
@@ -1367,6 +1411,11 @@ U10::U10() {
     AddScenario(U10_9, LayerDistance::_Environment);
     AddScenario(U10_16, LayerDistance::_ForeGround);
     AddScenario(U10_17, LayerDistance::_ForeGround_Close);
+
+    AddAnimated(U10_STATUE_ANIM, LayerDistance::_Environment_Far,Vec2(40.25,17),4);
+    AddAnimated(U10_STATUE_ANIM, LayerDistance::_Environment_Far,Vec2(47.25,16.7),4);
+    AddAnimated(U10_STATUE_ANIM, LayerDistance::_Environment_Far,Vec2(54.25,17),4);
+    AddAnimated(U10_CACHOEIRA_ANIM, LayerDistance::_Scenery_Close,Vec2(70.75,3),10);
 }
 #define MAP_U10 "assets/map/Zone/U10"
 void U10::LoadAssets() {
@@ -1398,7 +1447,7 @@ void U10::LoadAssets() {
     AddObject(AObj);
 
     AddSpikes(18,19,5);
-
+    
     FadeIn();
 }
 
@@ -1547,6 +1596,19 @@ void U12::LoadAssets() {
         std::make_pair(Zone::_U12, ZoneExit::D));
     DObj->AddComponent(doorD);
     AddObject(DObj);
+
+    GameObject* checkObj = new GameObject(LayerDistance::_Environment_Far);
+    Sprite* checkPoint = new Sprite(*checkObj, CHECKPOINT_ANIM, 6, 0.1);
+    checkObj->box.SetPurePosition(27.96*TILE_SIZE, 15.1*TILE_SIZE);
+    checkObj->box.SetSize(checkPoint->GetWidth(), checkPoint->GetHeight());
+    Interactor* checkSave = new Interactor(*checkObj);
+    checkSave->SetResult([](){
+        GameData::checkPoint = Zone::_U12;
+        GameData::revivePosition = Vec2(27,16);
+    });
+    checkObj->AddComponent(checkPoint);
+    checkObj->AddComponent(checkSave);
+    AddObject(checkObj);
 
     FadeIn();
 }
