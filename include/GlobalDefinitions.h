@@ -43,8 +43,6 @@ enum ComponentType {
     // x = 1 << 19,
     _Boss =             1 << 20,
     _Interactor =       1 << 21,
-    _DialogueBox =      1 << 22,
-    _Terrain =          1 << 23,
 
     // Testing Environment
     _Ball =             1 << 29,
