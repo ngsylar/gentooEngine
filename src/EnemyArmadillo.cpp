@@ -46,6 +46,7 @@ void EnemyArmadillo::Awaken () {
     associated.AddComponent(rigidBody);
     rigidBody->triggerLabels.push_back("Player");
     rigidBody->triggerLabels.push_back("Enemy");
+    rigidBody->triggerLabels.push_back("Boss");
 
     collider = new Collider(associated);
     associated.AddComponent(collider);

@@ -38,7 +38,7 @@ enum ComponentType {
     _EnemyArmadillo =   1 << 17,
     _EnemyRunner =      1 << 18,
     // x = 1 << 19,
-    // x = 1 << 20,
+    _Boss =             1 << 20,
 
     // Testing Environment
     _Ball =             1 << 21,
@@ -91,9 +91,13 @@ enum EntityState {
     Falling,
     Landing,
     Attacking,
+    AttackingMelee_0,
+    AttackingMelee_1,
+    AttackingRanged,
     AttackingSwordOnGround_0,
     AttackingSwordOnGround_1,
-    AttackingSwordOnAir,
+    AttackingSwordOnAir_0,
+    AttackingSwordOnAir_1,
     CastingSpell,
     Recovering,
     Injured,
