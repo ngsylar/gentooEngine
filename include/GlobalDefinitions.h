@@ -31,22 +31,25 @@ enum ComponentType {
     _CameraFollower =    1 << 9,
     _CameraBox =        1 << 10,
     _LoopedBackground = 1 << 11,
-    _Interactor =       1 << 18,
 
     // Game Components
     _PlatformCamera =   1 << 12,
     _Kid =              1 << 13,
-    _EnemyArmadillo =   1 << 14,
-    _Attack =           1 << 15,
-    _DialogueBox =      1 << 16,
-    _Terrain =          1 << 17,
+    _Attack =           1 << 14,
+    _DialogueBox =      1 << 15,
+    _Terrain =          1 << 16,
+    _EnemyArmadillo =   1 << 17,
+    _EnemyRunner =      1 << 18,
     // x = 1 << 19,
-    // x = 1 << 20,
+    _Boss =             1 << 20,
+    _Interactor =       1 << 21,
+    _DialogueBox =      1 << 22,
+    _Terrain =          1 << 23,
 
     // Testing Environment
-    _Ball =             1 << 21,
-    _RigidBodyLegacy =  1 << 22,
-    _Dummy =            1 << 23,
+    _Ball =             1 << 29,
+    _RigidBodyLegacy =  1 << 30,
+    _Dummy =            1 << 31,
 
     //...
 };
@@ -93,13 +96,19 @@ enum EntityState {
     Running,
     Jumping,
     Falling,
+    Landing,
     Attacking,
+    AttackingMelee_0,
+    AttackingMelee_1,
+    AttackingRanged,
     AttackingSwordOnGround_0,
     AttackingSwordOnGround_1,
-    AttackingSwordOnAir,
+    AttackingSwordOnAir_0,
+    AttackingSwordOnAir_1,
     CastingSpell,
+    Recovering,
     Injured,
-    Dying,
+    Dead,
 
     // Leave declaration below as the last element,
     // it is the index for how many valid states there are

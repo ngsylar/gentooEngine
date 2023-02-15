@@ -37,6 +37,7 @@ bool EntityMachine::HasState (EntityState compare) {
 bool EntityMachine::FormatState (EntityState newState, int argsc, float argsv[]) {
     if (NewStateRule(newState, argsc, argsv)) {
         state = newState;
+        sprites[state].get()->SetFrame(0);
         return true;
     } return false;
 }
@@ -54,19 +55,37 @@ void EntityMachine::Start () {
 }
 
 void EntityMachine::Update (float dt) {
-    EntityState previousState = state;
+    // EntityState previousState = state;
 
     if ((state == EntityState::None) or (sprites[state].get() == nullptr))
         return;
-    sprites[state].get()->Update(dt);
 
     UpdateEntity(dt);
 
-    if (state != previousState)
-        sprites[state].get()->SetFrame(0);
+    sprites[state].get()->Update(dt);
 
+    // if (state != previousState)
+    //     sprites[state].get()->SetFrame(0);
+
+    int directionX = (textureFlip ^ SDL_FLIP_HORIZONTAL)? 0 : 1;
+    int directionY = (textureFlip ^ SDL_FLIP_VERTICAL)? 0 : 1;
+
+    Collider* collider = (Collider*)associated.GetComponent(ComponentType::_Collider);
+    if (collider != nullptr) {
+
+        if (directionX != lastDirection.x) {
+            collider->offset.x = -collider->offset.x;
+            associated.box.x -= collider->offset.x * 2.0f;
+            lastDirection.x = directionX;
+        }
+        if (directionY != lastDirection.y) {
+            collider->offset.y = -collider->offset.y;
+            associated.box.y -= collider->offset.y * 2.0f;
+            lastDirection.y = directionY;
+        }
+    }
     // melius colliders' pixel correction
-    associated.pixelColliderFix0 = (textureFlip ^ SDL_FLIP_HORIZONTAL)? 0 : 1;
+    associated.pixelColliderFix0 = lastDirection.x;
 }
 
 void EntityMachine::LateUpdate (float dt) {

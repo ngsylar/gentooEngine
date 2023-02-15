@@ -50,8 +50,8 @@ class GameObject {
         void SignalTerrain();
 
         // melius colliders' pixel correction
-        // note: if pcf0 is true then apply (collider->box.x - 1)
-        //       if pcf1 is true then pcf1 is inverted
+        // note: if pcf0 is true then (collider->box.x - 1) is applied
+        //       if pcf1 is true then pcf1 is inverted (set true when the sprite is facing right)
         int pixelColliderFix0, pixelColliderFix1;
 };
 

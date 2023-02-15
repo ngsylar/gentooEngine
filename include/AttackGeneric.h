@@ -17,7 +17,8 @@ class AttackGeneric: public Component {
         int damage;
 
     public:
-        enum Argument {_ForceX, _ForceY, _Impulse, _Damage};
+        enum Argument {_ForceX, _ForceY, _Impulse, _Damage, _OriginX, _OriginY, _Displacement};
+        bool ignoreEqualLabels;
         Timer lifetime;
 
         AttackGeneric(
@@ -35,7 +36,9 @@ class AttackGeneric: public Component {
         void SetProperties(Vec2 force, float impulse, int damage);
         virtual void Awaken();
         virtual void Start();
-        void Update(float dt);
+        virtual void Perform();
+        virtual void PerformAttack();
+        virtual void Update(float dt);
         virtual void UpdateAttack(float dt);
         virtual void NotifyCollision(GameObject& other);
         bool UsingInternalAssociated();

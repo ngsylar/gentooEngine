@@ -1,7 +1,7 @@
 #ifndef ENEMY_ARMADILLO_H
 #define ENEMY_ARMADILLO_H
 
-#include "Component.h"
+#include "EntityMachine.h"
 #include "RigidBody.h"
 #include "Collider.h"
 #include "Sprite.h"
@@ -15,6 +15,7 @@ class EnemyArmadillo: public EntityMachine {
         int hp;
 
         // Automatic Factors
+        Timer turnTimer;
         float damageOriginX, damageImpulse;
         int damageDirectionX;
 

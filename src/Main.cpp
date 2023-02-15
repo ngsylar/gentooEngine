@@ -3,7 +3,7 @@
 
 // include the game states here
 #include "TestScene.h"
-#include "GameScene.h"
+// #include "GameScene.h"
 
 int main (int argc, char* argv[]) {
     Game::GetInstance(WINDOW_TITLE, WINDOW_SIZE, GAME_RESOLUTION);
@@ -11,8 +11,8 @@ int main (int argc, char* argv[]) {
     // Game::GetInstance().Run();
 
     // add and run the game states here
-    // Game::GetInstance().AddState(new TestScene5());
-    Game::GetInstance().AddState(new S1);//U3()use S1 and change spawn location on ZoneManager to start from the initial area
+    Game::GetInstance().AddState(new TestScene5());
+    // Game::GetInstance().AddState(new S1);//U3()use S1 and change spawn location on ZoneManager to start from the initial area
 
     Game::GetInstance().Run();
 

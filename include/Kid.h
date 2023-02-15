@@ -10,23 +10,30 @@
 
 class Kid: public EntityMachine {
     private:
+        static GameObject* instance;
         RigidBody* rigidBody;
         Collider* collider;
-        Timer jumpTimer, invincibilityTimer;
-        bool isInvincible;
+        Timer jumpTimer, attackTimer, damageTimer, invincibilityTimer;
+        bool isInvincible, isDead;
         int hp;
 
         // Attack Types
         KidAttackMelee* swordAttackOnGround;
-        Timer hitTimer;
 
-        // Automatic Factors
-        bool attackPerforming;
-        float runSpeedIncrease, jumpSpeedDecrease;
+        // Automatic Signals
+        bool attackPerforming, damagePerforming;
         bool runSpeedReset, attackImpulseCancel;
+
+        // Automatic Activation Values
+        float attackOriginX, fallOriginY;
         Vec2 damageOrigin, damageForce;
         float damageImpulse;
+        float flickDirection;
         int lastDirectionX;
+
+        // Automatic Factors
+        float runSpeedIncrease, jumpSpeedDecrease;
+        float flickFactor;
 
         // Collision Faces
         bool isGrounded, hitCeiling, hitWall;
@@ -36,19 +43,25 @@ class Kid: public EntityMachine {
         Timer cameraGroundedTimer;
 
         bool NewStateRule(EntityState newState, int argsc, float argsv[]);
+        void AttackStart();
+        void AttackUpdate(float dt);
+        void InvincibleUpdate(float dt);
+        void Die();
+        void ColliderReset();
 
         // Camera Assistants
         void* CameraEffects();
 
     public:
         Kid(GameObject& associated);
+        ~Kid();
+        static GameObject* GetInstance();
         void Awaken();
         void Start();
         void LateUpdate(float dt);
         void UpdateEntity(float dt);
-        void AttackStart();
-        void AttackUpdate(float dt);
         void NotifyCollision(GameObject& other);
+        bool IsInvincible();
         bool Is(ComponentType type);
 };
 

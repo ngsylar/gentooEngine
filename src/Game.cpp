@@ -193,7 +193,8 @@ void Game::Run () {
             break;
 
         SDL_RenderPresent(renderer);
-        if (noVSync) SDL_Delay(FpsToMs(60));
+        if (noVSync)
+            SDL_Delay(FpsToMs(60));
     }
 }
 

@@ -9,6 +9,7 @@ class EntityMachine: public Component {
         EntityState state;
         std::vector<std::unique_ptr<Sprite>> sprites;
         SDL_RendererFlip textureFlip;
+        Vec2 lastDirection;
 
         virtual bool NewStateRule(EntityState newState, int argsc, float argsv[]);
         void FlipSprite(Sprite::Axis axis);

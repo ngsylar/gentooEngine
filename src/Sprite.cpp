@@ -68,13 +68,20 @@ void Sprite::SetScale (float scale) {
 }
 
 void Sprite::SetBlendMode (SDL_BlendMode blendMode) {
+    if (texture.use_count() == 0) return;
     SDL_SetTextureBlendMode(texture.get(), blendMode);
+}
+
+void Sprite::SetTextureColorMod (int red, int green, int blue) {
+    if (texture.use_count() == 0) return;
+    SDL_SetTextureColorMod(texture.get(), red, green, blue);
 }
 
 void Sprite::SetFrame (int frame) {
     currentFrame = frame % frameCount;
     clipRect.x = currentFrame * frameWidth;
     oneshotIsOver = false;
+    frameTimer.Reset();
 }
 
 void Sprite::SetFrameTime (float frameTime) {
@@ -133,7 +140,6 @@ void Sprite::Update (float dt) {
                 return;
             }
             SetFrame(currentFrame);
-            frameTimer.Reset();
         }
     }
 }
@@ -173,7 +179,7 @@ void Sprite::Render (int startX, int startY) {
     }
 }
 
-void Sprite::RenderWithNoOffset (int startX, int startY) {
+void Sprite::RenderWithoutOffset (int startX, int startY) {
     if (texture == nullptr)
         return;
 

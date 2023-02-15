@@ -3,8 +3,8 @@
 
 AttackGeneric::AttackGeneric (GameObject& associated, GameObject* externalAssociated): Component(associated) {
     type = ComponentType::_Attack;
-    force = Vec2(400.0f, 0.0f);
-    impulse = 70.0f;
+    force = Vec2(400.0f, 140.0f);
+    impulse = 50.0f;
     damage = 1;
 
     if (externalAssociated != nullptr) {
@@ -17,6 +17,7 @@ AttackGeneric::AttackGeneric (GameObject& associated, GameObject* externalAssoci
         collider = (Collider*)associated.GetComponent(ComponentType::_Collider);
         sprite = nullptr;
     }
+    ignoreEqualLabels = true;
 }
 
 // sprite is only configurable if an external associated is used
@@ -45,8 +46,6 @@ void AttackGeneric::SetupCollider (Vec2 offset, Vec2 size) {
         return;
 
     if (sprite == nullptr) {
-        associated.box.x = offset.x;
-        associated.box.y = offset.y;
         associated.box.w = size.x;
         associated.box.h = size.y;
     }
@@ -69,21 +68,28 @@ void AttackGeneric::Awaken () {}
 
 void AttackGeneric::Start () {}
 
+void AttackGeneric::Perform () {
+    associated.enabled = true;
+    lifetime.Reset();
+    PerformAttack();
+}
+
+void AttackGeneric::PerformAttack () {}
+
 void AttackGeneric::Update (float dt) {
     if (usingExternalAssociated and externalAssociated.expired()) {
         associated.RequestDelete();
         return;
     }
-
-    UpdateAttack(dt);
-
     if (lifetime.HasResetTime()) {
         lifetime.Update(dt);
         if (lifetime.IsOver()) {
-            lifetime.Reset();
             associated.enabled = false;
+            return;
         }
     }
+    UpdateAttack(dt);
+
     // melius colliders' pixel correction
     associated.pixelColliderFix0 = (
         usingExternalAssociated and
@@ -96,14 +102,15 @@ void AttackGeneric::Update (float dt) {
 void AttackGeneric::UpdateAttack (float dt) {}
 
 void AttackGeneric::NotifyCollision (GameObject& other) {
-    if ((not externalAssociated.expired()) and (&other == externalAssociated.lock().get()))
+    if (((not externalAssociated.expired()) and (&other == externalAssociated.lock().get()))
+    or (ignoreEqualLabels and (associated.label == other.label)))
         return;
 
     EntityMachine* entity = (EntityMachine*)other.GetComponent(ComponentType::_EntityMachine);
-    if (entity != nullptr) {
-        float argsv[4] = {force.x, force.y, impulse, (float)damage};
-        entity->FormatState(EntityState::Injured, 4, argsv);
-    }
+    if (entity == nullptr) return;
+
+    float argsv[5] = {force.x, force.y, impulse, (float)damage, collider->box.x};
+    entity->FormatState(EntityState::Injured, 5, argsv);
 }
 
 bool AttackGeneric::UsingInternalAssociated () {

@@ -3,6 +3,8 @@
 #include "TestObjects.h"
 #include "Kid.h"
 #include "EnemyArmadillo.h"
+#include "EnemyRunner.h"
+#include "Boss.h"
 #include "PlatformCamera.h"
 
 #define SCENE_TEST_LABEL "TestScene"
@@ -42,7 +44,7 @@ TestScene0::TestScene0 () {
 
     GameObject* bg = new GameObject(SCENE_TEST_LAYER, SCENE_TEST_LABEL);
     // lbg = new LoopedBackground(*bg, "assets/img/fundo_teletobis.png", 2, Vec2(0.25f,0.25f));
-    lbg = new LoopedBackground(*bg, "assets/img/fundoverde.png", 2, Vec2(0.25f,0.25f));
+    lbg = new LoopedBackground(*bg, "assets/img/fundoverde.png", 2/*, Vec2(0.25f,0.25f)*/);
     bg->AddComponent(lbg);
     AddObject(bg);
 }
@@ -89,15 +91,15 @@ void TestScene0::LoadAssets () {
     rawPlat->AddComponent(platcoll);
     // platcoll->isTrigger = true;
 
-    rawPlat = new GameObject(LAYER_BLACK_SQUARE, "Ground");
-    platSpr = new Sprite(*rawPlat, SPRITE_BLACK_SQUARE);
-    rawPlat->AddComponent(platSpr);
-    AddObject(rawPlat);
-    mini_platform = GetObjectPtr(rawPlat);
-    platSpr->SetScale(1.5f, 0.5f);
-    // rawPlat->box.SetPosition(300, 300);
-    rawPlat->box.SetPosition(250, 162.5f);
-    rawPlat->AddComponent(new Collider(*rawPlat));
+    // rawPlat = new GameObject(LAYER_BLACK_SQUARE, "Ground");
+    // platSpr = new Sprite(*rawPlat, SPRITE_BLACK_SQUARE);
+    // rawPlat->AddComponent(platSpr);
+    // AddObject(rawPlat);
+    // mini_platform = GetObjectPtr(rawPlat);
+    // platSpr->SetScale(1.5f, 0.5f);
+    // // rawPlat->box.SetPosition(300, 300);
+    // rawPlat->box.SetPosition(250, 162.5f);
+    // rawPlat->AddComponent(new Collider(*rawPlat));
 
     GameObject* rawSquare = new GameObject(4);
     AddObject(rawSquare);
@@ -123,11 +125,29 @@ void TestScene0::LoadAssets () {
     // rawPlat->AddComponent(new CameraBox(*rawPlat, rawSquare, 0, 10));
     // AddObject(rawPlat);
 
+    // rawSquare = new GameObject(LAYER_RED_SQUARE);
+    // AddObject(rawSquare);
+    // square = GetObjectPtr(rawSquare);
+    // rawSquare->AddComponent(new EnemyArmadillo(*rawSquare));
+    // rawSquare->box.SetPosition(250,rawPlat->box.y-rawSquare->box.h-100);
+
+    // rawSquare = new GameObject(LAYER_RED_SQUARE);
+    // AddObject(rawSquare);
+    // square = GetObjectPtr(rawSquare);
+    // rawSquare->AddComponent(new EnemyRunner(*rawSquare));
+    // rawSquare->box.SetPosition(230,rawPlat->box.y-rawSquare->box.h-100);
+
+    // rawSquare = new GameObject(LAYER_RED_SQUARE);
+    // AddObject(rawSquare);
+    // square = GetObjectPtr(rawSquare);
+    // rawSquare->AddComponent(new Boss(*rawSquare));
+    // rawSquare->box.SetPosition(330,rawPlat->box.y-rawSquare->box.h-100);
+
     rawSquare = new GameObject(LAYER_RED_SQUARE);
     AddObject(rawSquare);
     square = GetObjectPtr(rawSquare);
-    rawSquare->AddComponent(new EnemyArmadillo(*rawSquare));
-    rawSquare->box.SetPosition(250,rawPlat->box.y-rawSquare->box.h-100);
+    rawSquare->AddComponent(new Boss(*rawSquare));
+    rawSquare->box.SetPosition(230,rawPlat->box.y-rawSquare->box.h-100);
 }
 
 void TestScene0::Start () {
