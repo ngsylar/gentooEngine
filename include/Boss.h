@@ -24,11 +24,11 @@ class Boss: public EntityMachine {
         bool isAttacking;
 
         // Automatic Factors
-        int attackDirectionX;
+        int attackDirectionX, damageTaken;
         float attackOriginX;
 
         bool NewStateRule(EntityState newState, int argsc, float argsv[]);
-        void UpdateAttack(float dt);
+        void AttackMeleeUpdate(float dt);
 
     public:
         Boss(GameObject& associated);

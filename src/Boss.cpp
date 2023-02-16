@@ -50,8 +50,9 @@ Boss::Boss (GameObject& associated): EntityMachine(associated) {
 
     restTimer.SetResetTime(0.9f);
     damageTimer.SetResetTime(0.6f);
-    recoverTimer.SetResetTime(0.9f);
+    recoverTimer.SetResetTime(0.15f);
     isAttacking = false;
+    damageTaken = 0;
 }
 
 void Boss::Awaken () {
@@ -137,21 +138,27 @@ void Boss::UpdateEntity (float dt) {
             if ((kidRigidBody == nullptr) or (kidRigidBody->GetSpeed().x == 0.0f))
                 rigidBody->SetSpeedOnX(0.0f);
 
-            recoverTimer.Update(dt);
             damageTimer.Update(dt);
             if (damageTimer.IsOver())
                 FormatState(Recovering);
 
             break;
-        
+
         case Recovering:
             recoverTimer.Update(dt);
-            if (recoverTimer.IsOver())
-                FormatState(Walking);
-            break;
+            if (recoverTimer.IsOver()) {
+                damageTaken = 2;
+
+                if (position.DistanceTo(kidPosition) < ATTACK_MELEE0_DISTANCE)
+                    FormatState(AttackingMelee_0);
+                else if (position.DistanceTo(kidPosition) < ATTACK_MELEE1_DISTANCE)
+                    FormatState(AttackingMelee_1);
+
+                else FormatState(Walking);
+            } break;
 
         case AttackingMelee_0: case AttackingMelee_1:
-            UpdateAttack(dt);
+            AttackMeleeUpdate(dt);
             break;
 
         default: break;
@@ -164,13 +171,18 @@ bool Boss::NewStateRule (EntityState newState, int argsc, float argsv[]) {
 
     switch (state) {
         case AttackingMelee_0: case AttackingMelee_1:
-            isAttacking = false;
-            break;
-        
-        case Recovering:
-            if ((newState == Injured) and recoverTimer.IsOver())
+            if ((newState == Injured) and (damageTaken >= 2)) {
+                hp -= argsv[AttackGeneric::_Damage];
                 return false;
+            }
+            else isAttacking = false;
             break;
+
+        case Recovering:
+            if ((newState == Injured) and (damageTaken >= 2)) {
+                hp -= argsv[AttackGeneric::_Damage];
+                return false;
+            } break;
 
         default: break;
     }
@@ -200,14 +212,16 @@ bool Boss::NewStateRule (EntityState newState, int argsc, float argsv[]) {
 
         case Injured:
             hp -= argsv[AttackGeneric::_Damage];
+            rigidBody->SetSpeedOnX(0.0f);
             damageTimer.Reset();
+            damageTaken++;
             return true;
 
         default: return true;
     }
 }
 
-void Boss::UpdateAttack (float dt) {
+void Boss::AttackMeleeUpdate (float dt) {
     attackTimer.Update(dt);
 
     switch (attackState) {
@@ -223,9 +237,11 @@ void Boss::UpdateAttack (float dt) {
         case _Stage1:
             if (fabs(associated.box.x - attackOriginX) >= IMPULSE_ATTACK_X)
                 rigidBody->SetSpeedOnX(0.0f);
-            if (attackTimer.IsOver())
+            if (attackTimer.IsOver()) {
+                if (damageTaken > 0)
+                    damageTaken = 0;
                 FormatState(Idle);
-            break;
+            } break;
 
         case _Stage2:
             if (attackTimer.IsOver()) {

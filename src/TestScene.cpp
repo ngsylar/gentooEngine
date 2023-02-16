@@ -125,11 +125,11 @@ void TestScene0::LoadAssets () {
     // rawPlat->AddComponent(new CameraBox(*rawPlat, rawSquare, 0, 10));
     // AddObject(rawPlat);
 
-    rawSquare = new GameObject(LAYER_RED_SQUARE);
-    AddObject(rawSquare);
-    square = GetObjectPtr(rawSquare);
-    rawSquare->AddComponent(new EnemyArmadillo(*rawSquare));
-    rawSquare->box.SetPosition(250,rawPlat->box.y-rawSquare->box.h-100);
+    // rawSquare = new GameObject(LAYER_RED_SQUARE);
+    // AddObject(rawSquare);
+    // square = GetObjectPtr(rawSquare);
+    // rawSquare->AddComponent(new EnemyArmadillo(*rawSquare));
+    // rawSquare->box.SetPosition(250,rawPlat->box.y-rawSquare->box.h-100);
 
     // rawSquare = new GameObject(LAYER_RED_SQUARE);
     // AddObject(rawSquare);
