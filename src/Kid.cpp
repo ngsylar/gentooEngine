@@ -127,6 +127,7 @@ void Kid::Awaken () {
     rigidBody = new RigidBody(associated);
     associated.AddComponent(rigidBody);
     rigidBody->triggerLabels.push_back("Enemy");
+    rigidBody->triggerLabels.push_back("Boss");
 
     collider = new Collider(associated);
     collider->SetBox(Vec2(COLLIDER_POSITION_ONGROUND), Vec2(COLLIDER_BOX_SIZE));
@@ -372,7 +373,7 @@ void Kid::AttackStart () {
     swordAttackOnGround->Perform();
     attackOriginX = associated.box.x;
 
-    if (runSpeedReset)
+    if (runSpeedReset or swordAttackOnGround->ImpulseIsCanceled())
         attackImpulseCancel = true;
     if (not attackImpulseCancel)
         rigidBody->SetSpeedOnX(SPEED_ATTACK * lastDirectionX);

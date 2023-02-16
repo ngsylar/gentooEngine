@@ -18,10 +18,13 @@ class Boss: public EntityMachine {
 
         // Behaviour
         SubState generalState, attackState;
-        Timer behaviourTimer;
+        Timer restTimer, attackTimer, damageTimer, recoverTimer;
+
+        // Automatic Signals
+        bool isAttacking;
 
         // Automatic Factors
-        int attackDirectionX, damageDirectionX;
+        int attackDirectionX;
         float attackOriginX;
 
         bool NewStateRule(EntityState newState, int argsc, float argsv[]);

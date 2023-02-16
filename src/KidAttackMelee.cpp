@@ -19,6 +19,8 @@ KidAttackMelee::KidAttackMelee (
     associated.label = externalAssociated->label;
     lifetime.SetResetTime(LIFETIME_END);
     associated.enabled = false;
+
+    impulseCancel = false;
 }
 
 void KidAttackMelee::SetProperties (Vec2 force, float impulse, int damage, float displacement) {
@@ -42,7 +44,19 @@ void KidAttackMelee::Perform () {
     lifetime.Reset();
 }
 
-void KidAttackMelee::UpdateAttack (float dt) {
+void KidAttackMelee::Update (float dt) {
+    if (usingExternalAssociated and externalAssociated.expired()) {
+        associated.RequestDelete();
+        return;
+    }
+    if (lifetime.HasResetTime()) {
+        lifetime.Update(dt);
+        if (lifetime.IsOver()) {
+            impulseCancel = false;
+            associated.enabled = false;
+            return;
+        }
+    }
     Rect externalBox = (Rect)(externalAssociated.lock()->box);
 
     switch (direction) {
@@ -62,6 +76,14 @@ void KidAttackMelee::UpdateAttack (float dt) {
         // case DOWN: break;
         default: break;
     }
+
+    // melius colliders' pixel correction
+    associated.pixelColliderFix0 = (
+        usingExternalAssociated and
+        (not externalAssociated.expired()) and
+        (externalAssociated.lock()->pixelColliderFix0 ^
+        externalAssociated.lock()->pixelColliderFix1)
+    );
 }
 
 void KidAttackMelee::NotifyCollision (GameObject& other) {
@@ -77,7 +99,10 @@ void KidAttackMelee::NotifyCollision (GameObject& other) {
         RigidBody* otherRigidBody = (RigidBody*)other.GetComponent(ComponentType::_RigidBody);
 
         if (lifetime.GetTime() < LIFETIME_START) {
-            otherRigidBody->SetSpeedOnX(rigidBody->GetSpeed().x);
+            if (other.label == "Boss") {
+                rigidBody->SetSpeedOnX(0.0f);
+                impulseCancel = true;
+            } else otherRigidBody->SetSpeedOnX(rigidBody->GetSpeed().x);
             return;
         }
         if (rigidBody->GetSpeed().x != 0.0f)
@@ -126,4 +151,8 @@ void* KidAttackMelee::CameraShake () {
         }
     } else cameraShakeTimer.Update(Game::GetInstance().GetDeltaTime());
     return nullptr;
+}
+
+bool KidAttackMelee::ImpulseIsCanceled () {
+    return impulseCancel;
 }

@@ -11,6 +11,7 @@ class KidAttackMelee: public AttackGeneric {
         Vec2 cameraShakeReset;
 
         // automatic factors
+        bool impulseCancel;
         float displacement;
 
         void* CameraShake();
@@ -27,8 +28,9 @@ class KidAttackMelee: public AttackGeneric {
         void Awaken();
         void Start();
         void Perform();
-        void UpdateAttack(float dt);
+        void Update(float dt);
         void NotifyCollision(GameObject& other);
+        bool ImpulseIsCanceled();
 };
 
 #endif
