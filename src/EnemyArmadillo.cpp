@@ -22,6 +22,7 @@
 
 EnemyArmadillo::EnemyArmadillo (GameObject& associated): EntityMachine(associated) {
     type = type | ComponentType::_EnemyArmadillo;
+    associated.layer = LayerDistance::_NPC;
     associated.label = "Enemy";
     movementDirection = -1;
     hp = 2;

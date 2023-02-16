@@ -22,7 +22,7 @@
 #define SPRITE_LAND_FRAMES                      3, 0.1f
 #define SPRITE_ATTACK_SWORDGROUND0_FRAMES       10, 0.1f
 #define SPRITE_ATTACK_SWORDGROUND1_FRAMES       10, 0.1f
-#define SPRITE_DEATH_FRAMES                     7, 0.1f
+#define SPRITE_DEATH_FRAMES                     12, 0.1f
 
 #define ACCELERATION_RUN                        800.0f
 #define SPEED_RUN                               120.0f
@@ -64,6 +64,7 @@ Kid::Kid (GameObject& associated): EntityMachine(associated) {
     associated.layer = LayerDistance::_Player;
     associated.label = "Player";
     jumpTimer.SetResetTime(0.8f);
+    damageTimer.SetResetTime(0.4f);
     invincibilityTimer.SetResetTime(1.25f);
     isInvincible = false;
     isDead = false;
@@ -266,6 +267,10 @@ void Kid::UpdateEntity (float dt) {
             break;
         
         case EntityState::Injured:
+            damageTimer.Update(dt);
+            if (damageTimer.IsOver())
+                FormatState(EntityState::Falling);
+
             if (collider->box.GetPosition().DistanceTo(damageOrigin) > damageImpulse) {
                 if (rigidBody->GetSpeed().y == 0.0f)
                     rigidBody->ResetGravity();
@@ -347,8 +352,9 @@ bool Kid::NewStateRule (EntityState newState, int argsc, float argsv[]) {
 
             damageOrigin = collider->box.GetPosition();
             damageForce = Vec2(-argsv[AttackGeneric::_ForceX], -argsv[AttackGeneric::_ForceY]);
-            damageImpulse = argsv[AttackGeneric::_Impulse];
+            damageImpulse = argsv[AttackGeneric::_Impulse] + argsv[AttackGeneric::_Displacement];
             jumpSpeedDecrease = 0.0f;
+            damageTimer.Reset();
 
             lastDirectionX = (argsv[AttackGeneric::_OriginX] < collider->box.x)? -1 : 1;
             textureFlip = (lastDirectionX == 1)? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL;
@@ -368,9 +374,9 @@ bool Kid::NewStateRule (EntityState newState, int argsc, float argsv[]) {
 }
 
 void Kid::AttackStart () {
-    swordAttackOnGround->direction = (lastDirectionX == 1)?
+    KidAttackMelee::AttackDirection direction = (lastDirectionX == 1)?
         KidAttackMelee::RIGHT : KidAttackMelee::LEFT;
-    swordAttackOnGround->Perform();
+    swordAttackOnGround->Perform(direction);
     attackOriginX = associated.box.x;
 
     if (runSpeedReset or swordAttackOnGround->ImpulseIsCanceled())
@@ -419,7 +425,10 @@ void Kid::InvincibleUpdate (float dt) {
 void Kid::Die () {
     associated.RemoveComponent(rigidBody);
     associated.RemoveComponent(collider);
+
+    isInvincible = false;
     FormatState(EntityState::Dead);
+    sprites[state]->SetTextureColorMod(255, 255, 255);
 }
 
 void Kid::NotifyCollision (GameObject& other) {

@@ -25,6 +25,10 @@
 #define SPEED_ATTACK                    600.0f
 #define IMPULSE_ATTACK_X                20
 
+#define ATTACK_FORCE                    400.0f, 140.0f
+#define ATTACK_IMPULSE                  50.0f
+#define ATTACK_DAMAGE                   1
+
 #define WALK_FAST_DISTANCE              400.0f
 
 #define ATTACK_MELEE0_DISTANCE          60.0f
@@ -44,15 +48,22 @@
 
 Boss::Boss (GameObject& associated): EntityMachine(associated) {
     type = type | ComponentType::_Boss;
+    associated.layer = LayerDistance::_NPC;
     associated.label = "Boss";
     movementDirection = -1;
-    hp = 70;
+    hp = 40;
 
     restTimer.SetResetTime(0.9f);
     damageTimer.SetResetTime(0.6f);
     recoverTimer.SetResetTime(0.15f);
     isAttacking = false;
     damageTaken = 0;
+
+    GameObject* attack = new GameObject(LayerDistance::_NPC_Close);
+    meleeAttack = new BossAttackMelee(*attack, &associated);
+    meleeAttack->SetProperties(Vec2(ATTACK_FORCE), ATTACK_IMPULSE, ATTACK_DAMAGE, IMPULSE_ATTACK_X);
+    attack->AddComponent(meleeAttack);
+    Game::GetInstance().GetCurrentState().AddObject(attack);
 }
 
 void Boss::Awaken () {
@@ -81,6 +92,10 @@ void Boss::Awaken () {
     collider = new Collider(associated);
     associated.AddComponent(collider);
     collider->SetBox(Vec2(COLLIDER_POSITION), Vec2(COLLIDER_BOX_SIZE));
+
+    AttackGeneric* attack = new AttackGeneric(associated);
+    attack->SetProperties(Vec2(ATTACK_FORCE), ATTACK_IMPULSE, ATTACK_DAMAGE);
+    associated.AddComponent(attack);
 }
 
 void Boss::Start () {
@@ -105,6 +120,11 @@ void Boss::UpdateEntity (float dt) {
     if ((direction != movementDirection) and (not isAttacking)) {
         movementDirection = direction;
         FlipSprite(Sprite::HORIZONTAL);
+    }
+
+    if ((state != Dead) and (hp <= 0)) {
+        Die();
+        return;
     }
 
     switch (state) {
@@ -195,6 +215,12 @@ bool Boss::NewStateRule (EntityState newState, int argsc, float argsv[]) {
             attackTimer.SetResetTime(ATTACK_MELEE0_TIME_START);
             attackTimer.Reset();
             isAttacking = true;
+
+            meleeAttack->PushAttack(Vec2(1.0f, 14.0f), Vec2(39, 22), 0.5f, 0.6f);
+            meleeAttack->PushAttack(Vec2(1.0f, 24.0f), Vec2(39, 33), 0.0f, 0.1f);
+            meleeAttack->PushAttack(Vec2(4.0f, 48.0f), Vec2(36, 13), 0.0f, 0.1f);
+            meleeAttack->Perform(
+                (movementDirection < 0)? BossAttackMelee::LEFT : BossAttackMelee::RIGHT);
             return true;
         
         case AttackingMelee_1:
@@ -204,13 +230,22 @@ bool Boss::NewStateRule (EntityState newState, int argsc, float argsv[]) {
             attackTimer.SetResetTime(ATTACK_MELEE1_TIME_START);
             attackTimer.Reset();
             isAttacking = true;
+
+            meleeAttack->PushAttack(Vec2(4.0f, 13.0f), Vec2(36, 38), 0.5f, 0.6f);
+            meleeAttack->PushAttack(Vec2(7.0f, 28.0f), Vec2(33, 45), 0.0f, 0.1f);
+            meleeAttack->PushAttack(Vec2(1.0f, 14.0f), Vec2(39, 22), 0.2f, 0.3f);
+            meleeAttack->PushAttack(Vec2(1.0f, 24.0f), Vec2(39, 33), 0.0f, 0.1f);
+            meleeAttack->PushAttack(Vec2(4.0f, 48.0f), Vec2(36, 13), 0.0f, 0.1f);
+            meleeAttack->Perform(
+                (movementDirection < 0)? BossAttackMelee::LEFT : BossAttackMelee::RIGHT);
             return true;
-        
+
         case Recovering:
             recoverTimer.Reset();
             return true;
 
         case Injured:
+            meleeAttack->CancelAttack();
             hp -= argsv[AttackGeneric::_Damage];
             rigidBody->SetSpeedOnX(0.0f);
             damageTimer.Reset();
@@ -265,6 +300,12 @@ void Boss::AttackMeleeUpdate (float dt) {
 
         default: break;
     }
+}
+
+void Boss::Die () {
+    associated.RemoveComponent(rigidBody);
+    associated.RemoveComponent(collider);
+    FormatState(EntityState::Dead);
 }
 
 // DEBUG

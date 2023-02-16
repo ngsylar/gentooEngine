@@ -53,15 +53,14 @@ void AttackGeneric::SetupCollider (Vec2 offset, Vec2 size) {
         collider = new Collider(associated, COLLIDER_TRIGGER_TRUE);
         associated.AddComponent(collider);
     }
-
-    if (sprite != nullptr)
-        collider->SetBox(offset, size);
+    else collider->SetBox(offset, size);
 }
 
-void AttackGeneric::SetProperties (Vec2 force, float impulse, int damage) {
+void AttackGeneric::SetProperties (Vec2 force, float impulse, int damage, float displacement) {
     this->force = force;
     this->impulse = impulse;
     this->damage = damage;
+    this->displacement = displacement;
 }
 
 void AttackGeneric::Awaken () {}
@@ -101,6 +100,11 @@ void AttackGeneric::Update (float dt) {
 
 void AttackGeneric::UpdateAttack (float dt) {}
 
+void AttackGeneric::CancelAttack () {
+    lifetime.Update(lifetime.GetResetTime());
+    associated.enabled = false;
+}
+
 void AttackGeneric::NotifyCollision (GameObject& other) {
     if (((not externalAssociated.expired()) and (&other == externalAssociated.lock().get()))
     or (ignoreEqualLabels and (associated.label == other.label)))
@@ -109,8 +113,9 @@ void AttackGeneric::NotifyCollision (GameObject& other) {
     EntityMachine* entity = (EntityMachine*)other.GetComponent(ComponentType::_EntityMachine);
     if (entity == nullptr) return;
 
-    float argsv[5] = {force.x, force.y, impulse, (float)damage, collider->box.x};
-    entity->FormatState(EntityState::Injured, 5, argsv);
+    // note: _ForceX, _ForceY, _Impulse, _Damage, _OriginX, _OriginY, _Displacement
+    float argsv[7] = {force.x, force.y, impulse, (float)damage, collider->box.x, collider->box.y, 0.0f};
+    entity->FormatState(EntityState::Injured, 7, argsv);
 }
 
 bool AttackGeneric::UsingInternalAssociated () {

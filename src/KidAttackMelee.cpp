@@ -5,6 +5,9 @@
 #define COLLIDER_OFFSET_Y       6.0f
 #define COLLIDER_SIZE           24.0f, 44.0f
 
+#define REPULSION_FORCE         140.0f
+#define REPULSION_IMPULSE       4.0f
+
 #define LIFETIME_START          0.09f
 #define LIFETIME_END            0.26f
 
@@ -21,13 +24,7 @@ KidAttackMelee::KidAttackMelee (
     associated.enabled = false;
 
     impulseCancel = false;
-}
-
-void KidAttackMelee::SetProperties (Vec2 force, float impulse, int damage, float displacement) {
-    this->force = force;
-    this->impulse = impulse;
-    this->damage = damage;
-    this->displacement = displacement;
+    repulsionEnabled = false;
 }
 
 void KidAttackMelee::Awaken () {
@@ -39,9 +36,12 @@ void KidAttackMelee::Start () {
     cameraShakeTimer.FalseStart();
 }
 
-void KidAttackMelee::Perform () {
+void KidAttackMelee::Perform (AttackDirection direction) {
     associated.enabled = true;
+    this->direction = direction;
     lifetime.Reset();
+
+    repulsionEnabled = false;
 }
 
 void KidAttackMelee::Update (float dt) {
@@ -49,16 +49,36 @@ void KidAttackMelee::Update (float dt) {
         associated.RequestDelete();
         return;
     }
+
+    RigidBody* rigidBody = nullptr;
+    if (repulsionEnabled)
+        rigidBody = (RigidBody*)externalAssociated.lock()->GetComponent(ComponentType::_RigidBody);
+
     if (lifetime.HasResetTime()) {
         lifetime.Update(dt);
         if (lifetime.IsOver()) {
+
+            if (repulsionEnabled and (rigidBody != nullptr))
+                rigidBody->SetSpeedOnX(0.0f);
             impulseCancel = false;
+
             associated.enabled = false;
             return;
         }
     }
     Rect externalBox = (Rect)(externalAssociated.lock()->box);
 
+    if (repulsionEnabled and (rigidBody != nullptr)) {
+        if (repulsionIncrease < REPULSION_IMPULSE) {
+            rigidBody->SetSpeedOnX(REPULSION_FORCE * (-direction));
+            float increase = rigidBody->GetSpeed().x * dt;
+            if (increase < 0) increase *= -1.0f;
+            repulsionIncrease += increase;
+        } else {
+            rigidBody->SetSpeedOnX(0.0f);
+            repulsionEnabled = false;
+        }
+    }
     switch (direction) {
         case LEFT:
             if (sprite != nullptr) sprite->textureFlip = SDL_FLIP_HORIZONTAL;
@@ -105,10 +125,13 @@ void KidAttackMelee::NotifyCollision (GameObject& other) {
             } else otherRigidBody->SetSpeedOnX(rigidBody->GetSpeed().x);
             return;
         }
-        if (rigidBody->GetSpeed().x != 0.0f)
+        if (rigidBody->GetSpeed().x != 0.0f) {
             argsv[_Displacement] = displacement;
-        else {
+            repulsionOriginX = self->box.x;
+            repulsionIncrease = 0.0f;
+            repulsionEnabled = true;
 
+        } else {
             Collider* otherCollider = (Collider*)other.GetComponent(ComponentType::_Collider);
             float overlap = (direction == LEFT)?
                 ((otherCollider->box.x+otherCollider->box.w)-collider->box.x) :
@@ -117,7 +140,7 @@ void KidAttackMelee::NotifyCollision (GameObject& other) {
         }
 
         // ensures that the collision will only happen once effectively
-        if (not entity->FormatState(EntityState::Injured, 5, argsv)) return;
+        if (not entity->FormatState(EntityState::Injured, 7, argsv)) return;
     } else return;
 
     /*--------------------------------------------------------------------------------------------------*/

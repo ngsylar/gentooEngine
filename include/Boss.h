@@ -6,6 +6,7 @@
 #include "Collider.h"
 #include "Sprite.h"
 #include "Timer.h"
+#include "BossAttackMelee.h"
 
 class Boss: public EntityMachine {
     private:
@@ -16,6 +17,9 @@ class Boss: public EntityMachine {
         Vec2 currentRoute;
         int hp;
 
+        // Attack Types
+        BossAttackMelee* meleeAttack;
+
         // Behaviour
         SubState generalState, attackState;
         Timer restTimer, attackTimer, damageTimer, recoverTimer;
@@ -24,11 +28,12 @@ class Boss: public EntityMachine {
         bool isAttacking;
 
         // Automatic Factors
-        int attackDirectionX, damageTaken;
         float attackOriginX;
+        int damageTaken;
 
         bool NewStateRule(EntityState newState, int argsc, float argsv[]);
         void AttackMeleeUpdate(float dt);
+        void Die();
 
     public:
         Boss(GameObject& associated);
