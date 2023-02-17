@@ -7,6 +7,9 @@
 #define SPRITE_OFFSET_X         -8.0f
 #define SPRITE_OFFSET_Y         0.0f
 
+#define REPULSION_FORCE         140.0f
+#define REPULSION_IMPULSE       4.0f
+
 #define CAMERA_SHAKE_COUNT      6
 #define CAMERA_SHAKE_RANGE      3
 #define CAMERA_SHAKE_RESET_TIME 0.04f
@@ -60,6 +63,7 @@ void KidAttackStrong::Perform (AttackDirection direction) {
     sprite->SetFrame(0);
     lifetime.Reset();
 
+    repulsionEnabled = false;
     isOver = false;
 }
 
@@ -68,6 +72,11 @@ void KidAttackStrong::Update (float dt) {
         associated.RequestDelete();
         return;
     }
+
+    RigidBody* rigidBody = nullptr;
+    if (repulsionEnabled)
+        rigidBody = (RigidBody*)externalAssociated.lock()->GetComponent(ComponentType::_RigidBody);
+
     if (lifetime.HasResetTime()) {
         lifetime.Update(dt);
         if (lifetime.IsOver()) {
@@ -87,7 +96,26 @@ void KidAttackStrong::Update (float dt) {
             } else if (not isOver) {
                 lifetime.SetResetTime(0.74f);
                 isOver = true;
-            } else associated.enabled = false;
+
+            } else {
+                if (repulsionEnabled and (rigidBody != nullptr))
+                    rigidBody->SetSpeedOnX(0.0f);
+                impulseCancel = false;
+
+                associated.enabled = false;
+                return;
+            }
+        }
+    }
+    if (repulsionEnabled and (rigidBody != nullptr)) {
+        if (repulsionIncrease < REPULSION_IMPULSE) {
+            rigidBody->SetSpeedOnX(REPULSION_FORCE * (-direction));
+            float increase = rigidBody->GetSpeed().x * dt;
+            if (increase < 0) increase *= -1.0f;
+            repulsionIncrease += increase;
+        } else {
+            rigidBody->SetSpeedOnX(0.0f);
+            repulsionEnabled = false;
         }
     }
     Rect externalBox = (Rect)(externalAssociated.lock()->box);

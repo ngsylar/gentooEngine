@@ -386,8 +386,12 @@ bool Kid::NewStateRule (EntityState newState, int argsc, float argsv[]) {
             break;
 
         case EntityState::AttackingSwordStrong_Perform:
-            chargePerforming = false;
+            if ((newState == EntityState::Injured) and (not swordAttackOnGround->lifetime.IsOver())
+            and (lastDirectionX == ((argsv[AttackGeneric::_OriginX] < collider->box.x)? -1 : 1)))
+                return false;
+            attackImpulseCancel = false;
             attackPerforming = false;
+            chargePerforming = false;
             break;
         
         case EntityState::CastingSpell_0:
@@ -566,6 +570,7 @@ void Kid::NotifyCollision (GameObject& other) {
             break;
 
         case EntityState::AttackingSwordOnGround_0: case EntityState::AttackingSwordOnGround_1:
+        case EntityState::AttackingSwordStrong_Perform:
             if (rigidBody->ImpactLeft() or rigidBody->ImpactRight()) {
                 rigidBody->SetSpeedOnX(0.0f);
                 attackImpulseCancel = true;

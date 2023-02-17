@@ -6,7 +6,7 @@
 #define SPRITE_DAMAGE           "assets/img/armadillo/damage.png"
 #define SPRITE_DEATH            "assets/img/armadillo/death.png"
 
-#define SPRITE_RUN_FRAMES       6, 0.1f
+#define SPRITE_RUN_FRAMES       6, 0.125f
 #define SPRITE_DAMAGE_FRAMES    2, 0.1f
 #define SPRITE_DEATH_FRAMES     8, 0.1f
 
@@ -142,7 +142,7 @@ bool EnemyArmadillo::NewStateRule (EntityState newState, int argsc, float argsv[
 void EnemyArmadillo::NotifyCollision (GameObject& other) {
     rigidBody->NotifyCollision(other);
 
-    if (rigidBody->ImpactDown() and (other.label == "Ground")) {
+    if (rigidBody->ImpactDown()) {
         if (state == EntityState::Falling)
             FormatState(EntityState::Running);
         Collider* groundCollider = (Collider*)other.GetComponent(ComponentType::_Collider);

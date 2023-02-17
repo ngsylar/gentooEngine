@@ -66,8 +66,6 @@ void KidAttackMelee::Update (float dt) {
             return;
         }
     }
-    Rect externalBox = (Rect)(externalAssociated.lock()->box);
-
     if (repulsionEnabled and (rigidBody != nullptr)) {
         if (repulsionIncrease < REPULSION_IMPULSE) {
             rigidBody->SetSpeedOnX(REPULSION_FORCE * (-direction));
@@ -79,6 +77,8 @@ void KidAttackMelee::Update (float dt) {
             repulsionEnabled = false;
         }
     }
+    Rect externalBox = (Rect)(externalAssociated.lock()->box);
+
     switch (direction) {
         case LEFT:
             if (sprite != nullptr) sprite->textureFlip = SDL_FLIP_HORIZONTAL;
