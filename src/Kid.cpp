@@ -1,5 +1,7 @@
 #include "GentooEngine.h"
 #include "Kid.h"
+#include "ZoneTransition.h"
+#include "GameData.h"
 
 #define SPRITE_IDLE                             "assets/img/kid/idle.png"
 // #define SPRITE_WALK                             "assets/img/kid/walk.png"
@@ -67,7 +69,7 @@ Kid::Kid (GameObject& associated): EntityMachine(associated) {
     invincibilityTimer.SetResetTime(1.25f);
     isInvincible = false;
     isDead = false;
-    hp = 6;
+    hp = (GameData::kidHp <= 0 ? 6 : GameData::kidHp);
 
     runSpeedIncrease = 0.0f;
     runSpeedReset = true;
@@ -76,7 +78,7 @@ Kid::Kid (GameObject& associated): EntityMachine(associated) {
     attackImpulseCancel = false;
     damagePerforming = false;
     flickFactor = 255.0f;
-    lastDirectionX = 1;
+    lastDirectionX = 0; //changed to avoid a moonwalking glitch
 
     GameObject* attack = new GameObject(LayerDistance::_Player_Front);
     swordAttackOnGround = new KidAttackMelee(*attack, &associated);
@@ -88,6 +90,13 @@ Kid::Kid (GameObject& associated): EntityMachine(associated) {
     isGrounded = false;
     hitCeiling = false;
     hitWall = false;
+
+    textureFlip = ZoneManager::GetSpriteFlip();//to face the right direction when changing state
+
+    //Death animation and transition to last checkpoint
+    deathFade = false;
+    deathSequence.SetResetTime(3.5);
+    deathSequence.Reset();
 
     // melius colliders' pixel correction
     associated.pixelColliderFix1 = true;
@@ -157,7 +166,21 @@ void Kid::Start () {
 void Kid::LateUpdate (float dt) {}
 
 void Kid::UpdateEntity (float dt) {
-    if (state == EntityState::Dead) return;
+    if (state == EntityState::Dead) {
+        deathSequence.Update(dt);
+        if(deathSequence.GetTime()>1 and !deathFade){
+            associated.SetLayer(LayerDistance::_DeathLayer);
+            GameObject* transitionGO = new GameObject(LayerDistance::_FadingLayer);
+            ScreenFade* transitionFilter = new ScreenFade(*transitionGO, Color("#000000"), 0, 1, STATE_FADE_TIME);
+            transitionGO->AddComponent(transitionFilter);
+            Game::GetInstance().GetCurrentState().AddObject(transitionGO);
+            Game::GetInstance().GetCurrentState().GetStateMusic()->Stop(STATE_FADE_TIME*1000);//To stop current music
+            deathFade = true;
+        } else if(deathSequence.IsOver()) {
+            ZoneManager::RequestZone(std::make_pair(GameData::checkPoint, ZoneExit::Death),false);
+        }
+        return;// HERE! FADE AND CALL 
+    }
     InputManager& input = InputManager::GetInstance();
 
     if (isInvincible)
@@ -415,9 +438,16 @@ void Kid::InvincibleUpdate (float dt) {
     } sprites[state]->SetTextureColorMod(flickFactor, flickFactor, flickFactor);
 }
 
-void Kid::Die () {
+void Kid::Die () {//HERE!!!!!! APPLY DEATH SCREEN
     associated.RemoveComponent(rigidBody);
     associated.RemoveComponent(collider);
+
+    associated.SetLayer(LayerDistance::_DeathLayer);
+    GameObject* darkBG = new GameObject(LayerDistance::_DarkLayer);
+    ScreenFade* deathFilter = new ScreenFade(*darkBG, Color("#000000"), 0, 1, 0.1);
+    darkBG->AddComponent(deathFilter);
+    Game::GetInstance().GetCurrentState().AddObject(darkBG);
+
     FormatState(EntityState::Dead);
 }
 

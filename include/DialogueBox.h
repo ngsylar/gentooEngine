@@ -9,12 +9,12 @@ class DialogueBox : public Component {
         std::string dialogueFile;
         std::vector<std::string> dialogueLines;
         Text* dialogueText;
-
+        bool followCamera;
         int counter;
         bool looped;
     public:
         static bool dialogueOngoing;
-        DialogueBox(GameObject& associated, std::string dialogueFile, bool looped = false);
+        DialogueBox(GameObject& associated, std::string dialogueFile, bool looped = false, bool followCamera=true);
         ~DialogueBox();
         void Start();
         void Update(float dt);

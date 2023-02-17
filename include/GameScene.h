@@ -5,6 +5,42 @@
 #include "ZoneTransition.h"
 #include "State.h"
 
+class Menu : public State {
+    private:
+        GameObject* startGO;
+        GameObject* creditsGO;
+        GameObject* exitGO;
+
+        Sprite* start;
+        Sprite* credits;
+        Sprite* exit;
+
+        Rect rStart;
+        Rect rCredits;
+        Rect rExit;
+
+        Timer changeState;
+        bool fading;
+
+        int highlighted;
+
+    public:
+        Menu();
+        void LoadAssets();
+        void Update(float dt);
+};
+
+class Credits : public State {
+    private:
+        Timer changeState;
+        bool fading;
+
+    public:
+        Credits();
+        void LoadAssets();
+        void Update(float dt);
+};
+
 //Surface levels
 class H1 : public State {
     private:

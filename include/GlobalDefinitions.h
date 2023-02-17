@@ -45,6 +45,7 @@ enum ComponentType {
     _Interactor =       1 << 21,
 
     // Testing Environment
+    _Boulder =          1 << 28,
     _Ball =             1 << 29,
     _RigidBodyLegacy =  1 << 30,
     _Dummy =            1 << 31,
@@ -85,6 +86,9 @@ enum LayerDistance {
     _ForeGround,
     _ForeGround_Close,
     _ForeGround_VeryClose,
+    _HUDLayer,
+    _DarkLayer,
+    _DeathLayer,
     _FadingLayer,
 };
 

@@ -1,6 +1,7 @@
 #include "ZoneTransition.h"
 #include "GameScene.h"
 #include "GameData.h"
+#include "Kid.h"
 
 ZoneTransition::ZoneTransition (GameObject& associated, Rect collider, std::pair<Zone, ZoneExit> zoneExit, bool carryMusic)
 : Component(associated) {
@@ -50,11 +51,15 @@ void ZoneTransition::NotifyCollision (GameObject& other){
 
 //########################################
 
-Vec2 ZoneManager::spawnPosition = Vec2(13, 18);//1st map initial position
+Vec2 ZoneManager::spawnPosition = Vec2(14, 10);//1st map initial position
+// Vec2 ZoneManager::spawnPosition = Vec2(13, 18);//1st map initial position
 // Vec2 ZoneManager::spawnPosition = Vec2(11, 15);//U3 close to U4
+
 Music* ZoneManager::levelMusic = nullptr;
+SDL_RendererFlip ZoneManager::currentFlip = SDL_FLIP_NONE;
 
 ZoneManager::ZoneManager() {
+    
     //TODO Set spawn point from load file or to 1st map
 }
 
@@ -75,6 +80,10 @@ void ZoneManager::RequestZone(std::pair<Zone, ZoneExit> place, bool carryMusic) 
             else if(place.second == ZoneExit::B) {//to H1-A
                 spawnPosition = Vec2(16, 10);
                 Game::GetInstance().AddState(new H1());
+            }
+            else if(place.second == ZoneExit::Death){
+                spawnPosition = GameData::revivePosition;
+                Game::GetInstance().AddState(new S1());
             }
             break;
 
@@ -114,6 +123,9 @@ void ZoneManager::RequestZone(std::pair<Zone, ZoneExit> place, bool carryMusic) 
             else if(place.second == ZoneExit::B) {//to U16-A
                 spawnPosition = Vec2(11, 5);
                 Game::GetInstance().AddState(new U16());
+            } else if(place.second == ZoneExit::Death){
+                spawnPosition = GameData::revivePosition;
+                Game::GetInstance().AddState(new S4());
             }
             break;
 
@@ -131,6 +143,9 @@ void ZoneManager::RequestZone(std::pair<Zone, ZoneExit> place, bool carryMusic) 
             else if(place.second == ZoneExit::C) {//to U2-A
                 spawnPosition = Vec2(11, 26);
                 Game::GetInstance().AddState(new U2());
+            }else if(place.second == ZoneExit::Death){
+                spawnPosition = GameData::revivePosition;
+                Game::GetInstance().AddState(new U1());
             }
             break;
 
@@ -224,6 +239,9 @@ void ZoneManager::RequestZone(std::pair<Zone, ZoneExit> place, bool carryMusic) 
             else if(place.second == ZoneExit::C) {//to U9-A
                 spawnPosition = Vec2(10, 17);
                 Game::GetInstance().AddState(new U9());
+            } else if(place.second == ZoneExit::Death){
+                spawnPosition = GameData::revivePosition;
+                Game::GetInstance().AddState(new U8());
             }
             break;
 
@@ -280,6 +298,9 @@ void ZoneManager::RequestZone(std::pair<Zone, ZoneExit> place, bool carryMusic) 
             else if(place.second == ZoneExit::D) {//to U13-B
                 spawnPosition = Vec2(9, 17);
                 Game::GetInstance().AddState(new U13());
+            } else if(place.second == ZoneExit::Death){
+                spawnPosition = GameData::revivePosition;
+                Game::GetInstance().AddState(new U12());
             }
             break;
             
@@ -292,7 +313,11 @@ void ZoneManager::RequestZone(std::pair<Zone, ZoneExit> place, bool carryMusic) 
             
         case Zone::_U14:
             if(place.second == ZoneExit::A) {//to U12-C
-                spawnPosition = Vec2(38, 19);
+                if(GameData::boulder4a){
+                    spawnPosition = Vec2(41, 19);
+                } else {
+                    spawnPosition = Vec2(38, 19);
+                }
                 Game::GetInstance().AddState(new U12());
             } 
             break;
@@ -310,7 +335,7 @@ void ZoneManager::RequestZone(std::pair<Zone, ZoneExit> place, bool carryMusic) 
                 Game::GetInstance().AddState(new S4());
             } 
             else if(place.second == ZoneExit::B) {//to U7-B
-                spawnPosition = Vec2(45, 20);
+                spawnPosition = Vec2(49, 20);
                 Game::GetInstance().AddState(new U7());
             }
             break;
@@ -324,6 +349,9 @@ void ZoneManager::RequestZone(std::pair<Zone, ZoneExit> place, bool carryMusic) 
     } else if(carryMusic) {
         levelMusic = Game::GetInstance().GetCurrentState().GetStateMusic();
     }
+    Kid* kidInfo = (Kid*)Kid::GetInstance()->GetComponent(ComponentType::_Kid);
+    currentFlip = (kidInfo->SpriteIsFlipped() ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE);
+    GameData::kidHp = kidInfo->hp;
     GameData::MultiConditionalChecks();
     Game::GetInstance().GetCurrentState().RequestPop();
 }
@@ -339,6 +367,10 @@ ZoneManager::~ZoneManager() {
 
 Vec2 ZoneManager::GetSpawnPosition() {
     return spawnPosition;
+}
+
+SDL_RendererFlip ZoneManager::GetSpriteFlip() {
+    return currentFlip;
 }
 
 Music* ZoneManager::GetCarriedMusic() {

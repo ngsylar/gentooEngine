@@ -2,12 +2,13 @@
 
 bool DialogueBox::dialogueOngoing = false;
 
-DialogueBox::DialogueBox(GameObject& associated, std::string dialogueFile, bool looped)
+DialogueBox::DialogueBox(GameObject& associated, std::string dialogueFile, bool looped, bool followCamera)
 : Component(associated) {
     dialogueText = nullptr;
     this->dialogueFile = dialogueFile;
     type = ComponentType::_DialogueBox;
     counter = 0;
+    this->followCamera = followCamera;
     this->looped = looped;
     dialogueOngoing = true;
 }
@@ -18,21 +19,22 @@ DialogueBox::~DialogueBox(){}
 #define DIALOGUEFONTSIZE 20
 //Max characters/line = 36, max lines = 3
 
-#define DIALOGUEBALLOON "assets/img/BaseBalloon.png"
-#define DIALOGUEFILE "assets/txt/test.txt"
+#define DIALOGUEBALLOON "assets/img/text/Balloon.png"
 
 void DialogueBox::Start(){
     Sprite* balloon = new Sprite(associated,DIALOGUEBALLOON);
-    CameraFollower* balloonfollow = new CameraFollower(associated);
-    TextParser::Parse(DIALOGUEFILE);
+    TextParser::Parse(dialogueFile);
     dialogueLines = TextParser::dialogue;
     TextParser::Clear();
     dialogueText = new Text(associated, dialogueLines[counter], DIALOGUEFONT,
-        DIALOGUEFONTSIZE, Text::Style::BLENDED, Color("#ffffff").ColorSDL());
+        DIALOGUEFONTSIZE, Text::Style::BLENDED, Color("#865C45").ColorSDL());
+    
+    CameraFollower* balloonfollow = new CameraFollower(associated);
     balloonfollow->offset = Vec2(96, 32);
+    associated.AddComponent(balloonfollow);
+    
     dialogueText->SetOffset(Vec2(8,8));
     associated.AddComponent(balloon);
-    associated.AddComponent(balloonfollow);
     associated.AddComponent(dialogueText);
     associated.box.SetSize(balloon->GetWidth(), balloon->GetHeight());
     dialogueText->SetWrap(247);//size in pixels
@@ -46,6 +48,7 @@ void DialogueBox::Update(float dt){
         counter++;
         if(counter > (int)dialogueLines.size()-1) {
             if(!looped) {
+                associated.RemoveComponent(dialogueText);
                 return;
             }
             counter = 0;
