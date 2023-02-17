@@ -352,6 +352,7 @@ void ZoneManager::RequestZone(std::pair<Zone, ZoneExit> place, bool carryMusic) 
     Kid* kidInfo = (Kid*)Kid::GetInstance()->GetComponent(ComponentType::_Kid);
     currentFlip = (kidInfo->SpriteIsFlipped() ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE);
     GameData::kidHp = kidInfo->hp;
+    GameData::kidMp = kidInfo->mp;
     GameData::MultiConditionalChecks();
     Game::GetInstance().GetCurrentState().RequestPop();
 }

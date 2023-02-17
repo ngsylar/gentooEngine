@@ -1,0 +1,9 @@
+2
+~Mana ativo!
+O personagem agora pode usar
+habilidades que requerem mana.
+
+~Garoto:
+Esse lugar é mais assustador
+do que eu pensava
+~

@@ -1,5 +1,6 @@
 #include "GameScene.h"
 #include "Kid.h"
+#include "Hud.h"
 #include "GameData.h"
 #include "Dummy.h"
 #include "Boulder.h"
@@ -285,6 +286,11 @@ void H1::LoadAssets() {
         intObj->AddComponent(output);
         AddObject(intObj);
     }
+
+    GameObject* HUD = new GameObject();
+    HUD->AddComponent(new Hud(*HUD));
+    AddObject(HUD);
+
     FadeIn();
     // GameObject* dialogueObj = new GameObject(LayerDistance::_ForeGround_VeryClose);
     // DialogueBox* chat = new DialogueBox(*dialogueObj);
@@ -432,10 +438,15 @@ void S1::LoadAssets() {
     checkSave->SetResult([](){
         GameData::checkPoint = Zone::_S1;
         GameData::revivePosition = Vec2(13,18);
+        Kid::self->hp = 6;
     });
     checkObj->AddComponent(checkSave);
     AddObject(checkObj);
     
+    GameObject* HUD = new GameObject();
+    HUD->AddComponent(new Hud(*HUD));
+    AddObject(HUD);
+
     LimitMap();
     FadeIn();
 
@@ -589,7 +600,9 @@ void S2::LoadAssets() {
     }
     AddObject(gateObj);
 
-
+    GameObject* HUD = new GameObject();
+    HUD->AddComponent(new Hud(*HUD));
+    AddObject(HUD);
 
     LimitMap();
     FadeIn();
@@ -757,6 +770,10 @@ void S3::LoadAssets() {
         AddObject(alche);
     }
 
+    GameObject* HUD = new GameObject();
+    HUD->AddComponent(new Hud(*HUD));
+    AddObject(HUD);
+
     LimitMap();
     FadeIn();
 }
@@ -854,10 +871,15 @@ void S4::LoadAssets() {
     checkSave->SetResult([](){
         GameData::checkPoint = Zone::_S4;
         GameData::revivePosition = Vec2(33,25);
+        Kid::self->hp = 6;
     });
     checkObj->AddComponent(checkPoint);
     checkObj->AddComponent(checkSave);
     AddObject(checkObj);
+
+    GameObject* HUD = new GameObject();
+    HUD->AddComponent(new Hud(*HUD));
+    AddObject(HUD);
 
     LimitMap();
     FadeIn();
@@ -892,19 +914,20 @@ void S4::Update(float dt) {
 #define U1_16 "assets/img/U1/16.png"
 #define U1_17 "assets/img/U1/17.png"
 #define U1_17_2 "assets/img/U1/17-2.png"
+#define CAN_MANA "assets/txt/066_mana.txt"
     
 
 U1::U1() {
     AddScenario(U1_FUNDO, LayerDistance::_Background_Far);
-    AddScenario(U1_2, LayerDistance::_Background);
-    AddScenario(U1_4, LayerDistance::_Background_VeryClose);
-    AddScenario(U1_6, LayerDistance::_Scenery);
-    AddScenario(U1_7, LayerDistance::_Scenery_Close);
+    AddScenario(U1_2, LayerDistance::_Background, 0.45, true);
+    AddScenario(U1_4, LayerDistance::_Background_VeryClose, 0.55, true);
+    AddScenario(U1_6, LayerDistance::_Scenery,0.7, true);
+    AddScenario(U1_7, LayerDistance::_Scenery_Close, 0.8, true);
     AddScenario(U1_8, LayerDistance::_Environment_Far);
     AddScenario(U1_9_BASE, LayerDistance::_Environment);
     AddScenario(U1_16, LayerDistance::_ForeGround);
-    AddScenario(U1_17, LayerDistance::_ForeGround_Close);
-    AddScenario(U1_17_2, LayerDistance::_ForeGround_Close);
+    AddScenario(U1_17, LayerDistance::_ForeGround_Close, 1.15);
+    AddScenario(U1_17_2, LayerDistance::_ForeGround_Close, 1.15);
 }
 #define MAP_U1 "assets/map/Zone/U1"
 void U1::LoadAssets() {
@@ -948,7 +971,7 @@ void U1::LoadAssets() {
 
     AddSpikes(26,42,5);
 
-    GameObject* checkObj = new GameObject(LayerDistance::_Environment_Far);
+    GameObject* checkObj = new GameObject(LayerDistance::_NPC);
     Sprite* checkPoint = new Sprite(*checkObj, CHECKPOINT_ANIM, 6, 0.1);
     checkObj->box.SetPurePosition(52.4*TILE_SIZE, 39.1*TILE_SIZE);
     checkObj->box.SetSize(checkPoint->GetWidth(), checkPoint->GetHeight());
@@ -956,6 +979,7 @@ void U1::LoadAssets() {
     checkSave->SetResult([](){
         GameData::checkPoint = Zone::_U1;
         GameData::revivePosition = Vec2(50,40);
+        Kid::self->hp = 6;
     });
     checkObj->AddComponent(checkPoint);
     checkObj->AddComponent(checkSave);
@@ -970,12 +994,19 @@ void U1::LoadAssets() {
         
         output->SetResult([](){
             GameData::canUseMana = true;
+            GameObject* dialogueObj = new GameObject(LayerDistance::_ForeGround_VeryClose);
+            dialogueObj->AddComponent(new DialogueBox(*dialogueObj,CAN_MANA));
+            Game::GetInstance().GetCurrentState().AddObject(dialogueObj);
         });
 
         intObj->AddComponent(output);
         intObj->AddComponent(new Sprite(*intObj,FIRE, 30, 0.1));
         AddObject(intObj);
     }
+
+    GameObject* HUD = new GameObject();
+    HUD->AddComponent(new Hud(*HUD));
+    AddObject(HUD);
 
     LimitMap();
     FadeIn();
@@ -1012,15 +1043,15 @@ void U1::Update(float dt) {
 
 U2::U2() {
     AddScenario(U2_FUNDO, LayerDistance::_Background_FarAway);
-    AddScenario(U2_2, LayerDistance::_Background);
-    AddScenario(U2_4, LayerDistance::_Background_VeryClose);
-    AddScenario(U2_6, LayerDistance::_Scenery);
-    AddScenario(U2_7, LayerDistance::_Scenery_Close);
+    AddScenario(U2_2, LayerDistance::_Background, 0.45, true);
+    AddScenario(U2_4, LayerDistance::_Background_VeryClose, 0.5, true);
+    AddScenario(U2_6, LayerDistance::_Scenery, 0.7, true);
+    AddScenario(U2_7, LayerDistance::_Scenery_Close, 0.8, true);
     AddScenario(U2_8, LayerDistance::_Environment_Far);
     AddScenario(U2_9_BASE, LayerDistance::_Environment);
     AddScenario(U2_16, LayerDistance::_ForeGround);
-    AddScenario(U2_17, LayerDistance::_ForeGround_Close);
-    AddScenario(U2_17_2, LayerDistance::_ForeGround_Close);
+    AddScenario(U2_17, LayerDistance::_ForeGround_Close, 1.15);
+    AddScenario(U2_17_2, LayerDistance::_ForeGround_Close, 1.15);
 }
 #define MAP_U2 "assets/map/Zone/U2"
 void U2::LoadAssets() {
@@ -1068,6 +1099,10 @@ void U2::LoadAssets() {
         std::make_pair(Zone::_U2, ZoneExit::D));
     DObj->AddComponent(doorD);
     AddObject(DObj);
+
+    GameObject* HUD = new GameObject();
+    HUD->AddComponent(new Hud(*HUD));
+    AddObject(HUD);
 
     LimitMap();
     FadeIn();
@@ -1170,6 +1205,9 @@ void U3::LoadAssets() {
 
     AddSpikes(14,22,69);
 
+    GameObject* HUD = new GameObject();
+    HUD->AddComponent(new Hud(*HUD));
+    AddObject(HUD);
     LimitMap();
     FadeIn();
 }
@@ -1221,6 +1259,7 @@ U4::U4() {
 }
 
 #define MAP_U4 "assets/map/Zone/U4"
+#define CHARGEDTXT "assets/txt/07_atk_fort.txt"
 void U4::LoadAssets() {
     //#####################################
     stateMusic = ZoneManager::GetCarriedMusic();
@@ -1275,13 +1314,19 @@ void U4::LoadAssets() {
         
         output->SetResult([](){
             GameData::canUseChargedAttack = true;
+
+            GameObject* dialogueObj = new GameObject(LayerDistance::_ForeGround_VeryClose);
+            dialogueObj->AddComponent(new DialogueBox(*dialogueObj,CHARGEDTXT));
+            Game::GetInstance().GetCurrentState().AddObject(dialogueObj);
         });
 
         intObj->AddComponent(output);
         intObj->AddComponent(new Sprite(*intObj,FIRE, 30, 0.1));
         AddObject(intObj);
     }
-
+    GameObject* HUD = new GameObject();
+    HUD->AddComponent(new Hud(*HUD));
+    AddObject(HUD);
     LimitMap();
     FadeIn();
 }
@@ -1323,15 +1368,15 @@ void U4::Update(float dt) {}
 
 U5::U5() {
     AddScenario(U5_0, LayerDistance::_Background_FarAway);
-    AddScenario(U5_2, LayerDistance::_Background);
-    AddScenario(U5_4, LayerDistance::_Background_VeryClose);
-    AddScenario(U5_6, LayerDistance::_Scenery);
-    AddScenario(U5_7, LayerDistance::_Scenery_Close);
+    AddScenario(U5_2, LayerDistance::_Background, 0.45, true);
+    AddScenario(U5_4, LayerDistance::_Background_VeryClose, 0.55, true);
+    AddScenario(U5_6, LayerDistance::_Scenery,0.7, true);
+    AddScenario(U5_7, LayerDistance::_Scenery_Close,0.8, true);
     AddScenario(U5_8, LayerDistance::_Environment_Far);
     AddScenario(U5_9, LayerDistance::_Environment);
     AddScenario(U5_16, LayerDistance::_ForeGround);
-    AddScenario(U5_17, LayerDistance::_ForeGround_Close);
-    AddScenario(U5_17_2, LayerDistance::_ForeGround_Close);
+    AddScenario(U5_17, LayerDistance::_ForeGround_Close, 1.15);
+    AddScenario(U5_17_2, LayerDistance::_ForeGround_Close, 1.15);
 }
 
 #define MAP_U5 "assets/map/Zone/U5"
@@ -1445,7 +1490,9 @@ void U5::LoadAssets() {
         mechaObj->AddComponent(mechanism);
     }
     AddObject(mechaObj);
-
+    GameObject* HUD = new GameObject();
+    HUD->AddComponent(new Hud(*HUD));
+    AddObject(HUD);
     LimitMap();
     FadeIn();
 }
@@ -1478,14 +1525,14 @@ void U5::Update(float dt) {}
     
 U6::U6() {
     AddScenario(U6_FUNDO, LayerDistance::_Background_Far);
-    AddScenario(U6_2, LayerDistance::_Background);
-    AddScenario(U6_5, LayerDistance::_Scenery_Far);
-    AddScenario(U6_6, LayerDistance::_Scenery);
+    AddScenario(U6_2, LayerDistance::_Background,0.45, true);
+    AddScenario(U6_5, LayerDistance::_Scenery_Far, 0.6, true);
+    AddScenario(U6_6, LayerDistance::_Scenery, 0.7, true);
     AddScenario(U6_8, LayerDistance::_Environment_Far);
     AddScenario(U6_9_BASE, LayerDistance::_Environment);
     AddScenario(U6_16, LayerDistance::_ForeGround);
-    AddScenario(U6_17, LayerDistance::_ForeGround_Close);
-    AddScenario(U6_17_2, LayerDistance::_ForeGround_Close);
+    AddScenario(U6_17, LayerDistance::_ForeGround_Close, 1.15);
+    AddScenario(U6_17_2, LayerDistance::_ForeGround_Close, 1.15);
 }
 #define MAP_U6 "assets/map/Zone/U6"
 void U6::LoadAssets() {
@@ -1522,7 +1569,9 @@ void U6::LoadAssets() {
 
     AddSpikes(20,21,7);
     AddSpikes(36,21,13);
-    
+    GameObject* HUD = new GameObject();
+    HUD->AddComponent(new Hud(*HUD));
+    AddObject(HUD);
     LimitMap();
     FadeIn();
 }
@@ -1552,11 +1601,11 @@ void U6::Update(float dt) {}
 
 U7::U7() {
     AddScenario(U7_0, LayerDistance::_Background_FarAway);
-    AddScenario(U7_6, LayerDistance::_Scenery);
+    AddScenario(U7_6, LayerDistance::_Scenery, 0.7, true);
     AddScenario(U7_8, LayerDistance::_Environment_Far);
     AddScenario(U7_9, LayerDistance::_Environment);
     AddScenario(U7_16, LayerDistance::_ForeGround);
-    AddScenario(U7_17, LayerDistance::_ForeGround_Close);
+    AddScenario(U7_17, LayerDistance::_ForeGround_Close, 1.15);
 }
 #define MAP_U7 "assets/map/Zone/U7"
 void U7::LoadAssets() {
@@ -1635,7 +1684,9 @@ void U7::LoadAssets() {
         gateObj->AddComponent(gateLimit);
     }
     AddObject(gateObj);
-
+    GameObject* HUD = new GameObject();
+    HUD->AddComponent(new Hud(*HUD));
+    AddObject(HUD);
     LimitMap();
     FadeIn();
 }
@@ -1689,12 +1740,12 @@ void U7::Update(float dt) {
 
 U8::U8() {
     AddScenario(U8_FUNDO, LayerDistance::_Background_Far);
-    AddScenario(U8_4, LayerDistance::_Background_VeryClose);
-    AddScenario(U8_6, LayerDistance::_Scenery);
+    AddScenario(U8_4, LayerDistance::_Background_VeryClose, 0.45, true);
+    AddScenario(U8_6, LayerDistance::_Scenery, 0.7, true);
     AddScenario(U8_8, LayerDistance::_Environment_Far);
     AddScenario(U8_9_BASE, LayerDistance::_Environment);
     AddScenario(U8_16, LayerDistance::_ForeGround);
-    AddScenario(U8_17, LayerDistance::_ForeGround_Close);
+    AddScenario(U8_17, LayerDistance::_ForeGround_Close, 1.15);
 }
 #define MAP_U8 "assets/map/Zone/U8"
 void U8::LoadAssets() {
@@ -1744,11 +1795,14 @@ void U8::LoadAssets() {
     checkSave->SetResult([](){
         GameData::checkPoint = Zone::_U8;
         GameData::revivePosition = Vec2(12,18);
+        Kid::self->hp = 6;
     });
     checkObj->AddComponent(checkPoint);
     checkObj->AddComponent(checkSave);
     AddObject(checkObj);
-
+    GameObject* HUD = new GameObject();
+    HUD->AddComponent(new Hud(*HUD));
+    AddObject(HUD);
     LimitMap();
     FadeIn();
 }
@@ -1782,13 +1836,13 @@ void U8::Update(float dt) {
 
 U9::U9() {
     AddScenario(U9_FUNDO, LayerDistance::_Background_FarAway);
-    AddScenario(U9_2, LayerDistance::_Background);
-    AddScenario(U9_4, LayerDistance::_Background_VeryClose);
-    AddScenario(U9_7, LayerDistance::_Scenery_Close);
+    AddScenario(U9_2, LayerDistance::_Background, 0.45, true);
+    AddScenario(U9_4, LayerDistance::_Background_VeryClose, 0.55, true);
+    AddScenario(U9_7, LayerDistance::_Scenery_Close, 0.8, true);
     AddScenario(U9_8, LayerDistance::_Environment_Far);
     AddScenario(U9_9_BASE, LayerDistance::_Environment);
     AddScenario(U9_16, LayerDistance::_ForeGround);
-    AddScenario(U9_17, LayerDistance::_ForeGround_Close);
+    AddScenario(U9_17, LayerDistance::_ForeGround_Close, 1.15);
 }
 #define MAP_U9 "assets/map/Zone/U9"
 void U9::LoadAssets() {
@@ -1838,7 +1892,9 @@ void U9::LoadAssets() {
     AddObject(DObj);
 
     AddSpikes(13,32,5);
-
+    GameObject* HUD = new GameObject();
+    HUD->AddComponent(new Hud(*HUD));
+    AddObject(HUD);
     LimitMap();
     FadeIn();
 }
@@ -1876,14 +1932,14 @@ void U9::Update(float dt) {
 
 U10::U10() {
     AddScenario(U10_0, LayerDistance::_Background_FarAway);
-    AddScenario(U10_4, LayerDistance::_Background_VeryClose);
-    AddScenario(U10_5, LayerDistance::_Scenery_Far);
-    AddScenario(U10_6, LayerDistance::_Scenery);
-    AddScenario(U10_7, LayerDistance::_Scenery_Close);
+    AddScenario(U10_4, LayerDistance::_Background_VeryClose, 0.45, true);
+    AddScenario(U10_5, LayerDistance::_Scenery_Far, 0.6, true);
+    AddScenario(U10_6, LayerDistance::_Scenery, 0.7, true);
+    AddScenario(U10_7, LayerDistance::_Scenery_Close, 0.8, true);
     AddScenario(U10_8, LayerDistance::_Environment_Far);
     AddScenario(U10_9, LayerDistance::_Environment);
     AddScenario(U10_16, LayerDistance::_ForeGround);
-    AddScenario(U10_17, LayerDistance::_ForeGround_Close);
+    AddScenario(U10_17, LayerDistance::_ForeGround_Close, 1.15);
 
     AddAnimated(U10_STATUE_ANIM, LayerDistance::_Environment_Far,Vec2(40.25,17),4);
     AddAnimated(U10_STATUE_ANIM, LayerDistance::_Environment_Far,Vec2(47.25,16.7),4);
@@ -1930,7 +1986,9 @@ void U10::LoadAssets() {
 
     AddSpikes(18,19,5);
     AddMagicBarrier(Vec2(62,16));
-
+    GameObject* HUD = new GameObject();
+    HUD->AddComponent(new Hud(*HUD));
+    AddObject(HUD);
     LimitMap();
     FadeIn();
 }
@@ -1966,10 +2024,10 @@ void U10::Update(float dt) {
 
 U11::U11() {
     AddScenario(U11_0, LayerDistance::_Background_FarAway);
-    AddScenario(U11_2, LayerDistance::_Background);
-    AddScenario(U11_4, LayerDistance::_Background_VeryClose);
-    AddScenario(U11_6, LayerDistance::_Scenery);
-    AddScenario(U11_7, LayerDistance::_Scenery_Close);
+    AddScenario(U11_2, LayerDistance::_Background, 0.45, true);
+    AddScenario(U11_4, LayerDistance::_Background_VeryClose, 0.55, true);
+    AddScenario(U11_6, LayerDistance::_Scenery,0.7, true);
+    AddScenario(U11_7, LayerDistance::_Scenery_Close,0.8, true);
     AddScenario(U11_8, LayerDistance::_Environment_Far);
     AddScenario(U11_9, LayerDistance::_Environment);
     AddScenario(U11_16, LayerDistance::_ForeGround);
@@ -2064,7 +2122,9 @@ void U11::LoadAssets() {
     AddObject(mechaObj);
 
     AddSpikes(28,23,16);
-
+    GameObject* HUD = new GameObject();
+    HUD->AddComponent(new Hud(*HUD));
+    AddObject(HUD);
     LimitMap();
     FadeIn();
 }
@@ -2101,14 +2161,14 @@ void U11::Update(float dt) {
 
 U12::U12() {
     AddScenario(U12_0, LayerDistance::_Background_FarAway);
-    AddScenario(U12_2, LayerDistance::_Background);
-    AddScenario(U12_4, LayerDistance::_Background_VeryClose);
-    AddScenario(U12_7, LayerDistance::_Scenery_Close);
+    AddScenario(U12_2, LayerDistance::_Background, 0.45, true);
+    AddScenario(U12_4, LayerDistance::_Background_VeryClose,0.55, true);
+    AddScenario(U12_7, LayerDistance::_Scenery_Close,0.8, true);
     AddScenario(U12_8, LayerDistance::_Environment_Far);
     AddScenario(U12_9, LayerDistance::_Environment);
     AddScenario(U12_16, LayerDistance::_ForeGround);
-    AddScenario(U12_17, LayerDistance::_ForeGround_Close);
-    AddScenario(U12_17_2, LayerDistance::_ForeGround_Close);
+    AddScenario(U12_17, LayerDistance::_ForeGround_Close,1.15);
+    AddScenario(U12_17_2, LayerDistance::_ForeGround_Close,1.15);
 }
 
 #define MAP_U12 "assets/map/Zone/U12"
@@ -2166,6 +2226,7 @@ void U12::LoadAssets() {
     checkSave->SetResult([](){
         GameData::checkPoint = Zone::_U12;
         GameData::revivePosition = Vec2(27,16);
+        Kid::self->hp = 6;
     });
     checkObj->AddComponent(checkPoint);
     checkObj->AddComponent(checkSave);
@@ -2209,7 +2270,9 @@ void U12::LoadAssets() {
         boulderObj->AddComponent(new Collider(*boulderObj));
         AddObject(boulderObj);
     }
-
+    GameObject* HUD = new GameObject();
+    HUD->AddComponent(new Hud(*HUD));
+    AddObject(HUD);
     LimitMap();
     FadeIn();
 }
@@ -2247,17 +2310,18 @@ void U12::Update(float dt) {
 
 U13::U13() {
     AddScenario(U13_0, LayerDistance::_Background_FarAway);
-    AddScenario(U13_4, LayerDistance::_Background_VeryClose);
-    AddScenario(U13_5, LayerDistance::_Scenery_Far);
-    AddScenario(U13_6, LayerDistance::_Scenery);
-    AddScenario(U13_6_2, LayerDistance::_Scenery);
+    AddScenario(U13_4, LayerDistance::_Background_VeryClose, 0.45, true);
+    AddScenario(U13_5, LayerDistance::_Scenery_Far,0.6, true);
+    AddScenario(U13_6, LayerDistance::_Scenery,0.7, true);
+    AddScenario(U13_6_2, LayerDistance::_Scenery,0.7, true);
     AddScenario(U13_8, LayerDistance::_Environment_Far);
     AddScenario(U13_9, LayerDistance::_Environment);
     AddScenario(U13_16, LayerDistance::_ForeGround);
-    AddScenario(U13_17, LayerDistance::_ForeGround_Close);
-    AddScenario(U13_17_2, LayerDistance::_ForeGround_Close);
+    AddScenario(U13_17, LayerDistance::_ForeGround_Close,1.15);
+    AddScenario(U13_17_2, LayerDistance::_ForeGround_Close,1.15);
 }
 #define MAP_U13 "assets/map/Zone/U13"
+#define CAN_MAGIC "assets/txt/07_magic.txt"
 void U13::LoadAssets() {
     //#####################################
     stateMusic = ZoneManager::GetCarriedMusic();
@@ -2328,13 +2392,18 @@ void U13::LoadAssets() {
         
         output->SetResult([](){
             GameData::canUseMagicAttack = true;
+            GameObject* dialogueObj = new GameObject(LayerDistance::_ForeGround_VeryClose);
+            dialogueObj->AddComponent(new DialogueBox(*dialogueObj,CAN_MAGIC));
+            Game::GetInstance().GetCurrentState().AddObject(dialogueObj);
         });
 
         intObj->AddComponent(output);
         intObj->AddComponent(new Sprite(*intObj,FIRE, 30, 0.1));
         AddObject(intObj);
     }
-
+    GameObject* HUD = new GameObject();
+    HUD->AddComponent(new Hud(*HUD));
+    AddObject(HUD);
     LimitMap();
     FadeIn();
 }
@@ -2366,9 +2435,9 @@ void U13::Update(float dt) {
 
 U14::U14() {
     AddScenario(U14_0, LayerDistance::_Background_FarAway);
-    AddScenario(U14_4, LayerDistance::_Background_VeryClose);
-    AddScenario(U14_6, LayerDistance::_Scenery);
-    AddScenario(U14_7, LayerDistance::_Scenery_Close);
+    AddScenario(U14_4, LayerDistance::_Background_VeryClose, 0.55, true);
+    AddScenario(U14_6, LayerDistance::_Scenery,0.7, true);
+    AddScenario(U14_7, LayerDistance::_Scenery_Close,0.8, true);
     AddScenario(U14_8, LayerDistance::_Environment_Far);
     AddScenario(U14_9, LayerDistance::_Environment);
 }
@@ -2410,7 +2479,9 @@ void U14::LoadAssets() {
         intObj->AddComponent(new Sprite(*intObj,POTION_ITEM, 30, 0.1));
         AddObject(intObj);
     }
-
+    GameObject* HUD = new GameObject();
+    HUD->AddComponent(new Hud(*HUD));
+    AddObject(HUD);
     LimitMap();
     FadeIn();
 }
@@ -2505,7 +2576,9 @@ void U15::LoadAssets() {
     AddSpikes(64,24,26);
     AddSpikes(83,23,4);
     AddMagicBarrier(Vec2(25,21));
-
+    GameObject* HUD = new GameObject();
+    HUD->AddComponent(new Hud(*HUD));
+    AddObject(HUD);
     LimitMap();
     FadeIn();
 }
@@ -2534,11 +2607,11 @@ void U15::Update(float dt) {
 
 U16::U16() {
     AddScenario(U16_0, LayerDistance::_Background_FarAway);
-    AddScenario(U16_5, LayerDistance::_Scenery_Far);
-    AddScenario(U16_7, LayerDistance::_Scenery_Close);
+    AddScenario(U16_5, LayerDistance::_Scenery_Far, 0.6, true);
+    AddScenario(U16_7, LayerDistance::_Scenery_Close,0.7, true);
     AddScenario(U16_8, LayerDistance::_Environment_Far);
     AddScenario(U16_9, LayerDistance::_Environment);
-    AddScenario(U16_17, LayerDistance::_ForeGround_Close);
+    AddScenario(U16_17, LayerDistance::_ForeGround_Close,1.15);
 }
 #define MAP_U16 "assets/map/Zone/U16"
 void U16::LoadAssets() {
@@ -2572,7 +2645,9 @@ void U16::LoadAssets() {
         std::make_pair(Zone::_U16, ZoneExit::B));
     BObj->AddComponent(doorB);
     AddObject(BObj);
-
+    GameObject* HUD = new GameObject();
+    HUD->AddComponent(new Hud(*HUD));
+    AddObject(HUD);
     LimitMap();
     FadeIn();
 }

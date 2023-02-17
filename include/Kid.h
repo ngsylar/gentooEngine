@@ -55,15 +55,17 @@ class Kid: public EntityMachine {
 
         // Camera Assistants
         void* CameraEffects();
-        
+        Timer increaseMP;
         Timer deathSequence;
         bool deathFade;
 
     public:
         Kid(GameObject& associated);
         ~Kid();
+        static Kid* self;
         static GameObject* GetInstance();
         int hp;
+        int mp;
         void Awaken();
         void Start();
         void LateUpdate(float dt);

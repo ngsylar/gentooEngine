@@ -1,6 +1,7 @@
 #include "GentooEngine.h"
 #include "Boulder.h"
 #include "GameData.h"
+#include "Kid.h"
 
 #define SPRITE_RUN_FRAMES       6, 0.1f
 #define SPRITE_DAMAGE_FRAMES    2, 0.1f
@@ -65,14 +66,14 @@ void Boulder::UpdateEntity (float dt) {
 
 
 void Boulder::NotifyCollision (GameObject& other) {
-    if(state != EntityState::Dead and GameData::canPushBoulder) {
+    
+    if(state != EntityState::Dead and GameData::canUseChargedAttack) {
         rigidBody->NotifyCollision(other);
         Collider* A = (Collider*)associated.GetComponent(ComponentType::_Collider);
-        Collider* B = (Collider*)other.GetComponent(ComponentType::_Collider);
-        Rect intersection = A->box.GetIntersection(B->box);
-
-        if(other.Contains(ComponentType::_Attack)){
-            int direction = (intersection.x>A->box.x?(-1):1);
+        // Collider* B = (Collider*)other.GetComponent(ComponentType::_Collider);
+        // Rect intersection = A->box.GetIntersection(B->box);
+        if(other.Contains(ComponentType::_Attack) and Kid::self->GetCurrentState() == EntityState::AttackingSwordStrong_Perform){
+            int direction = (Kid::GetInstance()->box.x > A->box.x?(-1):1);
             state = EntityState::Running;
             rigidBody->SetSpeedOnX(THRUST_XSPEED*direction);
             movementDirection = direction;
