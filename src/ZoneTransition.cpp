@@ -5,6 +5,7 @@
 
 ZoneTransition::ZoneTransition (GameObject& associated, Rect collider, std::pair<Zone, ZoneExit> zoneExit, bool carryMusic)
 : Component(associated) {
+    this->type = ComponentType::_ZoneTransition;
     transitioning = false;
     this->carryMusic = carryMusic;
     collider = Rect(collider.x*TILE_SIZE, collider.y*TILE_SIZE, 

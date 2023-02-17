@@ -27,7 +27,7 @@ EnemyArmadillo::EnemyArmadillo (GameObject& associated): EntityMachine(associate
     movementDirection = -1;
     hp = 2;
 
-    turnTimer.SetResetTime(0.4f);
+    turnTimer.SetResetTime(1.0f);
     isGrounded = false;
     hitWall = false;
 }
@@ -139,6 +139,11 @@ bool EnemyArmadillo::NewStateRule (EntityState newState, int argsc, float argsv[
     }
 }
 
+void EnemyArmadillo::FlipEntity () {
+    movementDirection *= -1;
+    FlipSprite(Sprite::HORIZONTAL);
+}
+
 void EnemyArmadillo::NotifyCollision (GameObject& other) {
     rigidBody->NotifyCollision(other);
 
@@ -146,12 +151,33 @@ void EnemyArmadillo::NotifyCollision (GameObject& other) {
         if (state == EntityState::Falling)
             FormatState(EntityState::Running);
         Collider* groundCollider = (Collider*)other.GetComponent(ComponentType::_Collider);
-        currentRoute = Vec2(groundCollider->box.x, groundCollider->box.x+groundCollider->box.w);
+        currentRoute = Vec2(
+            groundCollider->box.x + (SPEED_RUN * 0.1f),
+            groundCollider->box.x + groundCollider->box.w - (SPEED_RUN * 0.1f));
         isGrounded = true;
     }
-    if (rigidBody->ImpactLeft() or rigidBody->ImpactRight()) {
+    // if (rigidBody->ImpactLeft() or rigidBody->ImpactRight()) {
+    //     if (state == EntityState::Injured)
+    //         FormatState(EntityState::Running);
+    //     hitWall = true;
+    // }
+    if (other.GetComponent(ComponentType::_ZoneTransition))
+        hitWall = true;
+
+    /*--------------------------------------------------------------------------------------------------*/
+    // editar: iniciando tecnicas de gambiarras
+    /*--------------------------------------------------------------------------------------------------*/
+
+    if (rigidBody->ImpactLeft()) {
         if (state == EntityState::Injured)
             FormatState(EntityState::Running);
+        associated.box.SetPosition(associated.box.GetPosition()+2.0f);
+        hitWall = true;
+    }
+    if (rigidBody->ImpactRight()) {
+        if (state == EntityState::Injured)
+            FormatState(EntityState::Running);
+        associated.box.SetPosition(associated.box.GetPosition()-2.0f);
         hitWall = true;
     }
 }

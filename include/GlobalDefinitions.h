@@ -43,6 +43,7 @@ enum ComponentType {
     // x = 1 << 19,
     _Boss =             1 << 20,
     _Interactor =       1 << 21,
+    _ZoneTransition =   1 << 22,
 
     // Testing Environment
     _Boulder =          1 << 28,
