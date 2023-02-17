@@ -5,6 +5,9 @@
 #include "Dummy.h"
 #include "Boulder.h"
 #include "DialogueBox.h"
+#include "EnemyArmadillo.h"
+#include "EnemyRunner.h"
+#include "Boss.h"
 
 #define OUTER    "assets/img/outer.png"
 
@@ -604,6 +607,25 @@ void S2::LoadAssets() {
     HUD->AddComponent(new Hud(*HUD));
     AddObject(HUD);
 
+    GameObject* mouseGO = new GameObject(LayerDistance::_NPC);
+    EnemyArmadillo* mouseCP = new EnemyArmadillo(*mouseGO);
+    mouseGO->AddComponent(mouseCP);
+    mouseGO->box.SetPosition(700,500);
+    AddObject(mouseGO);
+
+    mouseGO = new GameObject(LayerDistance::_NPC);
+    mouseCP = new EnemyArmadillo(*mouseGO);
+    mouseCP->FlipEntity();
+    mouseGO->AddComponent(mouseCP);
+    mouseGO->box.SetPosition(2870,440);
+    AddObject(mouseGO);
+
+    mouseGO = new GameObject(LayerDistance::_NPC);
+    mouseCP = new EnemyArmadillo(*mouseGO);
+    mouseGO->AddComponent(mouseCP);
+    mouseGO->box.SetPosition(2870,440);
+    AddObject(mouseGO);
+
     LimitMap();
     FadeIn();
 }
@@ -738,6 +760,12 @@ void S3::LoadAssets() {
         limitObj->AddComponent(new Collider(*limitObj));
         limitObj->box = Rect(10*TILE_SIZE,0,TILE_SIZE, TILE_SIZE*20);
         AddObject(limitObj);
+
+        GameObject* bossGO = new GameObject(LayerDistance::_NPC);
+        Boss* bossCP = new Boss(*bossGO);
+        bossGO->AddComponent(bossCP);
+        AddObject(bossGO);
+
     } else {
         //Barrier on right side
         GameObject* limitObj = new GameObject(LayerDistance::_Environment_Close);
@@ -1104,6 +1132,12 @@ void U2::LoadAssets() {
     HUD->AddComponent(new Hud(*HUD));
     AddObject(HUD);
 
+    GameObject* mouseGO = new GameObject(LayerDistance::_NPC);
+    EnemyArmadillo* mouseCP = new EnemyArmadillo(*mouseGO);
+    mouseGO->AddComponent(mouseCP);
+    mouseGO->box.SetPosition(396,1090);
+    AddObject(mouseGO);
+
     LimitMap();
     FadeIn();
 }
@@ -1208,6 +1242,25 @@ void U3::LoadAssets() {
     GameObject* HUD = new GameObject();
     HUD->AddComponent(new Hud(*HUD));
     AddObject(HUD);
+
+    // GameObject* infectedGO = new GameObject(LayerDistance::_NPC);
+    // EnemyRunner* infectedCP = new EnemyRunner(*infectedGO);
+    // infectedGO->AddComponent(infectedCP);
+    // infectedGO->box.SetPosition(1622,466);
+    // AddObject(infectedGO);
+
+    // infectedGO = new GameObject(LayerDistance::_NPC);
+    // infectedCP = new EnemyRunner(*infectedGO);
+    // infectedGO->AddComponent(infectedCP);
+    // infectedGO->box.SetPosition(1945,592);
+    // AddObject(infectedGO);
+
+    // infectedGO = new GameObject(LayerDistance::_NPC);
+    // infectedCP = new EnemyRunner(*infectedGO);
+    // infectedGO->AddComponent(infectedCP);
+    // infectedGO->box.SetPosition(1081,605);
+    // AddObject(infectedGO);
+
     LimitMap();
     FadeIn();
 }
@@ -1324,9 +1377,17 @@ void U4::LoadAssets() {
         intObj->AddComponent(new Sprite(*intObj,FIRE, 30, 0.1));
         AddObject(intObj);
     }
+
     GameObject* HUD = new GameObject();
     HUD->AddComponent(new Hud(*HUD));
     AddObject(HUD);
+
+    GameObject* mouseGO = new GameObject(LayerDistance::_NPC);
+    EnemyArmadillo* mouseCP = new EnemyArmadillo(*mouseGO);
+    mouseGO->AddComponent(mouseCP);
+    mouseGO->box.SetPosition(1195,811);
+    AddObject(mouseGO);
+
     LimitMap();
     FadeIn();
 }
@@ -1490,9 +1551,17 @@ void U5::LoadAssets() {
         mechaObj->AddComponent(mechanism);
     }
     AddObject(mechaObj);
+
     GameObject* HUD = new GameObject();
     HUD->AddComponent(new Hud(*HUD));
     AddObject(HUD);
+
+    GameObject* infectedGO = new GameObject(LayerDistance::_NPC);
+    EnemyRunner* infectedCP = new EnemyRunner(*infectedGO);
+    infectedGO->AddComponent(infectedCP);
+    infectedGO->box.SetPosition(1092,388);
+    AddObject(infectedGO);
+
     LimitMap();
     FadeIn();
 }
@@ -1569,9 +1638,23 @@ void U6::LoadAssets() {
 
     AddSpikes(20,21,7);
     AddSpikes(36,21,13);
+
     GameObject* HUD = new GameObject();
     HUD->AddComponent(new Hud(*HUD));
     AddObject(HUD);
+
+    GameObject* mouseGO = new GameObject(LayerDistance::_NPC);
+    EnemyArmadillo* mouseCP = new EnemyArmadillo(*mouseGO);
+    mouseGO->AddComponent(mouseCP);
+    mouseGO->box.SetPosition(680,546);
+    AddObject(mouseGO);
+
+    GameObject* infectedGO = new GameObject(LayerDistance::_NPC);
+    EnemyRunner* infectedCP = new EnemyRunner(*infectedGO);
+    infectedGO->AddComponent(infectedCP);
+    infectedGO->box.SetPosition(953,545);
+    AddObject(infectedGO);
+    
     LimitMap();
     FadeIn();
 }
@@ -1684,9 +1767,17 @@ void U7::LoadAssets() {
         gateObj->AddComponent(gateLimit);
     }
     AddObject(gateObj);
+
     GameObject* HUD = new GameObject();
     HUD->AddComponent(new Hud(*HUD));
     AddObject(HUD);
+
+    GameObject* mouseGO = new GameObject(LayerDistance::_NPC);
+    EnemyArmadillo* mouseCP = new EnemyArmadillo(*mouseGO);
+    mouseGO->AddComponent(mouseCP);
+    mouseGO->box.SetPosition(571,644);
+    AddObject(mouseGO);
+
     LimitMap();
     FadeIn();
 }
@@ -2122,9 +2213,23 @@ void U11::LoadAssets() {
     AddObject(mechaObj);
 
     AddSpikes(28,23,16);
+
     GameObject* HUD = new GameObject();
     HUD->AddComponent(new Hud(*HUD));
     AddObject(HUD);
+
+    GameObject* mouseGO = new GameObject(LayerDistance::_NPC);
+    EnemyArmadillo* mouseCP = new EnemyArmadillo(*mouseGO);
+    mouseGO->AddComponent(mouseCP);
+    mouseGO->box.SetPosition(1444,296);
+    AddObject(mouseGO);
+
+    // GameObject* infectedGO = new GameObject(LayerDistance::_NPC);
+    // EnemyRunner* infectedCP = new EnemyRunner(*infectedGO);
+    // infectedGO->AddComponent(infectedCP);
+    // infectedGO->box.SetPosition(1295,452);
+    // AddObject(infectedGO);
+
     LimitMap();
     FadeIn();
 }
@@ -2270,9 +2375,17 @@ void U12::LoadAssets() {
         boulderObj->AddComponent(new Collider(*boulderObj));
         AddObject(boulderObj);
     }
+
     GameObject* HUD = new GameObject();
     HUD->AddComponent(new Hud(*HUD));
     AddObject(HUD);
+
+    GameObject* mouseGO = new GameObject(LayerDistance::_NPC);
+    EnemyArmadillo* mouseCP = new EnemyArmadillo(*mouseGO);
+    mouseGO->AddComponent(mouseCP);
+    mouseGO->box.SetPosition(1120,466);
+    AddObject(mouseGO);
+
     LimitMap();
     FadeIn();
 }
@@ -2401,9 +2514,29 @@ void U13::LoadAssets() {
         intObj->AddComponent(new Sprite(*intObj,FIRE, 30, 0.1));
         AddObject(intObj);
     }
+
     GameObject* HUD = new GameObject();
     HUD->AddComponent(new Hud(*HUD));
     AddObject(HUD);
+
+    // GameObject* mouseGO = new GameObject(LayerDistance::_NPC);
+    // EnemyArmadillo* mouseCP = new EnemyArmadillo(*mouseGO);
+    // mouseGO->AddComponent(mouseCP);
+    // mouseGO->box.SetPosition(987,485);
+    // AddObject(mouseGO);
+
+    // GameObject* infectedGO = new GameObject(LayerDistance::_NPC);
+    // EnemyRunner* infectedCP = new EnemyRunner(*infectedGO);
+    // infectedGO->AddComponent(infectedCP);
+    // infectedGO->box.SetPosition(696,468);
+    // AddObject(infectedGO);
+
+    // infectedGO = new GameObject(LayerDistance::_NPC);
+    // infectedCP = new EnemyRunner(*infectedGO);
+    // infectedGO->AddComponent(infectedCP);
+    // infectedGO->box.SetPosition(1260,540);
+    // AddObject(infectedGO);
+
     LimitMap();
     FadeIn();
 }
@@ -2645,9 +2778,23 @@ void U16::LoadAssets() {
         std::make_pair(Zone::_U16, ZoneExit::B));
     BObj->AddComponent(doorB);
     AddObject(BObj);
+
     GameObject* HUD = new GameObject();
     HUD->AddComponent(new Hud(*HUD));
     AddObject(HUD);
+
+    GameObject* infectedGO = new GameObject(LayerDistance::_NPC);
+    EnemyRunner* infectedCP = new EnemyRunner(*infectedGO);
+    infectedGO->AddComponent(infectedCP);
+    infectedGO->box.SetPosition(1995,624);
+    AddObject(infectedGO);
+
+    infectedGO = new GameObject(LayerDistance::_NPC);
+    infectedCP = new EnemyRunner(*infectedGO);
+    infectedGO->AddComponent(infectedCP);
+    infectedGO->box.SetPosition(1617,600);
+    AddObject(infectedGO);
+
     LimitMap();
     FadeIn();
 }

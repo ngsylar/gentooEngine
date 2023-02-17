@@ -30,6 +30,7 @@ class EnemyArmadillo: public EntityMachine {
         void Start();
         void LateUpdate(float dt);
         void UpdateEntity(float dt);
+        void FlipEntity();
         void NotifyCollision(GameObject& other);
 };
 
