@@ -11,6 +11,9 @@
 #define SPRITE_DAMAGE                           "assets/img/kid/damage.png"
 #define SPRITE_ATTACK_SWORDGROUND0              "assets/img/kid/attackmeleeground1.png"
 #define SPRITE_ATTACK_SWORDGROUND1              "assets/img/kid/attackmeleeground2.png"
+#define SPRITE_ATTACK_SWORDSTRONGC              "assets/img/kid/attackstrongcharge.png"
+#define SPRITE_ATTACK_SWORDSTRONGF              "assets/img/kid/attackstrongfull.png"
+#define SPRITE_ATTACK_SWORDSTRONGP              "assets/img/kid/attackstrongperform.png"
 #define SPRITE_SPELL0                           "assets/img/kid/magic.png"
 #define SPRITE_DEATH                            "assets/img/kid/death.png"
 
@@ -23,6 +26,9 @@
 #define SPRITE_LAND_FRAMES                      3, 0.1f
 #define SPRITE_ATTACK_SWORDGROUND0_FRAMES       10, 0.1f
 #define SPRITE_ATTACK_SWORDGROUND1_FRAMES       10, 0.1f
+#define SPRITE_ATTACK_SWORDSTRONGC_FRAMES       19, 0.1f
+#define SPRITE_ATTACK_SWORDSTRONGF_FRAMES       4, 0.1f
+#define SPRITE_ATTACK_SWORDSTRONGP_FRAMES       10, 0.1f
 #define SPRITE_SPELL0_FRAMES                    12, 0.1f
 #define SPRITE_DEATH_FRAMES                     12, 0.1f
 
@@ -77,6 +83,7 @@ Kid::Kid (GameObject& associated): EntityMachine(associated) {
     runSpeedReset = true;
     jumpSpeedDecrease = 0.0f;
     attackPerforming = false;
+    chargePerforming = false;
     attackImpulseCancel = false;
     damagePerforming = false;
     flickFactor = 255.0f;
@@ -87,6 +94,11 @@ Kid::Kid (GameObject& associated): EntityMachine(associated) {
     swordAttackOnGround->SetProperties(
         Vec2(ATTACK_SWORD_FORCE), ATTACK_SWORD_IMPULSE, ATTACK_SWORD_DAMAGE, IMPULSE_ATTACK_SWORD_X);
     attack->AddComponent(swordAttackOnGround);
+    Game::GetInstance().GetCurrentState().AddObject(attack);
+
+    attack = new GameObject(LayerDistance::_Player_Front);
+    swordAttackStrong = new KidAttackStrong(*attack, &associated);
+    attack->AddComponent(swordAttackStrong);
     Game::GetInstance().GetCurrentState().AddObject(attack);
 
     attack = new GameObject(LayerDistance::_Player_Front);
@@ -121,6 +133,12 @@ void Kid::Awaken () {
         associated, SPRITE_ATTACK_SWORDGROUND0, SPRITE_ATTACK_SWORDGROUND0_FRAMES, true);
     Sprite* spriteSwordOnGround1 = new Sprite(
         associated, SPRITE_ATTACK_SWORDGROUND1, SPRITE_ATTACK_SWORDGROUND1_FRAMES, true);
+    Sprite* spriteSwordStrongCharge = new Sprite(
+        associated, SPRITE_ATTACK_SWORDSTRONGC, SPRITE_ATTACK_SWORDSTRONGC_FRAMES, true);
+    Sprite* spriteSwordStrongFull = new Sprite(
+        associated, SPRITE_ATTACK_SWORDSTRONGF, SPRITE_ATTACK_SWORDSTRONGF_FRAMES);
+    Sprite* spriteSwordStrongPerform = new Sprite(
+        associated, SPRITE_ATTACK_SWORDSTRONGP, SPRITE_ATTACK_SWORDSTRONGP_FRAMES, true);
     Sprite* spriteSpell0 = new Sprite(associated, SPRITE_SPELL0, SPRITE_SPELL0_FRAMES, true);
     Sprite* spriteDeath = new Sprite(associated, SPRITE_DEATH, SPRITE_DEATH_FRAMES, true);
 
@@ -132,6 +150,9 @@ void Kid::Awaken () {
     AddSpriteState(EntityState::Injured, spriteDamage);
     AddSpriteState(EntityState::AttackingSwordOnGround_0, spriteSwordOnGround0);
     AddSpriteState(EntityState::AttackingSwordOnGround_1, spriteSwordOnGround1);
+    AddSpriteState(EntityState::AttackingSwordStrong_Charge, spriteSwordStrongCharge);
+    AddSpriteState(EntityState::AttackingSwordStrong_Full, spriteSwordStrongFull);
+    AddSpriteState(EntityState::AttackingSwordStrong_Perform, spriteSwordStrongPerform);
     AddSpriteState(EntityState::CastingSpell_0, spriteSpell0);
     AddSpriteState(EntityState::Dead, spriteDeath);
 
@@ -177,7 +198,7 @@ void Kid::UpdateEntity (float dt) {
 
     // prevent movement when opposite directions are active
     int directionX = input.IsKeyDown(Key::moveRight) - input.IsKeyDown(Key::moveLeft);
-    bool lockedDirection = attackPerforming or damagePerforming;
+    bool lockedDirection = attackPerforming or chargePerforming or damagePerforming;
     bool changeDirectionX = (not lockedDirection) and (directionX != 0) and (directionX != lastDirectionX);
     if (changeDirectionX) lastDirectionX = directionX;
 
@@ -223,7 +244,7 @@ void Kid::UpdateEntity (float dt) {
         
         // case EntityState::Walking:
         //     break;
-        
+
         case EntityState::Running:
             // movement is performed
             if (directionX == 0)
@@ -247,7 +268,7 @@ void Kid::UpdateEntity (float dt) {
             // start jump
             else if (input.KeyPress(Key::jump))
                 FormatState(EntityState::Jumping);
-            
+
             break;
         
         case EntityState::Jumping:
@@ -275,12 +296,40 @@ void Kid::UpdateEntity (float dt) {
         
         case EntityState::AttackingSwordOnGround_0:
             AttackUpdate(dt);
+
+            if (chargePerforming) {
+                if (not input.IsKeyDown(Key::attack)) {
+                    chargePerforming = false;
+
+                } else if (attackTimer.GetTime() >= (ATTACK_SWORD_TIME_CANCEL - 0.04f)) {
+                    FormatState(EntityState::AttackingSwordStrong_Charge);
+                }
+            }
             if (attackTimer.IsBetween(ATTACK_SWORD_TIME_HIT, ATTACK_SWORD_TIME_CANCEL)
-            and input.KeyPress(Key::attack))
+            and input.KeyPress(Key::attack)) {
                 FormatState(EntityState::AttackingSwordOnGround_1);
+            }
             break;
 
         case EntityState::AttackingSwordOnGround_1:
+            AttackUpdate(dt);
+            break;
+
+        case EntityState::AttackingSwordStrong_Charge:
+            if (input.IsKeyDown(Key::attack)) {
+                if (sprites[state]->OneshotIsOver())
+                    FormatState(EntityState::AttackingSwordStrong_Full);
+            } else {
+                chargePerforming = false;
+                FormatState(EntityState::Idle);
+            } break;
+
+        case EntityState::AttackingSwordStrong_Full:
+            if (input.KeyRelease(Key::attack))
+                FormatState(EntityState::AttackingSwordStrong_Perform);
+            break;
+
+        case EntityState::AttackingSwordStrong_Perform:
             AttackUpdate(dt);
             break;
 
@@ -333,6 +382,16 @@ bool Kid::NewStateRule (EntityState newState, int argsc, float argsv[]) {
             attackImpulseCancel = false;
             attackPerforming = false;
             break;
+
+        case EntityState::AttackingSwordStrong_Full:
+            if (newState == EntityState::Injured)
+                chargePerforming = false;
+            break;
+
+        case EntityState::AttackingSwordStrong_Perform:
+            chargePerforming = false;
+            attackPerforming = false;
+            break;
         
         case EntityState::CastingSpell_0:
             attackPerforming = false;
@@ -371,8 +430,17 @@ bool Kid::NewStateRule (EntityState newState, int argsc, float argsv[]) {
             runSpeedIncrease = 0.0f;
             return true;
 
-        case EntityState::AttackingSwordOnGround_0: case EntityState::AttackingSwordOnGround_1:
+        case EntityState::AttackingSwordOnGround_0:
             AttackStart();
+            chargePerforming = true;
+            return true;
+
+        case EntityState::AttackingSwordOnGround_1:
+            AttackStart();
+            return true;
+
+        case EntityState::AttackingSwordStrong_Perform:
+            AttackStrongStart();
             return true;
 
         case EntityState::CastingSpell_0:
@@ -425,6 +493,22 @@ void Kid::AttackStart () {
     attackTimer.Reset();
 }
 
+void Kid::AttackStrongStart () {
+    KidAttackStrong::AttackDirection direction = (lastDirectionX == 1)?
+        KidAttackStrong::RIGHT : KidAttackStrong::LEFT;
+    swordAttackStrong->Perform(direction);
+    attackOriginX = associated.box.x;
+
+    // if (runSpeedReset or swordAttackOnGround->ImpulseIsCanceled())
+    //     attackImpulseCancel = true;
+    // if (not attackImpulseCancel)
+    //     rigidBody->SetSpeedOnX(SPEED_ATTACK * lastDirectionX);
+    // else rigidBody->SetSpeedOnX(0.0f);
+    
+    attackPerforming = true;
+    attackTimer.Reset();
+}
+
 void Kid::AttackUpdate (float dt) {
     if ((not attackImpulseCancel) and
     (fabs(associated.box.x - attackOriginX) >= IMPULSE_ATTACK_SWORD_X)) {
@@ -432,8 +516,7 @@ void Kid::AttackUpdate (float dt) {
         attackImpulseCancel = true;
     }
     attackTimer.Update(dt);
-    float hitTime = attackTimer.GetTime();
-    if (hitTime >= ATTACK_SWORD_TIME_END)
+    if (sprites[state]->OneshotIsOver())
         FormatState(EntityState::Idle);
 }
 

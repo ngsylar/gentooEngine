@@ -7,6 +7,7 @@
 #include "CameraBox.h"
 #include "Timer.h"
 #include "KidAttackMelee.h"
+#include "KidAttackStrong.h"
 #include "FoxAttack.h"
 
 class Kid: public EntityMachine {
@@ -20,10 +21,11 @@ class Kid: public EntityMachine {
 
         // Attack Types
         KidAttackMelee* swordAttackOnGround;
+        KidAttackStrong* swordAttackStrong;
         FoxAttack* foxAttack;
 
         // Automatic Signals
-        bool attackPerforming, damagePerforming;
+        bool attackPerforming, chargePerforming, damagePerforming;
         bool runSpeedReset, attackImpulseCancel;
 
         // Automatic Activation Values
@@ -46,6 +48,7 @@ class Kid: public EntityMachine {
 
         bool NewStateRule(EntityState newState, int argsc, float argsv[]);
         void AttackStart();
+        void AttackStrongStart();
         void AttackUpdate(float dt);
         void InvincibleUpdate(float dt);
         void Die();

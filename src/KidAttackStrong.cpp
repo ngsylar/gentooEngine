@@ -1,32 +1,32 @@
 #include "GentooEngine.h"
-#include "FoxAttack.h"
+#include "KidAttackStrong.h"
 #include "Boss.h"
 
-#define SPRITE_ATTACK           "assets/img/fox/magic.png"
-#define SPRITE_FRAMES           12, 0.1f
-#define SPRITE_OFFSET_X         -6.0f
-#define SPRITE_OFFSET_Y         -16.0f
+#define SPRITE_ATTACK           "assets/img/kid/attackstrongtrail.png"
+#define SPRITE_FRAMES           10, 0.1f
+#define SPRITE_OFFSET_X         -8.0f
+#define SPRITE_OFFSET_Y         0.0f
 
 #define CAMERA_SHAKE_COUNT      6
 #define CAMERA_SHAKE_RANGE      3
 #define CAMERA_SHAKE_RESET_TIME 0.04f
 
-FoxAttack::FoxAttack (
+KidAttackStrong::KidAttackStrong (
     GameObject& associated, GameObject* externalAssociated
 ): AttackGeneric(associated, externalAssociated) {
     this->externalAssociated = Game::GetInstance().GetCurrentState().GetObjectPtr(externalAssociated);
     associated.label = externalAssociated->label;
     associated.enabled = false;
 
-    force = Vec2(480.0f, 0.0f);
-    impulse = 60.0f;
-    damage = 3;
+    force = Vec2(640.0f, 0.0f);
+    impulse = 80.0f;
+    damage = 2;
     displacement = 0.0f;
 
     isOver = false;
 }
 
-void FoxAttack::PushAttack (Vec2 offset, Vec2 size, float lifetimeStart, float lifetimeEnd) {
+void KidAttackStrong::PushAttack (Vec2 offset, Vec2 size, float lifetimeStart, float lifetimeEnd) {
     AttackType attackType;
     attackType.offset_i = offset;
     attackType.size_i = size;
@@ -35,21 +35,15 @@ void FoxAttack::PushAttack (Vec2 offset, Vec2 size, float lifetimeStart, float l
     attackTypes.push(attackType);
 }
 
-void FoxAttack::Start () {
+void KidAttackStrong::Start () {
     OpenSprite(SPRITE_ATTACK, SPRITE_FRAMES, true);
 
     cameraShakeTimer.SetResetTime(CAMERA_SHAKE_RESET_TIME);
     cameraShakeTimer.FalseStart();
 }
 
-void FoxAttack::Perform (AttackDirection direction) {
-    PushAttack(Vec2(-41.0f, -23.0f), Vec2(49.0f, 50.0f), 0.3f, 0.4f);
-    PushAttack(Vec2(-41.0f, -23.0f), Vec2(74.0f, 50.0f), 0.0f, 0.1f);
-    PushAttack(Vec2(-41.0f, -16.0f), Vec2(89.0f, 43.0f), 0.0f, 0.1f);
-    PushAttack(Vec2(-41.0f, -17.0f), Vec2(78.0f, 44.0f), 0.0f, 0.1f);
-    PushAttack(Vec2(-41.0f, -17.0f), Vec2(78.0f, 44.0f), 0.0f, 0.1f);
-    PushAttack(Vec2(-41.0f, -17.0f), Vec2(78.0f, 44.0f), 0.0f, 0.1f);
-    PushAttack(Vec2(-41.0f, 3.0f), Vec2(81.0f, 26.0f), 0.0f, 0.1f);
+void KidAttackStrong::Perform (AttackDirection direction) {
+    PushAttack(Vec2(-31.0f, -19.0f), Vec2(68.0f, 39.0f), 0.09f, 0.26f);
 
     AttackType attackType = attackTypes.front();
     attackTypes.pop();
@@ -66,28 +60,10 @@ void FoxAttack::Perform (AttackDirection direction) {
     sprite->SetFrame(0);
     lifetime.Reset();
 
-    Rect externalBox = (Rect)(externalAssociated.lock()->box);
-
-    switch (direction) {
-        case LEFT:
-            if (sprite != nullptr) sprite->textureFlip = SDL_FLIP_HORIZONTAL;
-            associated.box.x = externalBox.x + externalBox.w - SPRITE_OFFSET_X - associated.box.w;
-            associated.box.y = externalBox.y + SPRITE_OFFSET_Y;
-            break;
-
-        case RIGHT:
-            if (sprite != nullptr) sprite->textureFlip = SDL_FLIP_NONE;
-            associated.box.x = externalBox.x + SPRITE_OFFSET_X;
-            associated.box.y = externalBox.y + SPRITE_OFFSET_Y;
-            break;
-
-        default: break;
-    }
-
     isOver = false;
 }
 
-void FoxAttack::Update (float dt) {
+void KidAttackStrong::Update (float dt) {
     if (usingExternalAssociated and externalAssociated.expired()) {
         associated.RequestDelete();
         return;
@@ -109,11 +85,29 @@ void FoxAttack::Update (float dt) {
                 lifetime.Reset();
 
             } else if (not isOver) {
-                lifetime.SetResetTime(0.3f);
+                lifetime.SetResetTime(0.74f);
                 isOver = true;
             } else associated.enabled = false;
         }
     }
+    Rect externalBox = (Rect)(externalAssociated.lock()->box);
+
+    switch (direction) {
+        case LEFT:
+            if (sprite != nullptr) sprite->textureFlip = SDL_FLIP_HORIZONTAL;
+            associated.box.x = externalBox.x + externalBox.w - SPRITE_OFFSET_X - associated.box.w;
+            associated.box.y = externalBox.y + SPRITE_OFFSET_Y;
+            break;
+
+        case RIGHT:
+            if (sprite != nullptr) sprite->textureFlip = SDL_FLIP_NONE;
+            associated.box.x = externalBox.x + SPRITE_OFFSET_X;
+            associated.box.y = externalBox.y + SPRITE_OFFSET_Y;
+            break;
+
+        default: break;
+    }
+
     // melius colliders' pixel correction
     associated.pixelColliderFix0 = (
         usingExternalAssociated and
@@ -123,7 +117,7 @@ void FoxAttack::Update (float dt) {
     );
 }
 
-void FoxAttack::NotifyCollision (GameObject& other) {
+void KidAttackStrong::NotifyCollision (GameObject& other) {
     GameObject* self = externalAssociated.lock().get();
     if (externalAssociated.expired() or (&other == self) or isOver)
         return;
@@ -160,7 +154,7 @@ void FoxAttack::NotifyCollision (GameObject& other) {
     Camera::AddMethod(this, std::bind(&CameraShake, this));
 }
 
-void* FoxAttack::CameraShake () {
+void* KidAttackStrong::CameraShake () {
     if (cameraShakeQueue.empty()) {
         Camera::RemoveMethod(this);
         return nullptr;
