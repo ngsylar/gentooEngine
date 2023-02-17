@@ -1,5 +1,7 @@
 #include "GentooEngine.h"
 #include "ZoneTransition.h"
+#include "PlatformCamera.h"
+#include "Kid.h"
 
 #define FONT_LED "./assets/font/led_real.ttf"
 
@@ -232,15 +234,66 @@ void State::AddSpikes(float x, float y, float w) {
     spikeObj->box.SetSize(w*TILE_SIZE, 0.5*TILE_SIZE);
     Interactor* touchedSpike = new Interactor(*spikeObj);
     touchedSpike->SetResult([](){
-        //TODO finish when having access to Kid self instance
+        // Vec2 place = ZoneManager::GetSpawnPosition()*TILE_SIZE;
+        // Kid::GetInstance()->box.SetPosition(place.x, place.y-KID_HEIGHT);//TODO cause damage, implement transition, fix camera glitch
+        // Kid* kid = (Kid*)Kid::GetInstance()->GetComponent(ComponentType::_Kid);
         //Vec2 place = ZoneManager::GetSpawnPosition()*TILE_SIZE;
         //Add fadeout, once everything is black:
         //KidObj->box.SetPosition(place.x, place.y-KID_HEIGHT);
         //Add interactor on the same position to process fadein
-        SDL_Log("Spikes!");
+        // SDL_Log("Spikes!");
     });
+    AttackGeneric* atk = new AttackGeneric(*spikeObj);
+    spikeObj->AddComponent(atk);
     spikeObj->AddComponent(touchedSpike);
     AddObject(spikeObj);
+}
+
+void State::AddKid() {
+    GameObject* KidObj = new GameObject(LayerDistance::_Player);
+    AddObject(KidObj);
+    KidObj->AddComponent(new Kid(*KidObj));
+    Vec2 place = ZoneManager::GetSpawnPosition()*TILE_SIZE;
+    KidObj->box.SetPosition(place.x, place.y-KID_HEIGHT);
+}
+
+#define MAGIC_BARRIER "assets/img/animated/10_barreira28x84-sheet.png"
+void State::AddMagicBarrier(Vec2 position) {
+    GameObject* barrierObj = new GameObject(LayerDistance::_Environment_Close);
+    Sprite* anim = new Sprite(*barrierObj, MAGIC_BARRIER, 5, 0.1);
+    barrierObj->box.SetSize(anim->GetWidth(), anim->GetHeight());
+    barrierObj->box.SetPurePosition(position*TILE_SIZE);
+    Interactor* barrierLock = new Interactor(*barrierObj, true, false, ComponentType::_Attack);
+    barrierLock->SetCondition([](){
+        Kid* kid = (Kid*) Kid::GetInstance()->GetComponent(ComponentType::_Kid);
+        return kid->GetCurrentState() == EntityState::AttackingSwordOnGround_0;//TODO may change to magic attack label
+    });
+    barrierLock->SetResult([](){SDL_Log("Barrier broken!");});
+    barrierObj->AddComponent(anim);
+    barrierObj->AddComponent(barrierLock);
+    AddObject(barrierObj);
+}
+
+void State::LimitMap() {
+    GameObject* GO = new GameObject();
+    PlatformCamera* plat = new PlatformCamera(*GO, PlatformCamera::Direction::UP,0);
+    GO->AddComponent(plat);
+    AddObject(GO);
+
+    GO = new GameObject();
+    plat = new PlatformCamera(*GO, PlatformCamera::Direction::DOWN, zoneSize.y-Vec2(GAME_RESOLUTION).y);
+    GO->AddComponent(plat);
+    AddObject(GO);
+
+    GO = new GameObject();
+    plat = new PlatformCamera(*GO, PlatformCamera::Direction::LEFT,0);
+    GO->AddComponent(plat);
+    AddObject(GO);
+
+    GO = new GameObject();
+    plat = new PlatformCamera(*GO, PlatformCamera::Direction::RIGHT,zoneSize.x-Vec2(GAME_RESOLUTION).x);
+    GO->AddComponent(plat);
+    AddObject(GO);
 }
 
 Music* State::GetStateMusic () {

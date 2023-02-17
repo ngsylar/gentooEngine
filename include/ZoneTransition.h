@@ -38,6 +38,7 @@ enum ZoneExit {
     B,
     C,
     D,
+    Death,
 };
 
 class ZoneTransition : public Component {
@@ -64,12 +65,14 @@ class ZoneManager {
     private:
         static Vec2 spawnPosition;
         static Music* levelMusic;
+        static SDL_RendererFlip currentFlip;
     public:
     
         ZoneManager();
         ~ZoneManager();
         static void RequestZone(std::pair<Zone, ZoneExit> place, bool carryMusic);
         static Vec2 GetSpawnPosition();
+        static SDL_RendererFlip GetSpriteFlip();
         static Music* GetCarriedMusic();
 };
 

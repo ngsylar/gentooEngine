@@ -1,0 +1,49 @@
+01_inicio
+Protagonista
+não repetivel
+M00-a1 (Assim que o jogo inicia)
+
+02_sair_casa
+Protagonista
+não repetivel
+M01-a1 (Ao sair da casa)
+
+03_int_casa
+Protagonista
+repetivel
+M01-a1 (se o jogador voltar e interagir com a casa)
+
+04_alquim
+Protagonista e Alquimista
+não repetivel
+M01- a3a (primeira interação com o alquimista)
+
+05_int_alquim
+Alquimista
+repetivel
+M01- a3a (se o jogador voltar e interagir com o alquimista antes de entrar na cidade subterranea)
+
+06_rapos
+Protagonista
+não repetivel
+M02- a1 (depois de usar a defesa magica pela primeira vez)
+
+07_atk_fort
+Protagonista
+não repetivel
+M02- a4 (interação com o corpo, antes de adquirir o ataque carregado)
+
+08_int_porta
+Protagonista
+repetivel
+M02- a7 (interação com a porta antes de acionar todos os mecanismos)
+
+09_ultim_mecanismo
+Protagonista
+não repetivel
+M02- a? (depois de ativar o ultimo mecanismo da porta)
+
+10_alquim_fim
+Protagonista e Alquimista
+não repetivel
+M01- a3b (interação com o alquimista depois de adquirir todos os itens da poção)

@@ -17,7 +17,6 @@ class Kid: public EntityMachine {
         Collider* collider;
         Timer jumpTimer, attackTimer, spellTimer, damageTimer, invincibilityTimer;
         bool isInvincible, isDead;
-        int hp;
 
         // Attack Types
         KidAttackMelee* swordAttackOnGround;
@@ -56,11 +55,15 @@ class Kid: public EntityMachine {
 
         // Camera Assistants
         void* CameraEffects();
+        
+        Timer deathSequence;
+        bool deathFade;
 
     public:
         Kid(GameObject& associated);
         ~Kid();
         static GameObject* GetInstance();
+        int hp;
         void Awaken();
         void Start();
         void LateUpdate(float dt);
