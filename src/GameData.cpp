@@ -14,9 +14,8 @@ bool GameData::thirdMechanism = false;
 int GameData::mechanismCount = 0;
 
 //habilities
-bool GameData::canPushBoulder = false;
-bool GameData::canUseMana = false;
 bool GameData::canUseChargedAttack = false;
+bool GameData::canUseMana = false;
 bool GameData::canUseMagicAttack = false;
 
 //Boulders
@@ -32,7 +31,7 @@ bool GameData::changedS3Scenario = false;
 
 //Kiddo
 int GameData::kidHp = 0;
-int GameData::kidMana = 0;
+int GameData::kidMp = 0;
 
 //Chat controllers
 bool GameData::firstChat = false;
@@ -48,4 +47,8 @@ void GameData::MultiConditionalChecks() {
     mechanismCount = (int)firstMechanism + (int)secondMechanism + (int)thirdMechanism;
     SDL_Log("ITEMS: %d", itemCount);
     SDL_Log("MECHAS: %d", mechanismCount);
+    SDL_Log("USE MANA: %s", (canUseMana?"YES":"NO"));
+    SDL_Log("USE MAGIC ATTACK: %s", (canUseMagicAttack?"YES":"NO"));
+    SDL_Log("USE CHARGED ATTACK: %s", (canUseChargedAttack?"YES":"NO"));
+
 }

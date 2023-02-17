@@ -265,8 +265,8 @@ void State::AddMagicBarrier(Vec2 position) {
     barrierObj->box.SetPurePosition(position*TILE_SIZE);
     Interactor* barrierLock = new Interactor(*barrierObj, true, false, ComponentType::_Attack);
     barrierLock->SetCondition([](){
-        Kid* kid = (Kid*) Kid::GetInstance()->GetComponent(ComponentType::_Kid);
-        return kid->GetCurrentState() == EntityState::AttackingSwordOnGround_0;//TODO may change to magic attack label
+        // Kid* kid = (Kid*) Kid::GetInstance()->GetComponent(ComponentType::_Kid);
+        return Kid::self->GetCurrentState() == EntityState::CastingSpell_0;//TODO may change to magic attack label
     });
     barrierLock->SetResult([](){SDL_Log("Barrier broken!");});
     barrierObj->AddComponent(anim);

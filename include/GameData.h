@@ -20,7 +20,6 @@ class GameData
         static bool thirdMechanism;
         static int mechanismCount;
 
-        static bool canPushBoulder;
         static bool canUseMana;
         static bool canUseChargedAttack;
         static bool canUseMagicAttack;
@@ -40,7 +39,7 @@ class GameData
 
         //Kiddo
         static int kidHp;
-        static int kidMana;
+        static int kidMp;
 
         //Dialogue dependant
         static bool firstChat;

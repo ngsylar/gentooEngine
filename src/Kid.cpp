@@ -67,6 +67,7 @@
 #define CAMERA_GROUNDED_RESET_TIME              1.5f
 
 GameObject* Kid::instance = nullptr;
+Kid* Kid::self = nullptr;
 
 Kid::Kid (GameObject& associated): EntityMachine(associated) {
     instance = &associated;
@@ -80,7 +81,7 @@ Kid::Kid (GameObject& associated): EntityMachine(associated) {
     isInvincible = false;
     isDead = false;
     hp = (GameData::kidHp <= 0 ? 6 : GameData::kidHp);
-
+    mp = GameData::kidHp > 0 ? GameData::kidMp : 0;
     runSpeedIncrease = 0.0f;
     runSpeedReset = true;
     jumpSpeedDecrease = 0.0f;
@@ -119,12 +120,17 @@ Kid::Kid (GameObject& associated): EntityMachine(associated) {
     deathSequence.SetResetTime(3.5);
     deathSequence.Reset();
 
+    increaseMP.SetResetTime(5);
+    increaseMP.Reset();
+    self = this;
+
     // melius colliders' pixel correction
     associated.pixelColliderFix1 = true;
 }
 
 Kid::~Kid () {
     instance = nullptr;
+    self = nullptr;
 }
 
 GameObject* Kid::GetInstance () {
@@ -199,6 +205,16 @@ void Kid::Start () {
 void Kid::LateUpdate (float dt) {}
 
 void Kid::UpdateEntity (float dt) {
+    if(GameData::canUseMana){
+        increaseMP.Update(dt);
+        if(increaseMP.IsOver()){
+            if(mp<10){
+                mp++;
+            }
+            increaseMP.Reset();
+        }
+    }
+
     if (state == EntityState::Dead) {
         deathSequence.Update(dt);
         if(deathSequence.GetTime()>1 and !deathFade){
@@ -463,6 +479,13 @@ bool Kid::NewStateRule (EntityState newState, int argsc, float argsv[]) {
             AttackStart();
             return true;
 
+        case EntityState::AttackingSwordStrong_Charge:
+            if(!GameData::canUseChargedAttack or !GameData::canUseMana or mp<3){
+                chargePerforming = false;
+                return false;
+            }
+            break;
+
         case EntityState::AttackingSwordStrong_Perform:
             AttackStrongStart();
             return true;
@@ -499,6 +522,7 @@ bool Kid::NewStateRule (EntityState newState, int argsc, float argsv[]) {
 
         default: return true;
     }
+    return true;
 }
 
 void Kid::AttackStart () {
