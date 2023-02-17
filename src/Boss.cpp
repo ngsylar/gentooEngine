@@ -3,48 +3,49 @@
 #include "AttackGeneric.h"
 #include "Kid.h"
 
-#define SPRITE_IDLE                     "assets/img/boss/idle.png"
-#define SPRITE_WALK                     "assets/img/boss/walk.png"
-#define SPRITE_RUN                      "assets/img/boss/walk.png"
-#define SPRITE_ATTACK0                  "assets/img/boss/attack1.png"
-#define SPRITE_ATTACK1                  "assets/img/boss/attack2.png"
-#define SPRITE_ATTACK2                  "assets/img/boss/attack3.png"
-#define SPRITE_DAMAGE                   "assets/img/boss/damage.png"
-#define SPRITE_DEATH                    "assets/img/boss/death.png"
+#define SPRITE_IDLE                 "assets/img/boss/idle.png"
+#define SPRITE_WALK                 "assets/img/boss/walk.png"
+#define SPRITE_RUN                  "assets/img/boss/walk.png"
+#define SPRITE_ATTACK0              "assets/img/boss/attack1.png"
+#define SPRITE_ATTACK1              "assets/img/boss/attack2.png"
+#define SPRITE_ATTACK2              "assets/img/boss/attack3.png"
+#define SPRITE_DAMAGE               "assets/img/boss/damage.png"
+#define SPRITE_DEATH                "assets/img/boss/death.png"
 
-#define SPRITE_IDLE_FRAMES              18, 0.05f
-#define SPRITE_WALK_FRAMES              16, 0.05f
-#define SPRITE_ATTACK0_FRAMES           12, 0.1f
-#define SPRITE_ATTACK1_FRAMES           16, 0.1f
-#define SPRITE_ATTACK2_FRAMES           11, 0.1f
-#define SPRITE_DAMAGE_FRAMES            6, 0.1f
-#define SPRITE_DEATH_FRAMES             22, 0.1f
+#define SPRITE_IDLE_FRAMES          9, 0.1f
+#define SPRITE_WALK_FRAMES          8, 0.1f
+#define SPRITE_ATTACK0_FRAMES       12, 0.1f
+#define SPRITE_ATTACK1_FRAMES       16, 0.1f
+#define SPRITE_ATTACK2_FRAMES       11, 0.1f
+#define SPRITE_DAMAGE_FRAMES        6, 0.1f
+#define SPRITE_DEATH_FRAMES         22, 0.1f
 
-#define SPEED_WALK                      16.0f
-#define SPEED_WALKt2                    32.0f
-#define SPEED_ATTACK                    600.0f
-#define IMPULSE_ATTACK_X                20
+#define SPEED_WALK                  16.0f
+#define SPEED_WALKt2                32.0f
+#define SPEED_ATTACK                600.0f
+#define IMPULSE_ATTACK_X            20.0f
+#define IMPULSE_MASS                50.0f
 
-#define ATTACK_FORCE                    400.0f, 140.0f
-#define ATTACK_IMPULSE                  50.0f
-#define ATTACK_DAMAGE                   1
+#define ATTACK_FORCE                400.0f, 140.0f
+#define ATTACK_IMPULSE              50.0f
+#define ATTACK_DAMAGE               1
 
-#define WALK_FAST_DISTANCE              400.0f
+#define WALK_FAST_DISTANCE          400.0f
 
-#define ATTACK_MELEE0_DISTANCE          60.0f
-#define ATTACK_MELEE0_TIME_START        0.5f
-#define ATTACK_MELEE0_TIME_DURING       0.3f
-#define ATTACK_MELEE0_TIME_END          0.7f
+#define ATTACK_MELEE0_DISTANCE      60.0f
+#define ATTACK_MELEE0_TIME_START    0.5f
+#define ATTACK_MELEE0_TIME_DURING   0.3f
+#define ATTACK_MELEE0_TIME_END      0.7f
 
-#define ATTACK_MELEE1_DISTANCE          100.0f
-#define ATTACK_MELEE1_TIME_START        0.5f
-#define ATTACK_MELEE1_TIME_DURING       0.2f
-#define ATTACK_MELEE1_TIME_END          0.4f
+#define ATTACK_MELEE1_DISTANCE      100.0f
+#define ATTACK_MELEE1_TIME_START    0.5f
+#define ATTACK_MELEE1_TIME_DURING   0.2f
+#define ATTACK_MELEE1_TIME_END      0.4f
 
-#define ATTACK_RANGED_DISTANCE          400
+#define ATTACK_RANGED_DISTANCE      400
 
-#define COLLIDER_POSITION               3.0f, 10.0f
-#define COLLIDER_BOX_SIZE               31.0f, 59.0f
+#define COLLIDER_POSITION           3.0f, 10.0f
+#define COLLIDER_BOX_SIZE           31.0f, 59.0f
 
 Boss::Boss (GameObject& associated): EntityMachine(associated) {
     type = type | ComponentType::_Boss;
@@ -57,6 +58,7 @@ Boss::Boss (GameObject& associated): EntityMachine(associated) {
     damageTimer.SetResetTime(0.6f);
     recoverTimer.SetResetTime(0.15f);
     isAttacking = false;
+    barrierIsBroken = false;
     damageTaken = 0;
 
     GameObject* attack = new GameObject(LayerDistance::_NPC_Close);
@@ -127,6 +129,12 @@ void Boss::UpdateEntity (float dt) {
         return;
     }
 
+    if (barrierIsBroken) {
+        barrierBrokenTimer.Update(dt);
+        if (barrierBrokenTimer.IsOver())
+            barrierIsBroken = false;
+    }
+
     switch (state) {
         case Idle:
             restTimer.Update(dt);
@@ -192,7 +200,7 @@ bool Boss::NewStateRule (EntityState newState, int argsc, float argsv[]) {
     switch (state) {
         case AttackingMelee_0: case AttackingMelee_1:
             if ((newState == Injured) and (damageTaken >= 2)) {
-                hp -= argsv[AttackGeneric::_Damage];
+                // hp -= argsv[AttackGeneric::_Damage];
                 return false;
             }
             else isAttacking = false;
@@ -200,7 +208,7 @@ bool Boss::NewStateRule (EntityState newState, int argsc, float argsv[]) {
 
         case Recovering:
             if ((newState == Injured) and (damageTaken >= 2)) {
-                hp -= argsv[AttackGeneric::_Damage];
+                // hp -= argsv[AttackGeneric::_Damage];
                 return false;
             } break;
 
@@ -262,7 +270,6 @@ void Boss::AttackMeleeUpdate (float dt) {
     switch (attackState) {
         case _Stage0:
             if (attackTimer.IsOver()) {
-                // editar: ativar classe ataque aqui
                 rigidBody->SetSpeedOnX(SPEED_ATTACK * movementDirection);
                 attackTimer.SetResetTime(ATTACK_MELEE0_TIME_END);
                 attackTimer.Reset();
@@ -280,7 +287,6 @@ void Boss::AttackMeleeUpdate (float dt) {
 
         case _Stage2:
             if (attackTimer.IsOver()) {
-                // editar: ativar classe ataque aqui
                 rigidBody->SetSpeedOnX(SPEED_ATTACK * movementDirection);
                 attackTimer.SetResetTime(ATTACK_MELEE1_TIME_END);
                 attackTimer.Reset();
@@ -306,6 +312,15 @@ void Boss::Die () {
     associated.RemoveComponent(rigidBody);
     associated.RemoveComponent(collider);
     FormatState(EntityState::Dead);
+}
+
+bool Boss::BreakBarrier (float brokenTime) {
+    if (barrierIsBroken) return false;
+    barrierBrokenTimer.SetResetTime(brokenTime + 0.6f);
+    barrierBrokenTimer.Reset();
+    barrierIsBroken = true;
+    damageTaken = 0;
+    return true;
 }
 
 // DEBUG
@@ -343,5 +358,3 @@ void Boss::RenderEntity () {
         SDL_RenderDrawLines(Game::GetInstance().GetRenderer(), points, 5);
     }
 }
-
-void Boss::NotifyCollision (GameObject& other) {}

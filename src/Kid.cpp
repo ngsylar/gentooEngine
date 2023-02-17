@@ -11,6 +11,7 @@
 #define SPRITE_DAMAGE                           "assets/img/kid/damage.png"
 #define SPRITE_ATTACK_SWORDGROUND0              "assets/img/kid/attackmeleeground1.png"
 #define SPRITE_ATTACK_SWORDGROUND1              "assets/img/kid/attackmeleeground2.png"
+#define SPRITE_SPELL0                           "assets/img/kid/magic.png"
 #define SPRITE_DEATH                            "assets/img/kid/death.png"
 
 #define SPRITE_IDLE_FRAMES                      10, 0.1f
@@ -22,6 +23,7 @@
 #define SPRITE_LAND_FRAMES                      3, 0.1f
 #define SPRITE_ATTACK_SWORDGROUND0_FRAMES       10, 0.1f
 #define SPRITE_ATTACK_SWORDGROUND1_FRAMES       10, 0.1f
+#define SPRITE_SPELL0_FRAMES                    12, 0.1f
 #define SPRITE_DEATH_FRAMES                     12, 0.1f
 
 #define ACCELERATION_RUN                        800.0f
@@ -64,6 +66,7 @@ Kid::Kid (GameObject& associated): EntityMachine(associated) {
     associated.layer = LayerDistance::_Player;
     associated.label = "Player";
     jumpTimer.SetResetTime(0.8f);
+    spellTimer.SetResetTime(1.2f);
     damageTimer.SetResetTime(0.4f);
     invincibilityTimer.SetResetTime(1.25f);
     isInvincible = false;
@@ -84,6 +87,11 @@ Kid::Kid (GameObject& associated): EntityMachine(associated) {
     swordAttackOnGround->SetProperties(
         Vec2(ATTACK_SWORD_FORCE), ATTACK_SWORD_IMPULSE, ATTACK_SWORD_DAMAGE, IMPULSE_ATTACK_SWORD_X);
     attack->AddComponent(swordAttackOnGround);
+    Game::GetInstance().GetCurrentState().AddObject(attack);
+
+    attack = new GameObject(LayerDistance::_Player_Front);
+    foxAttack = new FoxAttack(*attack, &associated);
+    attack->AddComponent(foxAttack);
     Game::GetInstance().GetCurrentState().AddObject(attack);
 
     isGrounded = false;
@@ -113,6 +121,7 @@ void Kid::Awaken () {
         associated, SPRITE_ATTACK_SWORDGROUND0, SPRITE_ATTACK_SWORDGROUND0_FRAMES, true);
     Sprite* spriteSwordOnGround1 = new Sprite(
         associated, SPRITE_ATTACK_SWORDGROUND1, SPRITE_ATTACK_SWORDGROUND1_FRAMES, true);
+    Sprite* spriteSpell0 = new Sprite(associated, SPRITE_SPELL0, SPRITE_SPELL0_FRAMES, true);
     Sprite* spriteDeath = new Sprite(associated, SPRITE_DEATH, SPRITE_DEATH_FRAMES, true);
 
     AddSpriteState(EntityState::Idle, spriteIdle);
@@ -123,6 +132,7 @@ void Kid::Awaken () {
     AddSpriteState(EntityState::Injured, spriteDamage);
     AddSpriteState(EntityState::AttackingSwordOnGround_0, spriteSwordOnGround0);
     AddSpriteState(EntityState::AttackingSwordOnGround_1, spriteSwordOnGround1);
+    AddSpriteState(EntityState::CastingSpell_0, spriteSpell0);
     AddSpriteState(EntityState::Dead, spriteDeath);
 
     rigidBody = new RigidBody(associated);
@@ -201,6 +211,10 @@ void Kid::UpdateEntity (float dt) {
                 FormatState(EntityState::AttackingSwordOnGround_0);
                 break;
             }
+            // start magic attack
+            else if (input.KeyPress(Key::magic)) {
+                FormatState(EntityState::CastingSpell_0);
+            }
             // start jump
             else if (input.KeyPress(Key::jump))
                 FormatState(EntityState::Jumping);
@@ -226,6 +240,10 @@ void Kid::UpdateEntity (float dt) {
                 FormatState(EntityState::AttackingSwordOnGround_0);
                 break;
             }
+            // start magic attack
+            else if (input.KeyPress(Key::magic)) {
+                FormatState(EntityState::CastingSpell_0);
+            }
             // start jump
             else if (input.KeyPress(Key::jump))
                 FormatState(EntityState::Jumping);
@@ -249,7 +267,7 @@ void Kid::UpdateEntity (float dt) {
                 hitCeiling = false;
             }
             break;
-        
+
         case EntityState::Falling:
             // movement on air
             rigidBody->SetSpeedOnX(SPEED_ONAIR * directionX);
@@ -265,7 +283,13 @@ void Kid::UpdateEntity (float dt) {
         case EntityState::AttackingSwordOnGround_1:
             AttackUpdate(dt);
             break;
-        
+
+        case EntityState::CastingSpell_0:
+            spellTimer.Update(dt);
+            if (spellTimer.IsOver())
+                FormatState(Idle);
+            break;
+
         case EntityState::Injured:
             damageTimer.Update(dt);
             if (damageTimer.IsOver())
@@ -309,6 +333,10 @@ bool Kid::NewStateRule (EntityState newState, int argsc, float argsv[]) {
             attackImpulseCancel = false;
             attackPerforming = false;
             break;
+        
+        case EntityState::CastingSpell_0:
+            attackPerforming = false;
+            break;
 
         case EntityState::Injured:
             jumpSpeedDecrease = 0.0f;
@@ -345,6 +373,14 @@ bool Kid::NewStateRule (EntityState newState, int argsc, float argsv[]) {
 
         case EntityState::AttackingSwordOnGround_0: case EntityState::AttackingSwordOnGround_1:
             AttackStart();
+            return true;
+
+        case EntityState::CastingSpell_0:
+            spellTimer.Reset();
+            rigidBody->SetSpeedOnX(0.0f);
+            runSpeedIncrease = 0.0f;
+            attackPerforming = true;
+            foxAttack->Perform((lastDirectionX < 0)? FoxAttack::LEFT : FoxAttack::RIGHT);
             return true;
 
         case EntityState::Injured:

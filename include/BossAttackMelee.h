@@ -15,6 +15,8 @@ class BossAttackMelee: public AttackGeneric {
             float lifetimeEnd_i;
         };
         std::queue<AttackType> attackTypes;
+
+        // camera auxiliaries
         Timer cameraShakeTimer;
         std::queue<Vec2> cameraShakeQueue;
         Vec2 cameraShakeReset;
@@ -25,6 +27,7 @@ class BossAttackMelee: public AttackGeneric {
         // timer auxiliaries
         float lifetimeStart;
 
+        // camera auxiliaries
         void* CameraShake();
 
     public:

@@ -10,7 +10,7 @@
 #define SPRITE_DAMAGE_FRAMES    2, 0.1f
 #define SPRITE_DEATH_FRAMES     8, 0.1f
 
-#define SPEED_RUN               60.0f
+#define SPEED_RUN               50.0f
 #define IMPULSE_MASS            10.0f
 
 #define ATTACK_FORCE            400.0f, 140.0f

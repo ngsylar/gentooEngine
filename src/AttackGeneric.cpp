@@ -69,6 +69,8 @@ void AttackGeneric::Start () {}
 
 void AttackGeneric::Perform () {
     associated.enabled = true;
+    if (sprite != nullptr)
+        sprite->SetFrame(0);
     lifetime.Reset();
     PerformAttack();
 }

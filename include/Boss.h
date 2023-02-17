@@ -14,7 +14,6 @@ class Boss: public EntityMachine {
         RigidBody* rigidBody;
         Collider* collider;
         int movementDirection;
-        Vec2 currentRoute;
         int hp;
 
         // Attack Types
@@ -22,10 +21,10 @@ class Boss: public EntityMachine {
 
         // Behaviour
         SubState generalState, attackState;
-        Timer restTimer, attackTimer, damageTimer, recoverTimer;
+        Timer restTimer, attackTimer, damageTimer, recoverTimer, barrierBrokenTimer;
 
         // Automatic Signals
-        bool isAttacking;
+        bool isAttacking, barrierIsBroken;
 
         // Automatic Factors
         float attackOriginX;
@@ -41,8 +40,8 @@ class Boss: public EntityMachine {
         void Start();
         void LateUpdate(float dt);
         void UpdateEntity(float dt);
+        bool BreakBarrier(float brokenTime);
         void RenderEntity();
-        void NotifyCollision(GameObject& other);
 };
 
 #endif

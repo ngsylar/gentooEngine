@@ -7,18 +7,20 @@
 #include "CameraBox.h"
 #include "Timer.h"
 #include "KidAttackMelee.h"
+#include "FoxAttack.h"
 
 class Kid: public EntityMachine {
     private:
         static GameObject* instance;
         RigidBody* rigidBody;
         Collider* collider;
-        Timer jumpTimer, attackTimer, damageTimer, invincibilityTimer;
+        Timer jumpTimer, attackTimer, spellTimer, damageTimer, invincibilityTimer;
         bool isInvincible, isDead;
         int hp;
 
         // Attack Types
         KidAttackMelee* swordAttackOnGround;
+        FoxAttack* foxAttack;
 
         // Automatic Signals
         bool attackPerforming, damagePerforming;
