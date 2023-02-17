@@ -6,6 +6,7 @@
 #include "Collider.h"
 #include "Sprite.h"
 #include "Timer.h"
+#include "BossAttackMelee.h"
 
 class Boss: public EntityMachine {
     private:
@@ -13,19 +14,25 @@ class Boss: public EntityMachine {
         RigidBody* rigidBody;
         Collider* collider;
         int movementDirection;
-        Vec2 currentRoute;
         int hp;
+
+        // Attack Types
+        BossAttackMelee* meleeAttack;
 
         // Behaviour
         SubState generalState, attackState;
-        Timer behaviourTimer;
+        Timer restTimer, attackTimer, damageTimer, recoverTimer, barrierBrokenTimer;
+
+        // Automatic Signals
+        bool isAttacking, barrierIsBroken;
 
         // Automatic Factors
-        int attackDirectionX, damageDirectionX;
         float attackOriginX;
+        int damageTaken;
 
         bool NewStateRule(EntityState newState, int argsc, float argsv[]);
-        void UpdateAttack(float dt);
+        void AttackMeleeUpdate(float dt);
+        void Die();
 
     public:
         Boss(GameObject& associated);
@@ -33,8 +40,8 @@ class Boss: public EntityMachine {
         void Start();
         void LateUpdate(float dt);
         void UpdateEntity(float dt);
+        bool BreakBarrier(float brokenTime);
         void RenderEntity();
-        void NotifyCollision(GameObject& other);
 };
 
 #endif

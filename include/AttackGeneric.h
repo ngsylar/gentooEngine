@@ -13,7 +13,7 @@ class AttackGeneric: public Component {
         Collider* collider;
         Sprite* sprite;
         Vec2 force;
-        float impulse;
+        float impulse, displacement;
         int damage;
 
     public:
@@ -33,13 +33,14 @@ class AttackGeneric: public Component {
             bool selfDestruction=false
         );
         void SetupCollider(Vec2 offset, Vec2 size);
-        void SetProperties(Vec2 force, float impulse, int damage);
+        void SetProperties(Vec2 force, float impulse, int damage, float displacement=0.0f);
         virtual void Awaken();
         virtual void Start();
         virtual void Perform();
         virtual void PerformAttack();
         virtual void Update(float dt);
         virtual void UpdateAttack(float dt);
+        virtual void CancelAttack();
         virtual void NotifyCollision(GameObject& other);
         bool UsingInternalAssociated();
         bool UsingExternalAssociated();

@@ -6,11 +6,11 @@
 #define SPRITE_DAMAGE           "assets/img/armadillo/damage.png"
 #define SPRITE_DEATH            "assets/img/armadillo/death.png"
 
-#define SPRITE_RUN_FRAMES       6, 0.1f
+#define SPRITE_RUN_FRAMES       6, 0.125f
 #define SPRITE_DAMAGE_FRAMES    2, 0.1f
 #define SPRITE_DEATH_FRAMES     8, 0.1f
 
-#define SPEED_RUN               60.0f
+#define SPEED_RUN               50.0f
 #define IMPULSE_MASS            10.0f
 
 #define ATTACK_FORCE            400.0f, 140.0f
@@ -22,6 +22,7 @@
 
 EnemyArmadillo::EnemyArmadillo (GameObject& associated): EntityMachine(associated) {
     type = type | ComponentType::_EnemyArmadillo;
+    associated.layer = LayerDistance::_NPC;
     associated.label = "Enemy";
     movementDirection = -1;
     hp = 2;
@@ -141,7 +142,7 @@ bool EnemyArmadillo::NewStateRule (EntityState newState, int argsc, float argsv[
 void EnemyArmadillo::NotifyCollision (GameObject& other) {
     rigidBody->NotifyCollision(other);
 
-    if (rigidBody->ImpactDown() and (other.label == "Ground")) {
+    if (rigidBody->ImpactDown()) {
         if (state == EntityState::Falling)
             FormatState(EntityState::Running);
         Collider* groundCollider = (Collider*)other.GetComponent(ComponentType::_Collider);

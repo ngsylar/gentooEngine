@@ -1,24 +1,31 @@
-#ifndef KID_ATTACK_MELEE_H
-#define KID_ATTACK_MELEE_H
+#ifndef BOSS_ATTACK_MELEE_H
+#define BOSS_ATTACK_MELEE_H
 
 #include <queue>
 
 #include "Timer.h"
 #include "AttackGeneric.h"
 
-class KidAttackMelee: public AttackGeneric {
+class BossAttackMelee: public AttackGeneric {
     private:
+        struct AttackType {
+            Vec2 pureOffset_i;
+            Vec2 size_i;
+            float lifetimeStart_i;
+            float lifetimeEnd_i;
+        };
+        std::queue<AttackType> attackTypes;
+
         // camera auxiliaries
         Timer cameraShakeTimer;
         std::queue<Vec2> cameraShakeQueue;
         Vec2 cameraShakeReset;
 
-        // automatic signals
-        bool impulseCancel, repulsionEnabled;
-        float displacement;
+        // collider auxiliaries
+        Vec2 pureOffset;
 
-        // automatic factors
-        float repulsionOriginX, repulsionIncrease;
+        // timer auxiliaries
+        float lifetimeStart;
 
         // camera auxiliaries
         void* CameraShake();
@@ -27,16 +34,16 @@ class KidAttackMelee: public AttackGeneric {
         enum AttackDirection {LEFT, RIGHT, UP, DOWN};
         AttackDirection direction;
 
-        KidAttackMelee(
+        BossAttackMelee(
             GameObject& associated,
             GameObject* externalAssociated
         );
-        void Awaken();
+        void PushAttack(Vec2 pureOffset, Vec2 size, float lifetimeStart, float lifetimeEnd);
         void Start();
         void Perform(AttackDirection direction);
         void Update(float dt);
+        void CancelAttack();
         void NotifyCollision(GameObject& other);
-        bool ImpulseIsCanceled();
 };
 
 #endif

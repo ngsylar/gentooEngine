@@ -1,50 +1,73 @@
 #include "GentooEngine.h"
-#include "KidAttackMelee.h"
+#include "KidAttackStrong.h"
+#include "Boss.h"
 
-#define COLLIDER_OFFSET_X       24.0f
-#define COLLIDER_OFFSET_Y       6.0f
-#define COLLIDER_SIZE           24.0f, 44.0f
+#define SPRITE_ATTACK           "assets/img/kid/attackstrongtrail.png"
+#define SPRITE_FRAMES           10, 0.1f
+#define SPRITE_OFFSET_X         -8.0f
+#define SPRITE_OFFSET_Y         0.0f
 
 #define REPULSION_FORCE         140.0f
 #define REPULSION_IMPULSE       4.0f
-
-#define LIFETIME_START          0.09f
-#define LIFETIME_END            0.26f
 
 #define CAMERA_SHAKE_COUNT      6
 #define CAMERA_SHAKE_RANGE      3
 #define CAMERA_SHAKE_RESET_TIME 0.04f
 
-KidAttackMelee::KidAttackMelee (
+KidAttackStrong::KidAttackStrong (
     GameObject& associated, GameObject* externalAssociated
 ): AttackGeneric(associated, externalAssociated) {
     this->externalAssociated = Game::GetInstance().GetCurrentState().GetObjectPtr(externalAssociated);
     associated.label = externalAssociated->label;
-    lifetime.SetResetTime(LIFETIME_END);
     associated.enabled = false;
 
-    impulseCancel = false;
-    repulsionEnabled = false;
+    force = Vec2(640.0f, 0.0f);
+    impulse = 80.0f;
+    damage = 2;
+    displacement = 0.0f;
+
+    isOver = false;
 }
 
-void KidAttackMelee::Awaken () {
-    SetupCollider(Vec2(), Vec2(COLLIDER_SIZE));
+void KidAttackStrong::PushAttack (Vec2 offset, Vec2 size, float lifetimeStart, float lifetimeEnd) {
+    AttackType attackType;
+    attackType.offset_i = offset;
+    attackType.size_i = size;
+    attackType.lifetimeStart_i = lifetimeStart;
+    attackType.lifetimeEnd_i = lifetimeEnd;
+    attackTypes.push(attackType);
 }
 
-void KidAttackMelee::Start () {
+void KidAttackStrong::Start () {
+    OpenSprite(SPRITE_ATTACK, SPRITE_FRAMES, true);
+
     cameraShakeTimer.SetResetTime(CAMERA_SHAKE_RESET_TIME);
     cameraShakeTimer.FalseStart();
 }
 
-void KidAttackMelee::Perform (AttackDirection direction) {
+void KidAttackStrong::Perform (AttackDirection direction) {
+    PushAttack(Vec2(-31.0f, -19.0f), Vec2(68.0f, 39.0f), 0.09f, 0.26f);
+
+    AttackType attackType = attackTypes.front();
+    attackTypes.pop();
+
+    Vec2 colliderOffset = attackType.offset_i + (attackType.size_i * 0.5f);
+    if (direction == LEFT) colliderOffset.x *= -1.0f;
+    SetupCollider(colliderOffset, attackType.size_i);
+
+    this->lifetimeStart = attackType.lifetimeStart_i;
+    lifetime.SetResetTime(attackType.lifetimeEnd_i);
+
     associated.enabled = true;
     this->direction = direction;
+    sprite->SetFrame(0);
     lifetime.Reset();
 
     repulsionEnabled = false;
+    isOver = false;
 }
 
-void KidAttackMelee::Update (float dt) {
+void KidAttackStrong::Update (float dt) {
     if (usingExternalAssociated and externalAssociated.expired()) {
         associated.RequestDelete();
         return;
@@ -58,12 +81,30 @@ void KidAttackMelee::Update (float dt) {
         lifetime.Update(dt);
         if (lifetime.IsOver()) {
 
-            if (repulsionEnabled and (rigidBody != nullptr))
-                rigidBody->SetSpeedOnX(0.0f);
-            impulseCancel = false;
+            if (not attackTypes.empty()) {
+                AttackType attackType = attackTypes.front();
+                attackTypes.pop();
 
-            associated.enabled = false;
-            return;
+                Vec2 colliderOffset = attackType.offset_i + (attackType.size_i * 0.5f);
+                if (direction == LEFT) colliderOffset.x *= -1.0f;
+                SetupCollider(colliderOffset, attackType.size_i);
+
+                this->lifetimeStart = attackType.lifetimeStart_i;
+                lifetime.SetResetTime(attackType.lifetimeEnd_i);
+                lifetime.Reset();
+
+            } else if (not isOver) {
+                lifetime.SetResetTime(0.74f);
+                isOver = true;
+
+            } else {
+                if (repulsionEnabled and (rigidBody != nullptr))
+                    rigidBody->SetSpeedOnX(0.0f);
+                impulseCancel = false;
+
+                associated.enabled = false;
+                return;
+            }
         }
     }
     if (repulsionEnabled and (rigidBody != nullptr)) {
@@ -82,18 +123,16 @@ void KidAttackMelee::Update (float dt) {
     switch (direction) {
         case LEFT:
             if (sprite != nullptr) sprite->textureFlip = SDL_FLIP_HORIZONTAL;
-            associated.box.x = externalBox.x + externalBox.w - COLLIDER_OFFSET_X - associated.box.w;
-            associated.box.y = externalBox.y + COLLIDER_OFFSET_Y;
+            associated.box.x = externalBox.x + externalBox.w - SPRITE_OFFSET_X - associated.box.w;
+            associated.box.y = externalBox.y + SPRITE_OFFSET_Y;
             break;
 
         case RIGHT:
             if (sprite != nullptr) sprite->textureFlip = SDL_FLIP_NONE;
-            associated.box.x = externalBox.x + COLLIDER_OFFSET_X;
-            associated.box.y = externalBox.y + COLLIDER_OFFSET_Y;
+            associated.box.x = externalBox.x + SPRITE_OFFSET_X;
+            associated.box.y = externalBox.y + SPRITE_OFFSET_Y;
             break;
 
-        // case UP: break;
-        // case DOWN: break;
         default: break;
     }
 
@@ -106,23 +145,27 @@ void KidAttackMelee::Update (float dt) {
     );
 }
 
-void KidAttackMelee::NotifyCollision (GameObject& other) {
+void KidAttackStrong::NotifyCollision (GameObject& other) {
     GameObject* self = externalAssociated.lock().get();
-    if (externalAssociated.expired() or (&other == self))
+    if (externalAssociated.expired() or (&other == self) or isOver)
         return;
 
     EntityMachine* entity = (EntityMachine*)other.GetComponent(ComponentType::_EntityMachine);
     if (entity != nullptr) {
-        float argsv[7] = {force.x, force.y, impulse, (float)damage, self->box.x, self->box.y, 0.0f};
+        Vec2 selfPosition = self->box.GetPosition();
+        float argsv[7] = {force.x, force.y, impulse, (float)damage, selfPosition.x, selfPosition.y, 0.0f};
 
         RigidBody* rigidBody = (RigidBody*)self->GetComponent(ComponentType::_RigidBody);
         RigidBody* otherRigidBody = (RigidBody*)other.GetComponent(ComponentType::_RigidBody);
         if ((rigidBody != nullptr) and (otherRigidBody != nullptr)) {
 
-            if (lifetime.GetTime() < LIFETIME_START) {
-                if (other.label == "Boss") {
+            if (lifetime.GetTime() < lifetimeStart) {
+                Boss* boss = (Boss*)other.GetComponent(ComponentType::_Boss);
+                if (boss != nullptr) {
                     rigidBody->SetSpeedOnX(0.0f);
                     impulseCancel = true;
+
+                    if (not boss->BreakBarrier(1.2f)) return;
                 } else otherRigidBody->SetSpeedOnX(rigidBody->GetSpeed().x);
                 return;
             }
@@ -159,7 +202,7 @@ void KidAttackMelee::NotifyCollision (GameObject& other) {
     Camera::AddMethod(this, std::bind(&CameraShake, this));
 }
 
-void* KidAttackMelee::CameraShake () {
+void* KidAttackStrong::CameraShake () {
     if (cameraShakeQueue.empty()) {
         Camera::RemoveMethod(this);
         return nullptr;
@@ -177,6 +220,6 @@ void* KidAttackMelee::CameraShake () {
     return nullptr;
 }
 
-bool KidAttackMelee::ImpulseIsCanceled () {
+bool KidAttackStrong::ImpulseIsCanceled () {
     return impulseCancel;
 }

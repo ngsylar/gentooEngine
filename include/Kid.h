@@ -7,20 +7,24 @@
 #include "CameraBox.h"
 #include "Timer.h"
 #include "KidAttackMelee.h"
+#include "KidAttackStrong.h"
+#include "FoxAttack.h"
 
 class Kid: public EntityMachine {
     private:
         static GameObject* instance;
         RigidBody* rigidBody;
         Collider* collider;
-        Timer jumpTimer, attackTimer, damageTimer, invincibilityTimer;
+        Timer jumpTimer, attackTimer, spellTimer, damageTimer, invincibilityTimer;
         bool isInvincible, isDead;
 
         // Attack Types
         KidAttackMelee* swordAttackOnGround;
+        KidAttackStrong* swordAttackStrong;
+        FoxAttack* foxAttack;
 
         // Automatic Signals
-        bool attackPerforming, damagePerforming;
+        bool attackPerforming, chargePerforming, damagePerforming;
         bool runSpeedReset, attackImpulseCancel;
 
         // Automatic Activation Values
@@ -43,6 +47,7 @@ class Kid: public EntityMachine {
 
         bool NewStateRule(EntityState newState, int argsc, float argsv[]);
         void AttackStart();
+        void AttackStrongStart();
         void AttackUpdate(float dt);
         void InvincibleUpdate(float dt);
         void Die();

@@ -36,6 +36,7 @@
 
 EnemyRunner::EnemyRunner (GameObject& associated): EntityMachine(associated) {
     type = type | ComponentType::_EnemyRunner;
+    associated.layer = LayerDistance::_NPC;
     associated.label = "Enemy";
     movementDirection = 1;
     hp = 3;
@@ -225,7 +226,7 @@ bool EnemyRunner::NewStateRule (EntityState newState, int argsc, float argsv[]) 
             damageDirectionX = (argsv[AttackGeneric::_OriginX] < associated.box.x)? 1 : -1;
             rigidBody->SetSpeedOnX(argsv[AttackGeneric::_ForceX] * damageDirectionX);
             hp -= argsv[AttackGeneric::_Damage];
-            damageTaken++;
+            damageTaken += argsv[AttackGeneric::_Damage];
             return true;
 
         case EntityState::Falling:
