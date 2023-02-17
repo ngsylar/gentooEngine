@@ -242,9 +242,6 @@ void Kid::UpdateEntity (float dt) {
 
             break;
         
-        // case EntityState::Walking:
-        //     break;
-
         case EntityState::Running:
             // movement is performed
             if (directionX == 0)
@@ -488,7 +485,7 @@ void Kid::AttackStart () {
     if (not attackImpulseCancel)
         rigidBody->SetSpeedOnX(SPEED_ATTACK * lastDirectionX);
     else rigidBody->SetSpeedOnX(0.0f);
-    
+
     attackPerforming = true;
     attackTimer.Reset();
 }
@@ -499,12 +496,12 @@ void Kid::AttackStrongStart () {
     swordAttackStrong->Perform(direction);
     attackOriginX = associated.box.x;
 
-    // if (runSpeedReset or swordAttackOnGround->ImpulseIsCanceled())
-    //     attackImpulseCancel = true;
-    // if (not attackImpulseCancel)
-    //     rigidBody->SetSpeedOnX(SPEED_ATTACK * lastDirectionX);
-    // else rigidBody->SetSpeedOnX(0.0f);
-    
+    if (runSpeedReset or swordAttackStrong->ImpulseIsCanceled())
+        attackImpulseCancel = true;
+    if (not attackImpulseCancel)
+        rigidBody->SetSpeedOnX(SPEED_ATTACK * lastDirectionX);
+    else rigidBody->SetSpeedOnX(0.0f);
+
     attackPerforming = true;
     attackTimer.Reset();
 }

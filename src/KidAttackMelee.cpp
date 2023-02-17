@@ -117,28 +117,29 @@ void KidAttackMelee::NotifyCollision (GameObject& other) {
 
         RigidBody* rigidBody = (RigidBody*)self->GetComponent(ComponentType::_RigidBody);
         RigidBody* otherRigidBody = (RigidBody*)other.GetComponent(ComponentType::_RigidBody);
+        if ((rigidBody != nullptr) and (otherRigidBody != nullptr)) {
 
-        if (lifetime.GetTime() < LIFETIME_START) {
-            if (other.label == "Boss") {
-                rigidBody->SetSpeedOnX(0.0f);
-                impulseCancel = true;
-            } else otherRigidBody->SetSpeedOnX(rigidBody->GetSpeed().x);
-            return;
+            if (lifetime.GetTime() < LIFETIME_START) {
+                if (other.label == "Boss") {
+                    rigidBody->SetSpeedOnX(0.0f);
+                    impulseCancel = true;
+                } else otherRigidBody->SetSpeedOnX(rigidBody->GetSpeed().x);
+                return;
+            }
+            if (rigidBody->GetSpeed().x != 0.0f) {
+                argsv[_Displacement] = displacement;
+                repulsionOriginX = self->box.x;
+                repulsionIncrease = 0.0f;
+                repulsionEnabled = true;
+
+            } else {
+                Collider* otherCollider = (Collider*)other.GetComponent(ComponentType::_Collider);
+                float overlap = (direction == LEFT)?
+                    ((otherCollider->box.x+otherCollider->box.w)-collider->box.x) :
+                    ((collider->box.x+collider->box.w)-otherCollider->box.x);
+                if (overlap > 0.0f) argsv[_Impulse] += overlap;
+            }
         }
-        if (rigidBody->GetSpeed().x != 0.0f) {
-            argsv[_Displacement] = displacement;
-            repulsionOriginX = self->box.x;
-            repulsionIncrease = 0.0f;
-            repulsionEnabled = true;
-
-        } else {
-            Collider* otherCollider = (Collider*)other.GetComponent(ComponentType::_Collider);
-            float overlap = (direction == LEFT)?
-                ((otherCollider->box.x+otherCollider->box.w)-collider->box.x) :
-                ((collider->box.x+collider->box.w)-otherCollider->box.x);
-            if (overlap > 0.0f) argsv[_Impulse] += overlap;
-        }
-
         // ensures that the collision will only happen once effectively
         if (not entity->FormatState(EntityState::Injured, 7, argsv)) return;
     } else return;

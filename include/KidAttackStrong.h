@@ -16,14 +16,21 @@ class KidAttackStrong: public AttackGeneric {
         };
         std::queue<AttackType> attackTypes;
 
-        // camera auxiliaries
-        Timer cameraShakeTimer;
-        std::queue<Vec2> cameraShakeQueue;
-        Vec2 cameraShakeReset;
+        // automatic signals
+        bool impulseCancel, repulsionEnabled;
+        float displacement;
+
+        // automatic factors
+        float repulsionOriginX, repulsionIncrease;
 
         // timer auxiliaries
         float lifetimeStart;
         bool isOver;
+
+        // camera auxiliaries
+        Timer cameraShakeTimer;
+        std::queue<Vec2> cameraShakeQueue;
+        Vec2 cameraShakeReset;
 
         // camera auxiliaries
         void* CameraShake();
@@ -38,6 +45,7 @@ class KidAttackStrong: public AttackGeneric {
         void Perform(AttackDirection direction);
         void Update(float dt);
         void NotifyCollision(GameObject& other);
+        bool ImpulseIsCanceled();
 };
 
 #endif

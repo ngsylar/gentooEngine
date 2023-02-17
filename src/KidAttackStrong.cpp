@@ -123,18 +123,38 @@ void KidAttackStrong::NotifyCollision (GameObject& other) {
         return;
 
     EntityMachine* entity = (EntityMachine*)other.GetComponent(ComponentType::_EntityMachine);
-
     if (entity != nullptr) {
         Vec2 selfPosition = self->box.GetPosition();
         float argsv[7] = {force.x, force.y, impulse, (float)damage, selfPosition.x, selfPosition.y, 0.0f};
 
-        if (lifetime.GetTime() < lifetimeStart)
-            return;
+        RigidBody* rigidBody = (RigidBody*)self->GetComponent(ComponentType::_RigidBody);
+        RigidBody* otherRigidBody = (RigidBody*)other.GetComponent(ComponentType::_RigidBody);
+        if ((rigidBody != nullptr) and (otherRigidBody != nullptr)) {
 
-        Boss* boss = (Boss*)other.GetComponent(ComponentType::_Boss);
-        if ((boss != nullptr) and (not boss->BreakBarrier(1.2f)))
-            return;
+            if (lifetime.GetTime() < lifetimeStart) {
+                Boss* boss = (Boss*)other.GetComponent(ComponentType::_Boss);
+                if (boss != nullptr) {
+                    rigidBody->SetSpeedOnX(0.0f);
+                    impulseCancel = true;
 
+                    if (not boss->BreakBarrier(1.2f)) return;
+                } else otherRigidBody->SetSpeedOnX(rigidBody->GetSpeed().x);
+                return;
+            }
+            if (rigidBody->GetSpeed().x != 0.0f) {
+                argsv[_Displacement] = displacement;
+                repulsionOriginX = self->box.x;
+                repulsionIncrease = 0.0f;
+                repulsionEnabled = true;
+
+            } else {
+                Collider* otherCollider = (Collider*)other.GetComponent(ComponentType::_Collider);
+                float overlap = (direction == LEFT)?
+                    ((otherCollider->box.x+otherCollider->box.w)-collider->box.x) :
+                    ((collider->box.x+collider->box.w)-otherCollider->box.x);
+                if (overlap > 0.0f) argsv[_Impulse] += overlap;
+            }
+        }
         // ensures that the collision will only happen once effectively
         if (not entity->FormatState(EntityState::Injured, 7, argsv)) return;
     } else return;
@@ -170,4 +190,8 @@ void* KidAttackStrong::CameraShake () {
         }
     } else cameraShakeTimer.Update(Game::GetInstance().GetDeltaTime());
     return nullptr;
+}
+
+bool KidAttackStrong::ImpulseIsCanceled () {
+    return impulseCancel;
 }
