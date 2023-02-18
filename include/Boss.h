@@ -33,8 +33,11 @@ class Boss: public EntityMachine {
         bool NewStateRule(EntityState newState, int argsc, float argsv[]);
         void AttackMeleeUpdate(float dt);
         void Die();
+        Timer deathSequence;
+        bool deathFade;
 
     public:
+        static Boss* self;
         Boss(GameObject& associated);
         void Awaken();
         void Start();

@@ -42,6 +42,15 @@ class Credits : public State {
 };
 
 //Surface levels
+class End : public State {
+    private:
+    Timer changeState;
+        bool fading;
+    public:
+        End();
+        void LoadAssets();
+        void Update(float dt);
+};
 class H1 : public State {
     private:
 

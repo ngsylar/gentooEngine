@@ -131,17 +131,17 @@ void TestScene0::LoadAssets () {
     // rawSquare->AddComponent(new EnemyArmadillo(*rawSquare));
     // rawSquare->box.SetPosition(250,rawPlat->box.y-rawSquare->box.h-100);
 
-    rawSquare = new GameObject(LAYER_RED_SQUARE);
-    AddObject(rawSquare);
-    square = GetObjectPtr(rawSquare);
-    rawSquare->AddComponent(new EnemyRunner(*rawSquare));
-    rawSquare->box.SetPosition(230,rawPlat->box.y-rawSquare->box.h-100);
-
     // rawSquare = new GameObject(LAYER_RED_SQUARE);
     // AddObject(rawSquare);
     // square = GetObjectPtr(rawSquare);
-    // rawSquare->AddComponent(new Boss(*rawSquare));
-    // rawSquare->box.SetPosition(330,rawPlat->box.y-rawSquare->box.h-100);
+    // rawSquare->AddComponent(new EnemyRunner(*rawSquare));
+    // rawSquare->box.SetPosition(230,rawPlat->box.y-rawSquare->box.h-100);
+
+    rawSquare = new GameObject(LAYER_RED_SQUARE);
+    AddObject(rawSquare);
+    square = GetObjectPtr(rawSquare);
+    rawSquare->AddComponent(new Boss(*rawSquare));
+    rawSquare->box.SetPosition(330,rawPlat->box.y-rawSquare->box.h-100);
 }
 
 void TestScene0::Start () {

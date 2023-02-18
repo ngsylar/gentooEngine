@@ -41,18 +41,18 @@
 #define ATTACK_MELEE1_TIME_START    0.5f
 #define ATTACK_MELEE1_TIME_DURING   0.2f
 #define ATTACK_MELEE1_TIME_END      0.4f
-
+#include "GameScene.h"
 #define ATTACK_RANGED_DISTANCE      400
 
 #define COLLIDER_POSITION           3.0f, 10.0f
 #define COLLIDER_BOX_SIZE           31.0f, 59.0f
-
+Boss* Boss::self = nullptr;
 Boss::Boss (GameObject& associated): EntityMachine(associated) {
     type = type | ComponentType::_Boss;
     associated.layer = LayerDistance::_NPC;
     associated.label = "Boss";
     movementDirection = -1;
-    hp = 40;
+    hp = 15;
 
     restTimer.SetResetTime(0.9f);
     damageTimer.SetResetTime(0.6f);
@@ -60,12 +60,15 @@ Boss::Boss (GameObject& associated): EntityMachine(associated) {
     isAttacking = false;
     barrierIsBroken = false;
     damageTaken = 0;
-
+    self = this;
     GameObject* attack = new GameObject(LayerDistance::_NPC_Close);
     meleeAttack = new BossAttackMelee(*attack, &associated);
     meleeAttack->SetProperties(Vec2(ATTACK_FORCE), ATTACK_IMPULSE, ATTACK_DAMAGE, IMPULSE_ATTACK_X);
     attack->AddComponent(meleeAttack);
     Game::GetInstance().GetCurrentState().AddObject(attack);
+    deathFade = false;
+    deathSequence.SetResetTime(3.5);
+    deathSequence.Reset();
 }
 
 void Boss::Awaken () {
@@ -109,7 +112,22 @@ void Boss::LateUpdate (float dt) {}
 void Boss::UpdateEntity (float dt) {
     if (state == Dead) {
         if (sprites[state]->OneshotIsOver())
-            associated.RequestDelete();
+            // associated.RequestDelete();
+        deathSequence.Update(dt);
+        if(deathSequence.GetTime()>1 and !deathFade){
+            associated.SetLayer(LayerDistance::_DeathLayer);
+            GameObject* transitionGO = new GameObject(LayerDistance::_FadingLayer);
+            ScreenFade* transitionFilter = new ScreenFade(*transitionGO, Color("#000000"), 0, 1, STATE_FADE_TIME);
+            transitionGO->AddComponent(transitionFilter);
+            Game::GetInstance().GetCurrentState().AddObject(transitionGO);
+            Game::GetInstance().GetCurrentState().GetStateMusic()->Stop(STATE_FADE_TIME*1000);//To stop current music
+            deathFade = true;
+        } else if(deathSequence.IsOver()) {
+            Game::GetInstance().AddState(new End());
+            Game::GetInstance().GetCurrentState().RequestPop();
+
+        }
+        return;// HERE! FADE AND CALL 
         return;
     }
 
@@ -309,6 +327,7 @@ void Boss::AttackMeleeUpdate (float dt) {
 }
 
 void Boss::Die () {
+    self = nullptr;
     associated.RemoveComponent(rigidBody);
     associated.RemoveComponent(collider);
     FormatState(EntityState::Dead);

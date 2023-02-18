@@ -12,7 +12,7 @@ int main (int argc, char* argv[]) {
 
     // add and run the game states here
     // Game::GetInstance().AddState(new TestScene5());
-    Game::GetInstance().AddState(new Menu);//U3()use S1 and change spawn location on ZoneManager to start from the initial area
+    Game::GetInstance().AddState(new Menu());//U3()use S1 and change spawn location on ZoneManager to start from the initial area
 
     Game::GetInstance().Run();
 

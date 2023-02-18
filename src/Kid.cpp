@@ -120,7 +120,7 @@ Kid::Kid (GameObject& associated): EntityMachine(associated) {
     deathSequence.SetResetTime(3.5);
     deathSequence.Reset();
 
-    increaseMP.SetResetTime(5);
+    increaseMP.SetResetTime(3);
     increaseMP.Reset();
     self = this;
 
@@ -440,6 +440,8 @@ bool Kid::NewStateRule (EntityState newState, int argsc, float argsv[]) {
         case EntityState::Injured:
             jumpSpeedDecrease = 0.0f;
             damagePerforming = false;
+            attackPerforming=false;
+            damagePerforming=false;
             break;
 
         default: break;
@@ -477,22 +479,27 @@ bool Kid::NewStateRule (EntityState newState, int argsc, float argsv[]) {
 
         case EntityState::AttackingSwordOnGround_1:
             AttackStart();
-            return true;
+            return true;                  
 
         case EntityState::AttackingSwordStrong_Charge:
             if(!GameData::canUseChargedAttack or !GameData::canUseMana or mp<3){
                 chargePerforming = false;
                 return false;
             }
-            break;
+            return true;
 
         case EntityState::AttackingSwordStrong_Perform:
+            mp-=3;
             AttackStrongStart();
             return true;
 
         case EntityState::CastingSpell_0:
+            if(!GameData::canUseMagicAttack or !GameData::canUseMana or mp<5){
+                return false;
+            }
             spellTimer.Reset();
             rigidBody->SetSpeedOnX(0.0f);
+            mp-=5;
             runSpeedIncrease = 0.0f;
             attackPerforming = true;
             foxAttack->Perform((lastDirectionX < 0)? FoxAttack::LEFT : FoxAttack::RIGHT);

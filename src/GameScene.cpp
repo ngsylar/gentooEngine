@@ -163,6 +163,36 @@ void Credits::Update(float dt){
     }
 }
 
+#define FINALIMG "assets/img/end.png"
+End::End() {
+    AddScenario(FINALIMG, LayerDistance::_Background);
+    changeState.SetResetTime(STATE_FADE_TIME);
+    changeState.Reset();
+    fading = false;
+}
+
+void End::LoadAssets() {
+    FadeIn();
+    stateMusic = new Music(MUSIC_CREDITS);
+    stateMusic->Play(-1, STATE_FADE_TIME*1000);
+}
+
+void End::Update(float dt){
+    if(!fading and InputManager::GetInstance().KeyPress(KEY_ESCAPE)){
+        fading = true;
+        GameObject* outObj = new GameObject(LayerDistance::_FadingLayer);
+        ScreenFade* fade = new ScreenFade(*outObj, Color("#000000"), 0, 1, STATE_FADE_TIME);
+        outObj->AddComponent(fade);
+        AddObject(outObj);
+        stateMusic->Stop(STATE_FADE_TIME*1000);
+    }else if(fading){
+        changeState.Update(dt);
+        if(changeState.IsOver()){
+            popRequested = true;
+        }
+    }
+}
+
 
 
 
@@ -755,7 +785,7 @@ void S3::LoadAssets() {
     AddObject(BObj);
 
     if(GameData::changedS3Scenario) { //TODO ENABLE CODE AFTER DEBUGGING MAP
-        //Barrier on left side
+        // Barrier on left side
         GameObject* limitObj = new GameObject(LayerDistance::_Environment_Close);
         limitObj->AddComponent(new Collider(*limitObj));
         limitObj->box = Rect(10*TILE_SIZE,0,TILE_SIZE, TILE_SIZE*20);
@@ -764,14 +794,15 @@ void S3::LoadAssets() {
         GameObject* bossGO = new GameObject(LayerDistance::_NPC);
         Boss* bossCP = new Boss(*bossGO);
         bossGO->AddComponent(bossCP);
+        bossGO->box.SetPurePosition(Vec2(40,16)*TILE_SIZE);
         AddObject(bossGO);
 
     } else {
         //Barrier on right side
-        GameObject* limitObj = new GameObject(LayerDistance::_Environment_Close);
-        limitObj->AddComponent(new Collider(*limitObj));
-        limitObj->box = Rect(55*TILE_SIZE,0,TILE_SIZE, TILE_SIZE*20);
-        AddObject(limitObj);
+        // GameObject* limitObj = new GameObject(LayerDistance::_Environment_Close);
+        // limitObj->AddComponent(new Collider(*limitObj));
+        // limitObj->box = Rect(55*TILE_SIZE,0,TILE_SIZE, TILE_SIZE*20);
+        // AddObject(limitObj);
 
         //Alchemist interaction
         GameObject *alche =  new GameObject(LayerDistance::_NPC);
@@ -1385,7 +1416,7 @@ void U4::LoadAssets() {
     GameObject* mouseGO = new GameObject(LayerDistance::_NPC);
     EnemyArmadillo* mouseCP = new EnemyArmadillo(*mouseGO);
     mouseGO->AddComponent(mouseCP);
-    mouseGO->box.SetPosition(1195,811);
+    mouseGO->box.SetPurePosition(42*TILE_SIZE,28*TILE_SIZE);
     AddObject(mouseGO);
 
     LimitMap();
@@ -1649,11 +1680,11 @@ void U6::LoadAssets() {
     mouseGO->box.SetPosition(680,546);
     AddObject(mouseGO);
 
-    GameObject* infectedGO = new GameObject(LayerDistance::_NPC);
-    EnemyRunner* infectedCP = new EnemyRunner(*infectedGO);
-    infectedGO->AddComponent(infectedCP);
-    infectedGO->box.SetPosition(953,545);
-    AddObject(infectedGO);
+    // GameObject* infectedGO = new GameObject(LayerDistance::_NPC);
+    // EnemyRunner* infectedCP = new EnemyRunner(*infectedGO);
+    // infectedGO->AddComponent(infectedCP);
+    // infectedGO->box.SetPosition(953,545);
+    // AddObject(infectedGO);
     
     LimitMap();
     FadeIn();
@@ -2380,11 +2411,11 @@ void U12::LoadAssets() {
     HUD->AddComponent(new Hud(*HUD));
     AddObject(HUD);
 
-    GameObject* mouseGO = new GameObject(LayerDistance::_NPC);
-    EnemyArmadillo* mouseCP = new EnemyArmadillo(*mouseGO);
-    mouseGO->AddComponent(mouseCP);
-    mouseGO->box.SetPosition(1120,466);
-    AddObject(mouseGO);
+    // GameObject* mouseGO = new GameObject(LayerDistance::_NPC);
+    // EnemyArmadillo* mouseCP = new EnemyArmadillo(*mouseGO);
+    // mouseGO->AddComponent(mouseCP);
+    // mouseGO->box.SetPosition(1120,466);
+    // AddObject(mouseGO);
 
     LimitMap();
     FadeIn();

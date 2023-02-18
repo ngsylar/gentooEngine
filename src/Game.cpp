@@ -51,7 +51,7 @@ Game::Game (std::string title, int width, int height, int logicalWidth, int logi
     window = SDL_CreateWindow(
         this->title.c_str(),
         SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-        this->width, this->height, WINDOW_FLAGS //| SDL_WINDOW_MAXIMIZED //| SDL_WINDOW_BORDERLESS
+        this->width, this->height, WINDOW_FLAGS | SDL_WINDOW_BORDERLESS
     );
     if (window == nullptr) {
         SDL_Log("Unable to create window: %s", SDL_GetError());
@@ -65,7 +65,7 @@ Game::Game (std::string title, int width, int height, int logicalWidth, int logi
     if (renderer == nullptr) {
         SDL_Log("Unable to start renderer: %s", SDL_GetError());
     }
-    if (SDL_RenderSetVSync(renderer,1) != 0) {
+    if (SDL_RenderSetVSync(renderer,1) != LOL) {
         noVSync = true;
     }
 
