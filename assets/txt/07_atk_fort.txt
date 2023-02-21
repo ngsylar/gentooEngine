@@ -1,7 +1,10 @@
-2
-~Ataque Carregado!
-Pressione S e mantenha segurado
-para liberar um ataque devastador.
+3
+~
+Ataque Carregado!
+
+~Pressione D e mantenha segurado
+até que carregue para liberar 
+um ataque devastador.
 ~Garoto:
 Céus, que morte terrível…
 ~

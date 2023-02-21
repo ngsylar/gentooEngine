@@ -288,13 +288,13 @@ void EnemyRunner::NotifyCollision (GameObject& other) {
 
     if (rigidBody->ImpactLeft()) {
         if (state == EntityState::Injured)
-            FormatState(EntityState::Running);
+            FormatState(EntityState::Walking);
         associated.box.SetPosition(associated.box.GetPosition()+2.0f);
         hitWall = true;
     }
     if (rigidBody->ImpactRight()) {
         if (state == EntityState::Injured)
-            FormatState(EntityState::Running);
+            FormatState(EntityState::Walking);
         associated.box.SetPosition(associated.box.GetPosition()-2.0f);
         hitWall = true;
     }

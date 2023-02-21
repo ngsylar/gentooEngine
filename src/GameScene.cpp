@@ -17,6 +17,7 @@
 // #define SPRITE_FF "assets/img/Firefly.png"
 #define MUSIC_DIRT "assets/audio/cen1.ogg"
 #define MUSIC_CROSS "assets/audio/caverna.ogg"
+#define MUSIC_BOSS "assets/audio/boss.ogg"
 #define MUSIC_MENU "assets/audio/menu.ogg"
 #define MUSIC_CREDITS "assets/audio/credits.ogg"
 
@@ -720,7 +721,7 @@ S3::S3() {
         AddAnimated(TREE_0B_, LayerDistance::_Environment_Far,Vec2(8,9), 15);
         AddAnimated(TREE_0A_, LayerDistance::_Environment_Far,Vec2(42,9), 15);
         
-        AddAnimated(TREE_1C_, LayerDistance::_Environment_Far,Vec2(4,9), 15);
+        AddAnimated(TREE_1C_, LayerDistance::_Environment_Far,Vec2(4,10), 15);
         AddAnimated(TREE_1E_, LayerDistance::_Environment,Vec2(27,10), 15);
         AddAnimated(TREE_1A_, LayerDistance::_Environment,Vec2(47,10), 15);
 
@@ -740,7 +741,7 @@ S3::S3() {
         AddAnimated(TREE_0B, LayerDistance::_Environment_Far,Vec2(8,9), 15);
         AddAnimated(TREE_0A, LayerDistance::_Environment_Far,Vec2(42,9), 15);
         
-        AddAnimated(TREE_1C, LayerDistance::_Environment_Far,Vec2(4,9), 15);
+        AddAnimated(TREE_1C, LayerDistance::_Environment_Far,Vec2(4,10), 15);
         AddAnimated(TREE_1E, LayerDistance::_Environment,Vec2(27,10), 15);
         AddAnimated(TREE_1A, LayerDistance::_Environment,Vec2(47,10), 15);
     }
@@ -754,11 +755,6 @@ S3::S3() {
 
 void S3::LoadAssets() {
     //#####################################
-    stateMusic = ZoneManager::GetCarriedMusic();
-    if(stateMusic == nullptr) {
-        stateMusic = new Music(MUSIC_DIRT);
-        stateMusic->Play(-1, STATE_FADE_TIME*1000);
-    }
 
     GameObject* TileObj = new GameObject(LayerDistance::_Background_Far);
     TileSet* Set = new TileSet(*TileObj, SPRITE_TILE, TILE_SIZE,TILE_SIZE);
@@ -785,6 +781,11 @@ void S3::LoadAssets() {
     AddObject(BObj);
 
     if(GameData::changedS3Scenario) { //TODO ENABLE CODE AFTER DEBUGGING MAP
+        stateMusic = ZoneManager::GetCarriedMusic();
+        if(stateMusic == nullptr) {
+            stateMusic = new Music(MUSIC_BOSS);
+            stateMusic->Play(-1, STATE_FADE_TIME*1000);
+        }
         // Barrier on left side
         GameObject* limitObj = new GameObject(LayerDistance::_Environment_Close);
         limitObj->AddComponent(new Collider(*limitObj));
@@ -798,11 +799,17 @@ void S3::LoadAssets() {
         AddObject(bossGO);
 
     } else {
-        //Barrier on right side
-        // GameObject* limitObj = new GameObject(LayerDistance::_Environment_Close);
-        // limitObj->AddComponent(new Collider(*limitObj));
-        // limitObj->box = Rect(55*TILE_SIZE,0,TILE_SIZE, TILE_SIZE*20);
-        // AddObject(limitObj);
+        stateMusic = ZoneManager::GetCarriedMusic();
+        if(stateMusic == nullptr) {
+            stateMusic = new Music(MUSIC_DIRT);
+            stateMusic->Play(-1, STATE_FADE_TIME*1000);
+        }
+
+        // Barrier on right side
+        GameObject* limitObj = new GameObject(LayerDistance::_Environment_Close);
+        limitObj->AddComponent(new Collider(*limitObj));
+        limitObj->box = Rect(55*TILE_SIZE,0,TILE_SIZE, TILE_SIZE*20);
+        AddObject(limitObj);
 
         //Alchemist interaction
         GameObject *alche =  new GameObject(LayerDistance::_NPC);
@@ -911,7 +918,7 @@ void S4::LoadAssets() {
     //Path to S3-B
     GameObject *AObj = new GameObject(LayerDistance::_Environment);
     ZoneTransition* doorA = new ZoneTransition(*AObj, Rect(13, 0, 1, 19), 
-        std::make_pair(Zone::_S4, ZoneExit::A));
+        std::make_pair(Zone::_S4, ZoneExit::A), false);
     AObj->AddComponent(doorA);
     AddObject(AObj);
     

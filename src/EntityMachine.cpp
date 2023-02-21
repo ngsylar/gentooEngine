@@ -37,7 +37,9 @@ bool EntityMachine::HasState (EntityState compare) {
 bool EntityMachine::FormatState (EntityState newState, int argsc, float argsv[]) {
     if (NewStateRule(newState, argsc, argsv)) {
         state = newState;
-        sprites[state].get()->SetFrame(0);
+        auto x = sprites[state].get();
+        if(x != nullptr)
+            x->SetFrame(0);
         return true;
     } return false;
 }

@@ -167,7 +167,7 @@ void* KidAttackMelee::CameraShake () {
 
     if (cameraShakeTimer.IsOver()) {
         Camera::masterOffset += cameraShakeQueue.front() - cameraShakeReset;
-        cameraShakeReset = cameraShakeQueue.front();
+        cameraShakeReset = cameraShakeQueue.front(); 
         cameraShakeQueue.pop();
         if (cameraShakeQueue.empty()) {
             Camera::masterOffset -= cameraShakeReset;

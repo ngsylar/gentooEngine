@@ -21,8 +21,11 @@ Boulder::Boulder (GameObject& associated, std::string file, Vec2 position): Enti
     type = ComponentType::_Boulder;
     Sprite* sprite = new Sprite(associated, file);
     AddSpriteState(EntityState::Idle, sprite);
+    sprite = new Sprite(associated, file);
     AddSpriteState(EntityState::Running, sprite);
+    sprite = new Sprite(associated, file);
     AddSpriteState(EntityState::Falling, sprite);
+    sprite = new Sprite(associated, file);
     AddSpriteState(EntityState::Dead, sprite);
     associated.box.SetSize(sprites[EntityState::Idle].get()->GetWidth(), sprites[EntityState::Idle].get()->GetHeight());
     associated.box.SetPurePosition(position*TILE_SIZE);

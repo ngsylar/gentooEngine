@@ -33,7 +33,7 @@ class BossAttackMelee: public AttackGeneric {
     public:
         enum AttackDirection {LEFT, RIGHT, UP, DOWN};
         AttackDirection direction;
-
+        ~BossAttackMelee();
         BossAttackMelee(
             GameObject& associated,
             GameObject* externalAssociated
