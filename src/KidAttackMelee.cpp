@@ -15,6 +15,8 @@
 #define CAMERA_SHAKE_RANGE      3
 #define CAMERA_SHAKE_RESET_TIME 0.04f
 
+#define SOUND_HIT               "assets/audio/kid/attackhit.wav"
+
 KidAttackMelee::KidAttackMelee (
     GameObject& associated, GameObject* externalAssociated
 ): AttackGeneric(associated, externalAssociated) {
@@ -29,6 +31,10 @@ KidAttackMelee::KidAttackMelee (
 
 void KidAttackMelee::Awaken () {
     SetupCollider(Vec2(), Vec2(COLLIDER_SIZE));
+
+    sound = new Sound(associated);
+    associated.AddComponent(sound);
+    sound->Open(SOUND_HIT);
 }
 
 void KidAttackMelee::Start () {
@@ -157,6 +163,7 @@ void KidAttackMelee::NotifyCollision (GameObject& other) {
         cameraShakeQueue.push(shake);
     }
     Camera::AddMethod(this, std::bind(&CameraShake, this));
+    sound->Play();
 }
 
 void* KidAttackMelee::CameraShake () {

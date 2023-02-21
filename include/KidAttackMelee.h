@@ -4,6 +4,7 @@
 #include <queue>
 
 #include "Timer.h"
+#include "Sound.h"
 #include "AttackGeneric.h"
 
 class KidAttackMelee: public AttackGeneric {
@@ -12,6 +13,7 @@ class KidAttackMelee: public AttackGeneric {
         Timer cameraShakeTimer;
         std::queue<Vec2> cameraShakeQueue;
         Vec2 cameraShakeReset;
+        Sound* sound;
 
         // automatic signals
         bool impulseCancel, repulsionEnabled;

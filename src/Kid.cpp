@@ -66,6 +66,12 @@
 
 #define CAMERA_GROUNDED_RESET_TIME              1.5f
 
+#define SOUND_RUN                               "assets/audio/kid/run.wav"
+#define SOUND_ATTACK_SWORDGROUND                "assets/audio/kid/attack.wav"
+#define SOUND_ATTACK_SWORDSTRONGC               "assets/audio/kid/attackstrongcharge.wav"
+#define SOUND_ATTACK_SWORDSTRONGF               "assets/audio/kid/attackstrongfull.wav"
+#define SOUND_ATTACK_SWORDSTRONGP               "assets/audio/kid/attackstrongperform.wav"
+
 GameObject* Kid::instance = nullptr;
 Kid* Kid::self = nullptr;
 
@@ -91,7 +97,6 @@ Kid::Kid (GameObject& associated): EntityMachine(associated) {
     damagePerforming = false;
     flickFactor = 255.0f;
     lastDirectionX = 0; //changed to avoid a moonwalking glitch
-
     
     isGrounded = false;
     hitCeiling = false;
@@ -181,13 +186,15 @@ void Kid::Awaken () {
     attack->AddComponent(foxAttack);
     Game::GetInstance().GetCurrentState().AddObject(attack);
 
-
     cameraBox = new GameObject(associated.layer);
     CameraBox* cameraBoxComp = new CameraBox(*cameraBox, &associated, CAMERABOX_SPACING);
     cameraBoxComp->focusBoxOffset = Rect(CAMERABOX_RECT);
     cameraBox->AddComponent(cameraBoxComp);
     cameraBoxComp->AddMethod(this, std::bind(&CameraEffects, this));
     Game::GetInstance().GetCurrentState().AddObject(cameraBox);
+
+    sounds = new Sound(associated);
+    associated.AddComponent(sounds);
 }
 
 void Kid::Start () {
@@ -363,6 +370,10 @@ void Kid::UpdateEntity (float dt) {
             } break;
 
         case EntityState::AttackingSwordStrong_Full:
+            if (not sounds->Playing()) {
+                sounds->Open(SOUND_ATTACK_SWORDSTRONGF);
+                sounds->Play(-1);
+            }
             if (input.KeyRelease(Key::attack))
                 FormatState(EntityState::AttackingSwordStrong_Perform);
             break;
@@ -413,6 +424,10 @@ bool Kid::NewStateRule (EntityState newState, int argsc, float argsv[]) {
         return false;
 
     switch (state) {
+        case EntityState::Running:
+            sounds->Stop();
+            break;
+
         case EntityState::AttackingSwordOnGround_0: case EntityState::AttackingSwordOnGround_1:
             if ((newState == EntityState::Injured) and (not swordAttackOnGround->lifetime.IsOver())
             and (lastDirectionX == ((argsv[AttackGeneric::_OriginX] < collider->box.x)? -1 : 1)))
@@ -424,6 +439,7 @@ bool Kid::NewStateRule (EntityState newState, int argsc, float argsv[]) {
         case EntityState::AttackingSwordStrong_Full:
             if (newState == EntityState::Injured)
                 chargePerforming = false;
+            sounds->Stop();
             break;
 
         case EntityState::AttackingSwordStrong_Perform:
@@ -455,6 +471,11 @@ bool Kid::NewStateRule (EntityState newState, int argsc, float argsv[]) {
         case EntityState::Idle:
             rigidBody->SetSpeedOnX(0.0f);
             return true;
+        
+        case EntityState::Running:
+            sounds->Open(SOUND_RUN);
+            // sounds->Play(-1);
+            return true;
 
         case EntityState::Jumping:
             collider->SetBox(Vec2(COLLIDER_POSITION_ONAIR), Vec2(COLLIDER_BOX_SIZE));
@@ -475,11 +496,13 @@ bool Kid::NewStateRule (EntityState newState, int argsc, float argsv[]) {
             return true;
 
         case EntityState::AttackingSwordOnGround_0:
+            sounds->Open(SOUND_ATTACK_SWORDGROUND);
             AttackStart();
             chargePerforming = true;
             return true;
 
         case EntityState::AttackingSwordOnGround_1:
+            sounds->Open(SOUND_ATTACK_SWORDGROUND);
             AttackStart();
             return true;                  
 
@@ -488,11 +511,15 @@ bool Kid::NewStateRule (EntityState newState, int argsc, float argsv[]) {
                 chargePerforming = false;
                 return false;
             }
+            sounds->Open(SOUND_ATTACK_SWORDSTRONGC);
+            sounds->Play();
             return true;
 
         case EntityState::AttackingSwordStrong_Perform:
             mp-=3;
             AttackStrongStart();
+            sounds->Open(SOUND_ATTACK_SWORDSTRONGP);
+            sounds->Play();
             return true;
 
         case EntityState::CastingSpell_0:
@@ -548,6 +575,7 @@ void Kid::AttackStart () {
 
     attackPerforming = true;
     attackTimer.Reset();
+    sounds->Play();
 }
 
 void Kid::AttackStrongStart () {

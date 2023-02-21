@@ -11,6 +11,8 @@
 #define CAMERA_SHAKE_RANGE      3
 #define CAMERA_SHAKE_RESET_TIME 0.04f
 
+#define SOUND_HIT               "assets/audio/fox/magic.wav"
+
 FoxAttack::FoxAttack (
     GameObject& associated, GameObject* externalAssociated
 ): AttackGeneric(associated, externalAssociated) {
@@ -40,6 +42,10 @@ void FoxAttack::Start () {
 
     cameraShakeTimer.SetResetTime(CAMERA_SHAKE_RESET_TIME);
     cameraShakeTimer.FalseStart();
+
+    sound = new Sound(associated);
+    associated.AddComponent(sound);
+    sound->Open(SOUND_HIT);
 }
 
 void FoxAttack::Perform (AttackDirection direction) {
@@ -85,6 +91,7 @@ void FoxAttack::Perform (AttackDirection direction) {
     }
 
     isOver = false;
+    sound->Play();
 }
 
 void FoxAttack::Update (float dt) {

@@ -20,6 +20,7 @@ class FoxAttack: public AttackGeneric {
         Timer cameraShakeTimer;
         std::queue<Vec2> cameraShakeQueue;
         Vec2 cameraShakeReset;
+        Sound* sound;
 
         // timer auxiliaries
         float lifetimeStart;

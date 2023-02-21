@@ -3,6 +3,7 @@
 Sound::Sound (GameObject& associated): Component(associated) {
     selfDestruction = false;
     chunk = nullptr;
+    audioPan = false;
 }
 
 Sound::Sound (GameObject& associated, std::string file): Sound(associated) {

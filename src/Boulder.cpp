@@ -42,6 +42,8 @@ void Boulder::Awaken () {
     collider = new Collider(associated);
     associated.AddComponent(collider);
     collider->SetBox(Vec2(0,0), Vec2(associated.box.w-10, associated.box.h-5));
+
+    rigidBody->triggerLabels.push_back("Enemy");
 }
 
 void Boulder::Start () {

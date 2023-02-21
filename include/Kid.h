@@ -6,6 +6,7 @@
 #include "Collider.h"
 #include "CameraBox.h"
 #include "Timer.h"
+#include "Sound.h"
 #include "KidAttackMelee.h"
 #include "KidAttackStrong.h"
 #include "FoxAttack.h"
@@ -37,6 +38,7 @@ class Kid: public EntityMachine {
         // Automatic Factors
         float runSpeedIncrease, jumpSpeedDecrease;
         float flickFactor;
+        Sound* sounds;
 
         // Collision Faces
         bool isGrounded, hitCeiling, hitWall;
