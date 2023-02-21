@@ -1,4 +1,11 @@
-2
+4
+~
+Tutorial rápido:
+
+~Movimento: <- ->
+Pulo: S
+Ataque: D
+
 ~Garoto:
 Aguente firme, mamãe. Vou
 procurar por alguém

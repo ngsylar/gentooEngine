@@ -92,23 +92,7 @@ Kid::Kid (GameObject& associated): EntityMachine(associated) {
     flickFactor = 255.0f;
     lastDirectionX = 0; //changed to avoid a moonwalking glitch
 
-    GameObject* attack = new GameObject(LayerDistance::_Player_Front);
-    swordAttackOnGround = new KidAttackMelee(*attack, &associated);
-    swordAttackOnGround->SetProperties(
-        Vec2(ATTACK_SWORD_FORCE), ATTACK_SWORD_IMPULSE, ATTACK_SWORD_DAMAGE, IMPULSE_ATTACK_SWORD_X);
-    attack->AddComponent(swordAttackOnGround);
-    Game::GetInstance().GetCurrentState().AddObject(attack);
-
-    attack = new GameObject(LayerDistance::_Player_Front);
-    swordAttackStrong = new KidAttackStrong(*attack, &associated);
-    attack->AddComponent(swordAttackStrong);
-    Game::GetInstance().GetCurrentState().AddObject(attack);
-
-    attack = new GameObject(LayerDistance::_Player_Front);
-    foxAttack = new FoxAttack(*attack, &associated);
-    attack->AddComponent(foxAttack);
-    Game::GetInstance().GetCurrentState().AddObject(attack);
-
+    
     isGrounded = false;
     hitCeiling = false;
     hitWall = false;
@@ -179,6 +163,24 @@ void Kid::Awaken () {
     collider = new Collider(associated);
     collider->SetBox(Vec2(COLLIDER_POSITION_ONGROUND), Vec2(COLLIDER_BOX_SIZE));
     associated.AddComponent(collider);
+
+    GameObject* attack = new GameObject(LayerDistance::_Player_Front);
+    swordAttackOnGround = new KidAttackMelee(*attack, &associated);
+    swordAttackOnGround->SetProperties(
+        Vec2(ATTACK_SWORD_FORCE), ATTACK_SWORD_IMPULSE, ATTACK_SWORD_DAMAGE, IMPULSE_ATTACK_SWORD_X);
+    attack->AddComponent(swordAttackOnGround);
+    Game::GetInstance().GetCurrentState().AddObject(attack);
+
+    attack = new GameObject(LayerDistance::_Player_Front);
+    swordAttackStrong = new KidAttackStrong(*attack, &associated);
+    attack->AddComponent(swordAttackStrong);
+    Game::GetInstance().GetCurrentState().AddObject(attack);
+
+    attack = new GameObject(LayerDistance::_Player_Front);
+    foxAttack = new FoxAttack(*attack, &associated);
+    attack->AddComponent(foxAttack);
+    Game::GetInstance().GetCurrentState().AddObject(attack);
+
 
     cameraBox = new GameObject(associated.layer);
     CameraBox* cameraBoxComp = new CameraBox(*cameraBox, &associated, CAMERABOX_SPACING);

@@ -61,11 +61,7 @@ Boss::Boss (GameObject& associated): EntityMachine(associated) {
     barrierIsBroken = false;
     damageTaken = 0;
     self = this;
-    GameObject* attack = new GameObject(LayerDistance::_NPC_Close);
-    meleeAttack = new BossAttackMelee(*attack, &associated);
-    meleeAttack->SetProperties(Vec2(ATTACK_FORCE), ATTACK_IMPULSE, ATTACK_DAMAGE, IMPULSE_ATTACK_X);
-    attack->AddComponent(meleeAttack);
-    Game::GetInstance().GetCurrentState().AddObject(attack);
+    
     deathFade = false;
     deathSequence.SetResetTime(3.5);
     deathSequence.Reset();
@@ -89,6 +85,12 @@ void Boss::Awaken () {
     AddSpriteState(EntityState::Injured, spriteDamage);
     AddSpriteState(EntityState::Dead, spriteDeath);
 
+    GameObject* attack = new GameObject(LayerDistance::_NPC_Close);
+    meleeAttack = new BossAttackMelee(*attack, &associated);
+    meleeAttack->SetProperties(Vec2(ATTACK_FORCE), ATTACK_IMPULSE, ATTACK_DAMAGE, IMPULSE_ATTACK_X);
+    attack->AddComponent(meleeAttack);
+    Game::GetInstance().GetCurrentState().AddObject(attack);
+
     rigidBody = new RigidBody(associated);
     associated.AddComponent(rigidBody);
     rigidBody->triggerLabels.push_back("Player");
@@ -98,9 +100,9 @@ void Boss::Awaken () {
     associated.AddComponent(collider);
     collider->SetBox(Vec2(COLLIDER_POSITION), Vec2(COLLIDER_BOX_SIZE));
 
-    AttackGeneric* attack = new AttackGeneric(associated);
-    attack->SetProperties(Vec2(ATTACK_FORCE), ATTACK_IMPULSE, ATTACK_DAMAGE);
-    associated.AddComponent(attack);
+    AttackGeneric* atack = new AttackGeneric(associated);
+    atack->SetProperties(Vec2(ATTACK_FORCE), ATTACK_IMPULSE, ATTACK_DAMAGE);
+    associated.AddComponent(atack);
 }
 
 void Boss::Start () {
