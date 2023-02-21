@@ -3,6 +3,7 @@
 UnB :: Introdução ao Desenvolvimento de Jogos :: 2022/2
 
 Gabriel Rocha Fontenele :: 15/1026760
+
 Moisés Felipe Jacó Andrade de Lima :: 19/0018364
 
 ## Como compilar

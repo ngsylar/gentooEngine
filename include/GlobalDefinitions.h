@@ -3,7 +3,7 @@
 
 // Window definitions
 #define WINDOW_TITLE        "Game Title"
-#define WINDOW_SIZE         1365, 768
+#define WINDOW_SIZE         455, 256
 #define GAME_RESOLUTION     455, 256
 #define LOL 0
 // State fade definition

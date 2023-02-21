@@ -44,8 +44,9 @@
 #include "GameScene.h"
 #define ATTACK_RANGED_DISTANCE      400
 
-#define COLLIDER_POSITION           3.0f, 10.0f
+#define COLLIDER_POSITION           3.0f, 9.0f
 #define COLLIDER_BOX_SIZE           31.0f, 59.0f
+
 Boss* Boss::self = nullptr;
 Boss::Boss (GameObject& associated): EntityMachine(associated) {
     type = type | ComponentType::_Boss;

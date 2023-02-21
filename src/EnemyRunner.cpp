@@ -29,7 +29,7 @@
 #define TOGGLE_TIME_MINt10              15
 #define TOGGLE_TIME_RANGEt10            15
 
-#define COLLIDER_POSITION               0.0f, 2.0f
+#define COLLIDER_POSITION               0.0f, 1.0f
 #define COLLIDER_BOX_SIZE               18.0f, 39.0f
 
 #define PERCEPTION_RANGE                125.0f, 50.0f, 75.0f, 30.0f

@@ -52,8 +52,8 @@
 
 #define INVINCIBLE_FLICK_SPEED                  1200.0f
 
-#define COLLIDER_POSITION_ONGROUND              0.0f, 9.0f
-#define COLLIDER_POSITION_ONAIR                 0.0f, 5.0f
+#define COLLIDER_POSITION_ONGROUND              0.0f, 8.0f
+#define COLLIDER_POSITION_ONAIR                 0.0f, 4.0f
 #define COLLIDER_BOX_SIZE                       16.0f, 29.0f
 #define COLLIDER_POSITION_Y_REPULSION           4.0f
 

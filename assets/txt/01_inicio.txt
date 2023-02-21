@@ -1,13 +1,17 @@
-4
+3
 ~
-Tutorial rápido:
 
-~Movimento: <- ->
-Pulo: S
-Ataque: D
+Tutorial  rápido!
 
-~Garoto:
-Aguente firme, mamãe. Vou
-procurar por alguém
-~que possa te ajudar!
+~
+Correr:        ← →
+Interagir:    Z
+Pular:            S
+Atacar:          D
+
+~
+Garoto:
+Aguente  firme,  mamãe.
+Vou  procurar  por  alguém
+que  possa  te  ajudar!
 ~

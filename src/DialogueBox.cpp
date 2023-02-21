@@ -15,8 +15,8 @@ DialogueBox::DialogueBox(GameObject& associated, std::string dialogueFile, bool 
 
 DialogueBox::~DialogueBox(){}
 
-#define DIALOGUEFONT "assets/font/jupiter-crash-brk-regular.ttf"
-#define DIALOGUEFONTSIZE 20
+#define DIALOGUEFONT "assets/font/Minecraftia-Regular.ttf"
+#define DIALOGUEFONTSIZE 8
 //Max characters/line = 36, max lines = 3
 
 #define DIALOGUEBALLOON "assets/img/text/Balloon.png"

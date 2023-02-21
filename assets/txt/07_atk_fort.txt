@@ -1,10 +1,12 @@
-3
+2
 ~
-Ataque Carregado!
+Ataque  Carregado!
+Mantenha  D  pressionado
+até  carregar  para  liberar
+um  ataque  devastador.
 
-~Pressione D e mantenha segurado
-até que carregue para liberar 
-um ataque devastador.
-~Garoto:
-Céus, que morte terrível…
+~
+
+Garoto:
+Céus,  que  morte  terrível…
 ~

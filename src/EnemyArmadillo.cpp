@@ -17,7 +17,7 @@
 #define ATTACK_IMPULSE          50.0f
 #define ATTACK_DAMAGE           1
 
-#define COLLIDER_POSITION       0.0f, 14.0f
+#define COLLIDER_POSITION       0.0f, 13.0f
 #define COLLIDER_BOX_SIZE       21.0f, 19.0f
 
 EnemyArmadillo::EnemyArmadillo (GameObject& associated): EntityMachine(associated) {
@@ -27,7 +27,7 @@ EnemyArmadillo::EnemyArmadillo (GameObject& associated): EntityMachine(associate
     movementDirection = -1;
     hp = 2;
 
-    turnTimer.SetResetTime(1.0f);
+    turnTimer.SetResetTime(0.4f);
     isGrounded = false;
     hitWall = false;
 }

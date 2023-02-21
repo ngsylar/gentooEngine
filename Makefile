@@ -48,7 +48,7 @@ RM = del /q
 
 
 
-SDL_PATHS = sdl C:/SDL2-2.0.16 C:/msys64/mingw32 
+SDL_PATHS = sdl C:/SDL2-2.26.3 C:/msys64/mingw32
 
 SDL_INC_PATH += $(addsuffix /include,$(SDL_PATHS))
 LINK_PATH = $(addprefix -L,$(addsuffix /lib,$(SDL_PATHS)))
