@@ -2,9 +2,9 @@
 #define GLOBAL_DEFINITIONS
 
 // Window definitions
-#define WINDOW_TITLE        "Game Title"
-#define WINDOW_SIZE         455, 256
+#define WINDOW_TITLE        "Melius"
 #define GAME_RESOLUTION     455, 256
+#define WINDOW_SIZE         1365, 768
 #define LOL 0
 // State fade definition
 #define STATE_FADE_TIME     0.5f
