@@ -73,7 +73,7 @@ void Menu::Update(float dt){
 
         switch(highlighted){
             case 0:
-                if(input.KeyPress(SDLK_z)) {
+                if(input.KeyPress(SDLK_a)) {
                     start->SetFrame(1);
                     fading = true;
                     GameObject* outObj = new GameObject(LayerDistance::_FadingLayer);
@@ -92,7 +92,7 @@ void Menu::Update(float dt){
                 break;
 
             case 1:
-                if(input.KeyPress(SDLK_z)) {
+                if(input.KeyPress(SDLK_a)) {
                     credits->SetFrame(1);
                     fading = true;
                     GameObject* outObj = new GameObject(LayerDistance::_FadingLayer);
@@ -110,7 +110,7 @@ void Menu::Update(float dt){
                 break;
 
             case 2:
-                if(input.KeyPress(SDLK_z)) {
+                if(input.KeyPress(SDLK_a)) {
                     exit->SetFrame(1);
                     RequestPop();
                 } else {
@@ -149,7 +149,7 @@ void Credits::LoadAssets() {
 }
 
 void Credits::Update(float dt){
-    if(!fading and InputManager::GetInstance().KeyPress(SDLK_z)){
+    if(!fading and InputManager::GetInstance().KeyPress(SDLK_a)){
         fading = true;
         GameObject* outObj = new GameObject(LayerDistance::_FadingLayer);
         ScreenFade* fade = new ScreenFade(*outObj, Color("#000000"), 0, 1, STATE_FADE_TIME);
@@ -180,7 +180,7 @@ void End::LoadAssets() {
 }
 
 void End::Update(float dt){
-    if(!fading and InputManager::GetInstance().KeyPress(SDLK_z)){
+    if(!fading and InputManager::GetInstance().KeyPress(KEY_ESCAPE)){
         fading = true;
         GameObject* outObj = new GameObject(LayerDistance::_FadingLayer);
         ScreenFade* fade = new ScreenFade(*outObj, Color("#000000"), 0, 1, STATE_FADE_TIME);
@@ -236,7 +236,8 @@ void H1::LoadAssets() {
     TileObj->AddComponent(tile);
     AddObject(TileObj);
 
-    AddKid();
+    Kid* taQuiancaLinda = (Kid*)AddKid();
+    taQuiancaLinda->FlipHimself();
 
     //Interaction Exit
     
@@ -249,8 +250,8 @@ void H1::LoadAssets() {
     if(!GameData::firstChat)
     {
         GameObject* dialogueObj = new GameObject(LayerDistance::_ForeGround_VeryClose);
-        dialogueObj->box.SetPosition(14*TILE_SIZE, 10*TILE_SIZE);
-        dialogueObj->box.SetSize(TILE_SIZE,TILE_SIZE);
+        dialogueObj->box.SetPosition(12*TILE_SIZE, 10*TILE_SIZE);
+        dialogueObj->box.SetSize(3*TILE_SIZE,TILE_SIZE);
         Interactor* chat = new Interactor(*dialogueObj, true);
         chat->SetResult([](){
 
@@ -259,11 +260,11 @@ void H1::LoadAssets() {
             Game::GetInstance().GetCurrentState().AddObject(dialogueObj);      
 
             GameObject* interact = new GameObject(LayerDistance::_ForeGround_VeryClose);
-            interact->box.SetPosition(14*TILE_SIZE, 10*TILE_SIZE);
-            interact->box.SetSize(TILE_SIZE,TILE_SIZE);
+            interact->box.SetPosition(12*TILE_SIZE, 10*TILE_SIZE);
+            interact->box.SetSize(3*TILE_SIZE,TILE_SIZE);
             Interactor* chat = new Interactor(*interact);
 
-            chat->SetCondition([](){return InputManager::GetInstance().KeyPress(SDLK_z);});
+            chat->SetCondition([](){return InputManager::GetInstance().KeyPress(SDLK_a);});
             chat->SetResult([](){
                 GameObject* dialogueObj = new GameObject(LayerDistance::_ForeGround_VeryClose);
                 dialogueObj->AddComponent(new DialogueBox(*dialogueObj,CHAT2));
@@ -274,7 +275,7 @@ void H1::LoadAssets() {
                 intObj->box = Rect(0,0,TILE_SIZE,TILE_SIZE);
                 intObj->box.SetPurePosition(16*TILE_SIZE,10*TILE_SIZE);
                 Interactor* output = new Interactor(*intObj);
-                output->SetCondition([](){return InputManager::GetInstance().KeyPress(SDLK_z);});
+                output->SetCondition([](){return InputManager::GetInstance().KeyPress(SDLK_a);});
                 output->SetResult([](){
                     GameObject *AObj = new GameObject(LayerDistance::_Environment);
                     ZoneTransition* doorA = new ZoneTransition(*AObj, Rect(16, 10, 1, 1), 
@@ -293,10 +294,10 @@ void H1::LoadAssets() {
 
     }else{
         GameObject* interact = new GameObject(LayerDistance::_ForeGround_VeryClose);
-        interact->box.SetPosition(14*TILE_SIZE, 10*TILE_SIZE);
-        interact->box.SetSize(TILE_SIZE,TILE_SIZE);
+        interact->box.SetPosition(12*TILE_SIZE, 10*TILE_SIZE);
+        interact->box.SetSize(3*TILE_SIZE,TILE_SIZE);
         Interactor* chat = new Interactor(*interact);
-        chat->SetCondition([](){return InputManager::GetInstance().KeyPress(SDLK_z);});
+        chat->SetCondition([](){return InputManager::GetInstance().KeyPress(SDLK_a);});
         chat->SetResult([](){
             GameObject* dialogueObj = new GameObject(LayerDistance::_ForeGround_VeryClose);
             dialogueObj->AddComponent(new DialogueBox(*dialogueObj,CHAT2));
@@ -310,7 +311,7 @@ void H1::LoadAssets() {
         intObj->box = Rect(0,0,TILE_SIZE,TILE_SIZE);
         intObj->box.SetPurePosition(16*TILE_SIZE,10*TILE_SIZE);
         Interactor* output = new Interactor(*intObj);
-        output->SetCondition([](){return InputManager::GetInstance().KeyPress(SDLK_z);});
+        output->SetCondition([](){return InputManager::GetInstance().KeyPress(SDLK_a);});
         output->SetResult([](){
             GameObject *AObj = new GameObject(LayerDistance::_Environment);
             ZoneTransition* doorA = new ZoneTransition(*AObj, Rect(16, 10, 1, 1), 
@@ -426,7 +427,7 @@ S1::S1() {
 #define MAP_S1 "assets/map/Zone/S1"
 
 
-
+// bool funkytimesbaby = true;
 void S1::LoadAssets() {
     //#####################################
 
@@ -458,7 +459,7 @@ void S1::LoadAssets() {
     intObj->box = Rect(0,0,TILE_SIZE,TILE_SIZE);
     intObj->box.SetPurePosition(13*TILE_SIZE,18*TILE_SIZE);
     Interactor* output = new Interactor(*intObj);
-    output->SetCondition([](){return InputManager::GetInstance().KeyPress(SDLK_z);});
+    output->SetCondition([](){return InputManager::GetInstance().KeyPress(SDLK_a);});
     output->SetResult([](){
         GameObject *AObj = new GameObject(LayerDistance::_Environment);
         ZoneTransition* doorA = new ZoneTransition(*AObj, Rect(13, 18, 1, 1), 
@@ -494,6 +495,24 @@ void S1::LoadAssets() {
     AddObject(HUD);
 
     LimitMap();
+
+    // if (funkytimesbaby) {
+    //     GameObject* cameraPlatform = new GameObject(999);
+    //     AddObject(cameraPlatform);
+    //     PlatformCamera* pcCP = new PlatformCamera(*cameraPlatform, PlatformCamera::DOWN, 11*TILE_SIZE);
+    //     GameObject* kidptr = thekid->GetAssociated();
+    //     pcCP->SetTrigger(Rect(9900,446-999,30,30+999), Rect(800,502-999,30,30+999));
+    //     pcCP->ForceMovement(*kidptr);
+    //     pcCP->podePassar = true;
+    //     funkytimesbaby = false;
+    //     cameraPlatform->AddComponent(pcCP);
+    // } else {
+        GameObject* cameraPlatform = new GameObject(999);
+        AddObject(cameraPlatform);
+        PlatformCamera* pcCP = new PlatformCamera(*cameraPlatform, PlatformCamera::DOWN, 12*TILE_SIZE);
+        cameraPlatform->AddComponent(pcCP);
+    // }
+
     FadeIn();
 
     
@@ -585,6 +604,7 @@ void S2::LoadAssets() {
     TileObj->AddComponent(tile);
     AddObject(TileObj);
 
+    // Kid* thekid = (Kid*)
     AddKid();
 
     //Path to S1-A
@@ -734,7 +754,7 @@ S3::S3() {
         AddAnimated(TREE_0A_, LayerDistance::_Environment_Far,Vec2(42,9), 13);
         
         AddAnimated(TREE_1C_, LayerDistance::_Environment_Far,Vec2(4,10), 15);
-        AddAnimated(TREE_1E_, LayerDistance::_Environment_Far,Vec2(27,10), 15);
+        AddAnimated(TREE_1E_, LayerDistance::_Environment,Vec2(27,10), 15);
         AddAnimated(TREE_1A_, LayerDistance::_Environment,Vec2(47,10), 15);
 
     } else {
@@ -754,7 +774,7 @@ S3::S3() {
         AddAnimated(TREE_0A, LayerDistance::_Environment_Far,Vec2(42,9), 13);
         
         AddAnimated(TREE_1C, LayerDistance::_Environment_Far,Vec2(4,10), 15);
-        AddAnimated(TREE_1E, LayerDistance::_Environment_Far,Vec2(27,10), 15);
+        AddAnimated(TREE_1E, LayerDistance::_Environment,Vec2(27,10), 15);
         AddAnimated(TREE_1A, LayerDistance::_Environment,Vec2(47,10), 15);
     }
 }
@@ -831,7 +851,7 @@ void S3::LoadAssets() {
         alche->box.SetPurePosition(40*TILE_SIZE, 17*TILE_SIZE+1);
 
         Interactor* alcheTalk = new Interactor(*alche);
-        alcheTalk->SetCondition([](){return InputManager::GetInstance().KeyPress(SDLK_z);});
+        alcheTalk->SetCondition([](){return InputManager::GetInstance().KeyPress(SDLK_a);});
         alcheTalk->SetResult([](){
             if(!GameData::firstChatAlche){
                 GameObject* dialogueObj = new GameObject(LayerDistance::_ForeGround_VeryClose);
@@ -853,6 +873,12 @@ void S3::LoadAssets() {
     AddObject(HUD);
 
     LimitMap();
+
+    GameObject* cameraPlatform = new GameObject(999);
+    AddObject(cameraPlatform);
+    PlatformCamera* pcCP = new PlatformCamera(*cameraPlatform, PlatformCamera::DOWN, 11*TILE_SIZE);
+    cameraPlatform->AddComponent(pcCP);
+
     FadeIn();
 }
 
@@ -1068,7 +1094,7 @@ void U1::LoadAssets() {
         intObj->box = Rect(0,0,TILE_SIZE,TILE_SIZE);
         intObj->box.SetPurePosition(59*TILE_SIZE,41*TILE_SIZE);
         Interactor* output = new Interactor(*intObj, true);
-        output->SetCondition([](){return InputManager::GetInstance().KeyPress(SDLK_z);});
+        output->SetCondition([](){return InputManager::GetInstance().KeyPress(SDLK_a);});
         
         output->SetResult([](){
             GameData::canUseMana = true;
@@ -1087,6 +1113,12 @@ void U1::LoadAssets() {
     AddObject(HUD);
 
     LimitMap();
+
+    GameObject* cameraPlatform = new GameObject(999);
+    AddObject(cameraPlatform);
+    PlatformCamera* pcCP = new PlatformCamera(*cameraPlatform, PlatformCamera::DOWN, 34*TILE_SIZE);
+    cameraPlatform->AddComponent(pcCP);
+
     FadeIn();
 }
 
@@ -1185,10 +1217,16 @@ void U2::LoadAssets() {
     GameObject* infectedGO = new GameObject(LayerDistance::_NPC);
     EnemyRunner* infectedCP = new EnemyRunner(*infectedGO);
     infectedGO->AddComponent(infectedCP);
-    infectedGO->box.SetPurePosition(Vec2(15,39)*TILE_SIZE);
+    infectedGO->box.SetPurePosition(Vec2(15,39)*28);
     AddObject(infectedGO);
 
     LimitMap();
+
+    GameObject* cameraPlatform = new GameObject(999);
+    AddObject(cameraPlatform);
+    PlatformCamera* pcCP = new PlatformCamera(*cameraPlatform, PlatformCamera::DOWN, 33*TILE_SIZE);
+    cameraPlatform->AddComponent(pcCP);
+
     FadeIn();
 }
 
@@ -1296,41 +1334,47 @@ void U3::LoadAssets() {
     GameObject* mouseGO = new GameObject(LayerDistance::_NPC);
     EnemyArmadillo* mouseCP = new EnemyArmadillo(*mouseGO);
     mouseGO->AddComponent(mouseCP);
-    mouseGO->box.SetPurePosition(Vec2(76,15)*TILE_SIZE);
+    mouseGO->box.SetPurePosition(Vec2(76,15)*28);
     AddObject(mouseGO);
 
     mouseGO = new GameObject(LayerDistance::_NPC);
     mouseCP = new EnemyArmadillo(*mouseGO);
     mouseGO->AddComponent(mouseCP);
-    mouseGO->box.SetPurePosition(Vec2(59,15)*TILE_SIZE);
+    mouseGO->box.SetPurePosition(Vec2(59,15)*28);
     AddObject(mouseGO);
 
     mouseGO = new GameObject(LayerDistance::_NPC);
     mouseCP = new EnemyArmadillo(*mouseGO);
     mouseGO->AddComponent(mouseCP);
-    mouseGO->box.SetPurePosition(Vec2(59,15)*TILE_SIZE);
+    mouseGO->box.SetPurePosition(Vec2(59,15)*28);
     mouseCP->FlipEntity();
     AddObject(mouseGO);
 
     GameObject* infectedGO = new GameObject(LayerDistance::_NPC);
     EnemyRunner* infectedCP = new EnemyRunner(*infectedGO);
     infectedGO->AddComponent(infectedCP);
-    infectedGO->box.SetPurePosition(Vec2(69,20)*TILE_SIZE);
+    infectedGO->box.SetPurePosition(Vec2(69,20)*28);
     AddObject(infectedGO);
 
     infectedGO = new GameObject(LayerDistance::_NPC);
     infectedCP = new EnemyRunner(*infectedGO);
     infectedGO->AddComponent(infectedCP);
-    infectedGO->box.SetPurePosition(Vec2(37,20)*TILE_SIZE);
+    infectedGO->box.SetPurePosition(Vec2(37,20)*28);
     AddObject(infectedGO);
 
     infectedGO = new GameObject(LayerDistance::_NPC);
     infectedCP = new EnemyRunner(*infectedGO);
     infectedGO->AddComponent(infectedCP);
-    infectedGO->box.SetPurePosition(Vec2(39,20)*TILE_SIZE);
+    infectedGO->box.SetPurePosition(Vec2(39,20)*28);
     AddObject(infectedGO);
 
     LimitMap();
+
+    GameObject* cameraPlatform = new GameObject(999);
+    AddObject(cameraPlatform);
+    PlatformCamera* pcCP = new PlatformCamera(*cameraPlatform, PlatformCamera::DOWN, 14*TILE_SIZE);
+    cameraPlatform->AddComponent(pcCP);
+
     FadeIn();
 }
 
@@ -1398,6 +1442,27 @@ void U4::LoadAssets() {
     TileObj->AddComponent(tile);
     AddObject(TileObj);
 
+    GameObject* TileBetaFix = new GameObject(LayerDistance::_Background_Far);
+    TileBetaFix->box = Rect(19*28,41*28,56,14);
+    Collider* Tbf = new Collider(*TileBetaFix);
+    TileBetaFix->AddComponent(Tbf);
+    AddObject(TileBetaFix);
+    TileBetaFix = new GameObject(LayerDistance::_Background_Far);
+    TileBetaFix->box = Rect(20*28,37*28,56,14);
+    Tbf = new Collider(*TileBetaFix);
+    TileBetaFix->AddComponent(Tbf);
+    AddObject(TileBetaFix);
+    TileBetaFix = new GameObject(LayerDistance::_Background_Far);
+    TileBetaFix->box = Rect(20*28,(37*28)+14,28,14);
+    Tbf = new Collider(*TileBetaFix);
+    TileBetaFix->AddComponent(Tbf);
+    AddObject(TileBetaFix);
+    TileBetaFix = new GameObject(LayerDistance::_Background_Far);
+    TileBetaFix->box = Rect(19*28,38*28,28,14);
+    Tbf = new Collider(*TileBetaFix);
+    TileBetaFix->AddComponent(Tbf);
+    AddObject(TileBetaFix);
+
     AddKid();
 
     //Path to U3-A
@@ -1420,7 +1485,7 @@ void U4::LoadAssets() {
         intObj->box = Rect(0,0,TILE_SIZE,TILE_SIZE);
         intObj->box.SetPurePosition(27.9*TILE_SIZE,43*TILE_SIZE);
         Interactor* output = new Interactor(*intObj, true);
-        output->SetCondition([](){return InputManager::GetInstance().KeyPress(SDLK_z);});
+        output->SetCondition([](){return InputManager::GetInstance().KeyPress(SDLK_a);});
         output->SetResult([](){GameData::firstItem = true;});
         intObj->AddComponent(output);
         intObj->AddComponent(new Sprite(*intObj,POTION_ITEM, 30, 0.1));
@@ -1432,7 +1497,7 @@ void U4::LoadAssets() {
         intObj->box = Rect(0,0,TILE_SIZE,TILE_SIZE);
         intObj->box.SetPurePosition(46*TILE_SIZE,29*TILE_SIZE);
         Interactor* output = new Interactor(*intObj, true);
-        output->SetCondition([](){return InputManager::GetInstance().KeyPress(SDLK_z);});
+        output->SetCondition([](){return InputManager::GetInstance().KeyPress(SDLK_a);});
         
         output->SetResult([](){
             GameData::canUseChargedAttack = true;
@@ -1452,6 +1517,12 @@ void U4::LoadAssets() {
     AddObject(HUD);
 
     LimitMap();
+
+    GameObject* cameraPlatform = new GameObject(999);
+    AddObject(cameraPlatform);
+    PlatformCamera* pcCP = new PlatformCamera(*cameraPlatform, PlatformCamera::DOWN, 37*TILE_SIZE);
+    cameraPlatform->AddComponent(pcCP);
+
     FadeIn();
 }
 
@@ -1592,7 +1663,7 @@ void U5::LoadAssets() {
         mechaObj->box.SetPurePosition(43*TILE_SIZE, 20*TILE_SIZE);
 
         Interactor* mechaEnabler = new Interactor(*mechaObj, true);
-        mechaEnabler->SetCondition([](){return (InputManager::GetInstance().KeyPress(SDLK_z));});
+        mechaEnabler->SetCondition([](){return (InputManager::GetInstance().KeyPress(SDLK_a));});
         mechaEnabler->SetResult([](){
             GameObject* mechaObj = new GameObject(LayerDistance::_Environment_Close);
             Sprite* mechanism = new Sprite(*mechaObj, MECHA2, 8, 0.1, true);
@@ -1622,10 +1693,16 @@ void U5::LoadAssets() {
     GameObject* infectedGO = new GameObject(LayerDistance::_NPC);
     EnemyRunner* infectedCP = new EnemyRunner(*infectedGO);
     infectedGO->AddComponent(infectedCP);
-    infectedGO->box.SetPurePosition(Vec2(37,13)*TILE_SIZE);
+    infectedGO->box.SetPurePosition(Vec2(37,13)*28);
     AddObject(infectedGO);
 
     LimitMap();
+
+    GameObject* cameraPlatform = new GameObject(999);
+    AddObject(cameraPlatform);
+    PlatformCamera* pcCP = new PlatformCamera(*cameraPlatform, PlatformCamera::DOWN, 17*TILE_SIZE);
+    cameraPlatform->AddComponent(pcCP);
+
     FadeIn();
 }
 
@@ -1709,22 +1786,28 @@ void U6::LoadAssets() {
     GameObject* mouseGO = new GameObject(LayerDistance::_NPC);
     EnemyArmadillo* mouseCP = new EnemyArmadillo(*mouseGO);
     mouseGO->AddComponent(mouseCP);
-    mouseGO->box.SetPurePosition(Vec2(24,18)*TILE_SIZE);
+    mouseGO->box.SetPurePosition(Vec2(24,18)*28);
     AddObject(mouseGO);
 
     GameObject* infectedGO = new GameObject(LayerDistance::_NPC);
     EnemyRunner* infectedCP = new EnemyRunner(*infectedGO);
     infectedGO->AddComponent(infectedCP);
-    infectedGO->box.SetPurePosition(Vec2(33,18)*TILE_SIZE);
+    infectedGO->box.SetPurePosition(Vec2(33,18)*28);
     AddObject(infectedGO);
 
     infectedGO = new GameObject(LayerDistance::_NPC);
     infectedCP = new EnemyRunner(*infectedGO);
     infectedGO->AddComponent(infectedCP);
-    infectedGO->box.SetPurePosition(Vec2(49,17)*TILE_SIZE);
+    infectedGO->box.SetPurePosition(Vec2(49,17)*28);
     AddObject(infectedGO);
     
     LimitMap();
+
+    GameObject* cameraPlatform = new GameObject(999);
+    AddObject(cameraPlatform);
+    PlatformCamera* pcCP = new PlatformCamera(*cameraPlatform, PlatformCamera::DOWN, 15*TILE_SIZE);
+    cameraPlatform->AddComponent(pcCP);
+
     FadeIn();
 }
 
@@ -1844,28 +1927,34 @@ void U7::LoadAssets() {
     GameObject* infectedGO = new GameObject(LayerDistance::_NPC);
     EnemyRunner* infectedCP = new EnemyRunner(*infectedGO);
     infectedGO->AddComponent(infectedCP);
-    infectedGO->box.SetPurePosition(Vec2(34,19)*TILE_SIZE);
+    infectedGO->box.SetPurePosition(Vec2(34,19)*28);
     AddObject(infectedGO);
 
     infectedGO = new GameObject(LayerDistance::_NPC);
     infectedCP = new EnemyRunner(*infectedGO);
     infectedGO->AddComponent(infectedCP);
-    infectedGO->box.SetPurePosition(Vec2(38,19)*TILE_SIZE);
+    infectedGO->box.SetPurePosition(Vec2(38,19)*28);
     AddObject(infectedGO);
 
     infectedGO = new GameObject(LayerDistance::_NPC);
     infectedCP = new EnemyRunner(*infectedGO);
     infectedGO->AddComponent(infectedCP);
-    infectedGO->box.SetPurePosition(Vec2(42,19)*TILE_SIZE);
+    infectedGO->box.SetPurePosition(Vec2(42,19)*28);
     AddObject(infectedGO);
 
     LimitMap();
+
+    GameObject* cameraPlatform = new GameObject(999);
+    AddObject(cameraPlatform);
+    PlatformCamera* pcCP = new PlatformCamera(*cameraPlatform, PlatformCamera::DOWN, 27*TILE_SIZE);
+    cameraPlatform->AddComponent(pcCP);
+
     FadeIn();
 }
 
 void U7::Update(float dt) {
 
-    // if(InputManager::GetInstance().KeyPress(SDLK_z)) { //for debugging door
+    // if(InputManager::GetInstance().KeyPress(SDLK_a)) { //for debugging door
     //     if(GameData::firstItem == false)
     //     {
     //         GameData::firstItem = true;
@@ -2071,7 +2160,7 @@ void U9::LoadAssets() {
     GameObject* mouseGO = new GameObject(LayerDistance::_NPC);
     EnemyArmadillo* mouseCP = new EnemyArmadillo(*mouseGO);
     mouseGO->AddComponent(mouseCP);
-    mouseGO->box.SetPurePosition(Vec2(19,30)*TILE_SIZE);
+    mouseGO->box.SetPurePosition(Vec2(19,30)*28);
     AddObject(mouseGO);
 
     LimitMap();
@@ -2156,7 +2245,7 @@ void U10::LoadAssets() {
         intObj->box = Rect(0,0,TILE_SIZE,TILE_SIZE);
         intObj->box.SetPurePosition(73.9*TILE_SIZE,16.5*TILE_SIZE);
         Interactor* output = new Interactor(*intObj, true);
-        output->SetCondition([](){return InputManager::GetInstance().KeyPress(SDLK_z);});
+        output->SetCondition([](){return InputManager::GetInstance().KeyPress(SDLK_a);});
         output->SetResult([](){GameData::secondItem = true;});
         intObj->AddComponent(output);
         intObj->AddComponent(new Sprite(*intObj,POTION_ITEM, 30, 0.1));
@@ -2172,77 +2261,53 @@ void U10::LoadAssets() {
     GameObject* infectedGO = new GameObject(LayerDistance::_NPC);
     EnemyRunner* infectedCP = new EnemyRunner(*infectedGO);
     infectedGO->AddComponent(infectedCP);
-    infectedGO->box.SetPurePosition(Vec2(33,17)*TILE_SIZE);
+    infectedGO->box.SetPurePosition(Vec2(33,17)*28);
     AddObject(infectedGO);
 
     infectedGO = new GameObject(LayerDistance::_NPC);
     infectedCP = new EnemyRunner(*infectedGO);
     infectedGO->AddComponent(infectedCP);
-    infectedGO->box.SetPurePosition(Vec2(37,17)*TILE_SIZE);
+    infectedGO->box.SetPurePosition(Vec2(39,17)*28);
     AddObject(infectedGO);
 
     infectedGO = new GameObject(LayerDistance::_NPC);
     infectedCP = new EnemyRunner(*infectedGO);
     infectedGO->AddComponent(infectedCP);
-    infectedGO->box.SetPurePosition(Vec2(39,17)*TILE_SIZE);
+    infectedGO->box.SetPurePosition(Vec2(44,17)*28);
     AddObject(infectedGO);
 
     infectedGO = new GameObject(LayerDistance::_NPC);
     infectedCP = new EnemyRunner(*infectedGO);
     infectedGO->AddComponent(infectedCP);
-    infectedGO->box.SetPurePosition(Vec2(42,17)*TILE_SIZE);
-    AddObject(infectedGO);
-
-    infectedGO = new GameObject(LayerDistance::_NPC);
-    infectedCP = new EnemyRunner(*infectedGO);
-    infectedGO->AddComponent(infectedCP);
-    infectedGO->box.SetPurePosition(Vec2(44,17)*TILE_SIZE);
-    AddObject(infectedGO);
-
-    infectedGO = new GameObject(LayerDistance::_NPC);
-    infectedCP = new EnemyRunner(*infectedGO);
-    infectedGO->AddComponent(infectedCP);
-    infectedGO->box.SetPurePosition(Vec2(45,17)*TILE_SIZE);
-    AddObject(infectedGO);
-
-    infectedGO = new GameObject(LayerDistance::_NPC);
-    infectedCP = new EnemyRunner(*infectedGO);
-    infectedGO->AddComponent(infectedCP);
-    infectedGO->box.SetPurePosition(Vec2(50,17)*TILE_SIZE);
-    AddObject(infectedGO);
-
-    infectedGO = new GameObject(LayerDistance::_NPC);
-    infectedCP = new EnemyRunner(*infectedGO);
-    infectedGO->AddComponent(infectedCP);
-    infectedGO->box.SetPurePosition(Vec2(52,17)*TILE_SIZE);
-    AddObject(infectedGO);
-
-    infectedGO = new GameObject(LayerDistance::_NPC);
-    infectedCP = new EnemyRunner(*infectedGO);
-    infectedGO->AddComponent(infectedCP);
-    infectedGO->box.SetPurePosition(Vec2(57,17)*TILE_SIZE);
+    infectedGO->box.SetPurePosition(Vec2(57,17)*28);
     AddObject(infectedGO);
 
     GameObject* mouseGO = new GameObject(LayerDistance::_NPC);
     EnemyArmadillo* mouseCP = new EnemyArmadillo(*mouseGO);
     mouseGO->AddComponent(mouseCP);
-    mouseGO->box.SetPurePosition(Vec2(50,17)*TILE_SIZE);
+    mouseGO->box.SetPurePosition(Vec2(50,17)*28);
     mouseCP->FlipEntity();
     AddObject(mouseGO);
 
     mouseGO = new GameObject(LayerDistance::_NPC);
     mouseCP = new EnemyArmadillo(*mouseGO);
     mouseGO->AddComponent(mouseCP);
-    mouseGO->box.SetPurePosition(Vec2(37,17)*TILE_SIZE);
+    mouseGO->box.SetPurePosition(Vec2(37,17)*28);
     AddObject(mouseGO);
 
     mouseGO = new GameObject(LayerDistance::_NPC);
     mouseCP = new EnemyArmadillo(*mouseGO);
     mouseGO->AddComponent(mouseCP);
-    mouseGO->box.SetPurePosition(Vec2(57,17)*TILE_SIZE);
+    mouseGO->box.SetPurePosition(Vec2(57,17)*28);
     AddObject(mouseGO);
 
     LimitMap();
+
+    GameObject* cameraPlatform = new GameObject(999);
+    AddObject(cameraPlatform);
+    PlatformCamera* pcCP = new PlatformCamera(*cameraPlatform, PlatformCamera::DOWN, 13*TILE_SIZE);
+    cameraPlatform->AddComponent(pcCP);
+
     FadeIn();
 }
 
@@ -2351,7 +2416,7 @@ void U11::LoadAssets() {
         mechaObj->box.SetPurePosition(5*TILE_SIZE, 18*TILE_SIZE);
 
         Interactor* mechaEnabler = new Interactor(*mechaObj, true);
-        mechaEnabler->SetCondition([](){return (InputManager::GetInstance().KeyPress(SDLK_z));});
+        mechaEnabler->SetCondition([](){return (InputManager::GetInstance().KeyPress(SDLK_a));});
         mechaEnabler->SetResult([](){
             GameObject* mechaObj = new GameObject(LayerDistance::_Environment_Close);
             Sprite* mechanism = new Sprite(*mechaObj, MECHA1, 8, 0.1, true);
@@ -2389,25 +2454,25 @@ void U11::LoadAssets() {
     mouseGO = new GameObject(LayerDistance::_NPC);
     mouseCP = new EnemyArmadillo(*mouseGO);
     mouseGO->AddComponent(mouseCP);
-    mouseGO->box.SetPurePosition(Vec2(35,18)*TILE_SIZE);
+    mouseGO->box.SetPurePosition(Vec2(35,18)*28);
     AddObject(mouseGO);
 
     GameObject* infectedGO = new GameObject(LayerDistance::_NPC);
     EnemyRunner* infectedCP = new EnemyRunner(*infectedGO);
     infectedGO->AddComponent(infectedCP);
-    infectedGO->box.SetPurePosition(Vec2(16,20)*TILE_SIZE);
+    infectedGO->box.SetPurePosition(Vec2(16,20)*28);
     AddObject(infectedGO);
 
     infectedGO = new GameObject(LayerDistance::_NPC);
     infectedCP = new EnemyRunner(*infectedGO);
     infectedGO->AddComponent(infectedCP);
-    infectedGO->box.SetPurePosition(Vec2(19,20)*TILE_SIZE);
+    infectedGO->box.SetPurePosition(Vec2(19,20)*28);
     AddObject(infectedGO);
 
     infectedGO = new GameObject(LayerDistance::_NPC);
     infectedCP = new EnemyRunner(*infectedGO);
     infectedGO->AddComponent(infectedCP);
-    infectedGO->box.SetPurePosition(Vec2(51,9)*TILE_SIZE);
+    infectedGO->box.SetPurePosition(Vec2(51,9)*28);
     AddObject(infectedGO);
 
     LimitMap();
@@ -2563,10 +2628,16 @@ void U12::LoadAssets() {
     GameObject* mouseGO = new GameObject(LayerDistance::_NPC);
     EnemyArmadillo* mouseCP = new EnemyArmadillo(*mouseGO);
     mouseGO->AddComponent(mouseCP);
-    mouseGO->box.SetPurePosition(Vec2(40,15)*TILE_SIZE);
+    mouseGO->box.SetPurePosition(Vec2(40,15)*28);
     AddObject(mouseGO);
 
     LimitMap();
+
+    GameObject* cameraPlatform = new GameObject(999);
+    AddObject(cameraPlatform);
+    PlatformCamera* pcCP = new PlatformCamera(*cameraPlatform, PlatformCamera::DOWN, 13*TILE_SIZE);
+    cameraPlatform->AddComponent(pcCP);
+
     FadeIn();
 }
 
@@ -2653,7 +2724,7 @@ void U13::LoadAssets() {
         mechaObj->box.SetPurePosition(52*TILE_SIZE, 16*TILE_SIZE);
 
         Interactor* mechaEnabler = new Interactor(*mechaObj, true);
-        mechaEnabler->SetCondition([](){return (InputManager::GetInstance().KeyPress(SDLK_z));});
+        mechaEnabler->SetCondition([](){return (InputManager::GetInstance().KeyPress(SDLK_a));});
         mechaEnabler->SetResult([](){
             GameObject* mechaObj = new GameObject(LayerDistance::_Environment_Close);
             Sprite* mechanism = new Sprite(*mechaObj, MECHA2, 8, 0.1, true);
@@ -2681,7 +2752,7 @@ void U13::LoadAssets() {
         intObj->box = Rect(0,0,TILE_SIZE,TILE_SIZE);
         intObj->box.SetPurePosition(21*TILE_SIZE,12*TILE_SIZE);
         Interactor* output = new Interactor(*intObj, true);
-        output->SetCondition([](){return InputManager::GetInstance().KeyPress(SDLK_z);});
+        output->SetCondition([](){return InputManager::GetInstance().KeyPress(SDLK_a);});
         
         output->SetResult([](){
             GameData::canUseMagicAttack = true;
@@ -2702,13 +2773,13 @@ void U13::LoadAssets() {
     GameObject* mouseGO = new GameObject(LayerDistance::_NPC);
     EnemyArmadillo* mouseCP = new EnemyArmadillo(*mouseGO);
     mouseGO->AddComponent(mouseCP);
-    mouseGO->box.SetPurePosition(Vec2(44,18)*TILE_SIZE);
+    mouseGO->box.SetPurePosition(Vec2(44,18)*28);
     AddObject(mouseGO);
 
     GameObject* infectedGO = new GameObject(LayerDistance::_NPC);
     EnemyRunner* infectedCP = new EnemyRunner(*infectedGO);
     infectedGO->AddComponent(infectedCP);
-    infectedGO->box.SetPurePosition(Vec2(24,16)*TILE_SIZE);
+    infectedGO->box.SetPurePosition(Vec2(24,16)*28);
     AddObject(infectedGO);
 
     LimitMap();
@@ -2780,7 +2851,7 @@ void U14::LoadAssets() {
         intObj->box = Rect(0,0,TILE_SIZE,TILE_SIZE);
         intObj->box.SetPurePosition(15.5*TILE_SIZE,28.5*TILE_SIZE);
         Interactor* output = new Interactor(*intObj, true);
-        output->SetCondition([](){return InputManager::GetInstance().KeyPress(SDLK_z);});
+        output->SetCondition([](){return InputManager::GetInstance().KeyPress(SDLK_a);});
         output->SetResult([](){GameData::thirdItem = true;});
         intObj->AddComponent(output);
         intObj->AddComponent(new Sprite(*intObj,POTION_ITEM, 30, 0.1));
@@ -2790,6 +2861,12 @@ void U14::LoadAssets() {
     HUD->AddComponent(new Hud(*HUD));
     AddObject(HUD);
     LimitMap();
+
+    GameObject* cameraPlatform = new GameObject(999);
+    AddObject(cameraPlatform);
+    PlatformCamera* pcCP = new PlatformCamera(*cameraPlatform, PlatformCamera::DOWN, (22*TILE_SIZE)+11);
+    cameraPlatform->AddComponent(pcCP);
+
     FadeIn();
 }
 
@@ -2872,7 +2949,7 @@ void U15::LoadAssets() {
         intObj->box = Rect(0,0,TILE_SIZE,TILE_SIZE);
         intObj->box.SetPurePosition(18.1*TILE_SIZE,22*TILE_SIZE);
         Interactor* output = new Interactor(*intObj, true);
-        output->SetCondition([](){return InputManager::GetInstance().KeyPress(SDLK_z);});
+        output->SetCondition([](){return InputManager::GetInstance().KeyPress(SDLK_a);});
         output->SetResult([](){GameData::fourthItem = true;});
         intObj->AddComponent(output);
         intObj->AddComponent(new Sprite(*intObj,POTION_ITEM, 30, 0.1));
@@ -2890,10 +2967,17 @@ void U15::LoadAssets() {
     GameObject* infectedGO = new GameObject(LayerDistance::_NPC);
     EnemyRunner* infectedCP = new EnemyRunner(*infectedGO);
     infectedGO->AddComponent(infectedCP);
-    infectedGO->box.SetPurePosition(Vec2(13,19)*TILE_SIZE);
+    infectedGO->box.SetPurePosition(Vec2(13,19)*28);
     AddObject(infectedGO);
 
     LimitMap();
+
+    GameObject* cameraPlatform = new GameObject(999);
+    AddObject(cameraPlatform);
+    PlatformCamera* pcCP = new PlatformCamera(*cameraPlatform, PlatformCamera::DOWN, (15*TILE_SIZE)+22);
+    pcCP->SetTrigger(Rect(694,608,30,60), Rect(766,608,30,60));
+    cameraPlatform->AddComponent(pcCP);
+
     FadeIn();
 }
 
@@ -2977,6 +3061,12 @@ void U16::LoadAssets() {
     AddObject(infectedGO);
 
     LimitMap();
+
+    GameObject* cameraPlatform = new GameObject(999);
+    AddObject(cameraPlatform);
+    PlatformCamera* pcCP = new PlatformCamera(*cameraPlatform, PlatformCamera::DOWN, 23*TILE_SIZE);
+    cameraPlatform->AddComponent(pcCP);
+
     FadeIn();
 }
 

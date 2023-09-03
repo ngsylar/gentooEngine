@@ -168,6 +168,7 @@ void Kid::Awaken () {
     collider = new Collider(associated);
     collider->SetBox(Vec2(COLLIDER_POSITION_ONGROUND), Vec2(COLLIDER_BOX_SIZE));
     associated.AddComponent(collider);
+    // collider->isTrigger = true;
 
     GameObject* attack = new GameObject(LayerDistance::_Player_Front);
     swordAttackOnGround = new KidAttackMelee(*attack, &associated);
@@ -211,7 +212,24 @@ void Kid::Start () {
 }
 
 // keep it empty so LateUpdateEntity is not called
-void Kid::LateUpdate (float dt) {}
+void Kid::LateUpdate (float dt) {
+    InputManager& input = InputManager::GetInstance();
+    if (input.KeyPress(KEY_SPACE)) {
+        SDL_Log("KID: %f %f", collider->box.x, collider->box.y);
+        SDL_Log("CAM: %f %f", Camera::pos.x, Camera::pos.y);
+        // collider->isTrigger = false;
+    }
+    // SDL_Log("DT: %f", dt);
+}
+
+void Kid::FlipHimself () {
+    lastDirectionX = (lastDirectionX <= 0) ? -1 : 1;
+    textureFlip = (lastDirectionX == 1)? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL;
+}
+
+int Kid::GetDirectionX () {
+    return lastDirectionX;
+}
 
 void Kid::UpdateEntity (float dt) {
     if(GameData::canUseMana){
@@ -526,9 +544,9 @@ bool Kid::NewStateRule (EntityState newState, int argsc, float argsv[]) {
             if(!GameData::canUseMagicAttack or !GameData::canUseMana or mp<5){
                 return false;
             }
+            mp -= 5;
             spellTimer.Reset();
             rigidBody->SetSpeedOnX(0.0f);
-            mp-=5;
             runSpeedIncrease = 0.0f;
             attackPerforming = true;
             foxAttack->Perform((lastDirectionX < 0)? FoxAttack::LEFT : FoxAttack::RIGHT);
@@ -715,4 +733,8 @@ void* Kid::CameraEffects () {
             cameraGroundedTimer.Reset();
         }
     } return nullptr;
+}
+
+GameObject* Kid::GetAssociated () {
+    return &associated;
 }

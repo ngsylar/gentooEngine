@@ -1,7 +1,7 @@
 #ifndef STATE_H
 #define STATE_H
 
-#include "GameObject.h"
+#include "Component.h"
 #include "Timer.h"
 
 class State {
@@ -42,7 +42,7 @@ class State {
         void AddScenario(std::string file, LayerDistance layer, float parallax=0, bool align=false);
         void AddAnimated(std::string file, LayerDistance layer, Vec2 position, int frames, float frameTime=0.1);
         void AddSpikes(float x, float y, float w);
-        void AddKid();
+        Component* AddKid();
         void LimitMap();
         void AddMagicBarrier(Vec2 position);
         Music* GetStateMusic();

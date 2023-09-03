@@ -5,7 +5,7 @@ Tutorial  rápido!
 
 ~
 Correr:        ← →
-Interagir:    Z
+Interagir:    A
 Pular:            S
 Atacar:          D
 

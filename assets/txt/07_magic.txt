@@ -1,9 +1,9 @@
 2
 ~
 Ataque  Mágico!
+
 Pressione  W  para  realizar  um
 ataque poderoso. Mas tenha cautela!
-
 ~
 Garoto:
 Será  que  isso  pode  me  ajudar

@@ -72,9 +72,12 @@ class Kid: public EntityMachine {
         void Start();
         void LateUpdate(float dt);
         void UpdateEntity(float dt);
+        void FlipHimself();
+        int GetDirectionX();
         void NotifyCollision(GameObject& other);
         bool IsInvincible();
         bool Is(ComponentType type);
+        GameObject* GetAssociated();
 };
 
 #endif

@@ -44,7 +44,7 @@ void DialogueBox::Start(){
 
 void DialogueBox::Update(float dt){
     InputManager& input = InputManager::GetInstance(); 
-    if(input.KeyPress(SDLK_z)) {
+    if(input.KeyPress(SDLK_a)) {
         counter++;
         if(counter > (int)dialogueLines.size()-1) {
             if(!looped) {

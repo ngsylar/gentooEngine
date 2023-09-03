@@ -12,8 +12,8 @@ BossAttackMelee::BossAttackMelee (
     associated.label = externalAssociated->label;
     associated.enabled = false;
 }
-BossAttackMelee::~BossAttackMelee(){}
-
+BossAttackMelee::~BossAttackMelee()
+{SDL_Log("eu murri.");}
 void BossAttackMelee::PushAttack (Vec2 pureOffset, Vec2 size, float lifetimeStart, float lifetimeEnd) {
     AttackType attackType;
     attackType.pureOffset_i = pureOffset;

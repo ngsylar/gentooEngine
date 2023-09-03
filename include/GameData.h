@@ -7,6 +7,7 @@ class GameData
 {
     public:
         static void MultiConditionalChecks();
+        static void ZerarTudo();
 
         //Conditions to unlock
         static bool firstItem;

@@ -24,7 +24,7 @@ class Boss: public EntityMachine {
         Timer restTimer, attackTimer, damageTimer, recoverTimer, barrierBrokenTimer;
 
         // Automatic Signals
-        bool isAttacking, barrierIsBroken;
+        bool isAttacking, barrierIsBroken, isInvested;
 
         // Automatic Factors
         float attackOriginX;
@@ -33,7 +33,7 @@ class Boss: public EntityMachine {
         bool NewStateRule(EntityState newState, int argsc, float argsv[]);
         void AttackMeleeUpdate(float dt);
         void Die();
-        Timer deathSequence;
+        Timer deathSequence, investidaTimer, cooldownInvest;
         bool deathFade;
 
     public:

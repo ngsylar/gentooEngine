@@ -1,7 +1,12 @@
-1
+2
 ~
 Garoto:
 Sei  que  um  senhor  alquimista  vive
 na  floresta.  Talvez  ele  saiba  de
 algum  remédio  para  sua  doença.
+~
+Chave  da  porta  obtida!
+
+Pressione  A  em  frente  à  porta
+para  sair.
 ~

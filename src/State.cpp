@@ -248,13 +248,14 @@ void State::AddSpikes(float x, float y, float w) {
     spikeObj->AddComponent(touchedSpike);
     AddObject(spikeObj);
 }
-
-void State::AddKid() {
+Component* State::AddKid() {
     GameObject* KidObj = new GameObject(LayerDistance::_Player);
     AddObject(KidObj);
-    KidObj->AddComponent(new Kid(*KidObj));
+    Kid* kidComp = new Kid(*KidObj);
+    KidObj->AddComponent(kidComp);
     Vec2 place = ZoneManager::GetSpawnPosition()*TILE_SIZE;
     KidObj->box.SetPosition(place.x, place.y-KID_HEIGHT);
+    return kidComp;
 }
 
 #define MAGIC_BARRIER "assets/img/animated/10_barreira28x84-sheet.png"

@@ -33,7 +33,7 @@ void PlatformCamera::Awaken () {
 }
 
 void PlatformCamera::NotifyCollision (GameObject& other) {
-    if ((not bodied) or (other.label != "Player"))
+    if ((not bodied) or (other.label != "Player") or other.GetComponent(_Attack))
         return;
 
     if (activeRect == MOVE) {
@@ -61,7 +61,7 @@ void* PlatformCamera::MoveCamera () {
     float currentDisplacement, currentPosition;
     switch (direction) {
         case DOWN:
-            currentDisplacement = targetDisplacement.y * 1.5f * dt;
+            currentDisplacement = targetDisplacement.y * 0.5f * dt;
             relativeOffset.y += currentDisplacement;
             currentPosition = Camera::pos.y + relativeOffset.y;
             if (currentPosition > positionLimit) {
@@ -86,7 +86,7 @@ void* PlatformCamera::UndoCameraMovement () {
     float currentDisplacement;
     switch (direction) {
         case DOWN:
-            currentDisplacement = targetDisplacement.y * 1.5f * dt;
+            currentDisplacement = targetDisplacement.y * 0.5f * dt;
             relativeOffset.y += currentDisplacement;
             if (relativeOffset.y < 0.0f) {
                 Camera::masterOffset.y += currentDisplacement;

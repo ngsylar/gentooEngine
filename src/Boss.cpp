@@ -9,6 +9,7 @@
 #define SPRITE_ATTACK0              "assets/img/boss/attack1.png"
 #define SPRITE_ATTACK1              "assets/img/boss/attack2.png"
 #define SPRITE_ATTACK2              "assets/img/boss/attack3.png"
+#define SPRITE_INVEST               "assets/img/boss/onslaught_2.png"
 #define SPRITE_DAMAGE               "assets/img/boss/damage.png"
 #define SPRITE_DEATH                "assets/img/boss/death.png"
 
@@ -17,6 +18,7 @@
 #define SPRITE_ATTACK0_FRAMES       12, 0.1f
 #define SPRITE_ATTACK1_FRAMES       16, 0.1f
 #define SPRITE_ATTACK2_FRAMES       11, 0.1f
+#define SPRITE_INVEST_FRAMES        5, 0.075f
 #define SPRITE_DAMAGE_FRAMES        6, 0.1f
 #define SPRITE_DEATH_FRAMES         22, 0.1f
 
@@ -58,13 +60,16 @@ Boss::Boss (GameObject& associated): EntityMachine(associated) {
     restTimer.SetResetTime(0.9f);
     damageTimer.SetResetTime(0.6f);
     recoverTimer.SetResetTime(0.15f);
+    investidaTimer.SetResetTime(3);
+    // cooldownInvest.SetResetTime(0.03f);
     isAttacking = false;
+    isInvested = false;
     barrierIsBroken = false;
     damageTaken = 0;
     self = this;
     
     deathFade = false;
-    deathSequence.SetResetTime(3.5);
+    deathSequence.SetResetTime(3.5f);
     deathSequence.Reset();
 }
 
@@ -73,7 +78,7 @@ void Boss::Awaken () {
     Sprite* spriteWalk = new Sprite(associated, SPRITE_WALK, SPRITE_WALK_FRAMES);
     Sprite* spriteAttack0 = new Sprite(associated, SPRITE_ATTACK0, SPRITE_ATTACK0_FRAMES, true);
     Sprite* spriteAttack1 = new Sprite(associated, SPRITE_ATTACK1, SPRITE_ATTACK1_FRAMES);
-    // Sprite* spriteAttack3 = new Sprite(associated, SPRITE_ATTACK3, SPRITE_ATTACK3_FRAMES);
+    Sprite* spriteInvest = new Sprite(associated, SPRITE_INVEST, SPRITE_INVEST_FRAMES);
     Sprite* spriteRecover = new Sprite(associated, SPRITE_IDLE, SPRITE_IDLE_FRAMES);
     Sprite* spriteDamage = new Sprite(associated, SPRITE_DAMAGE, SPRITE_DAMAGE_FRAMES, true);
     Sprite* spriteDeath = new Sprite(associated, SPRITE_DEATH, SPRITE_DEATH_FRAMES, true);
@@ -82,6 +87,7 @@ void Boss::Awaken () {
     AddSpriteState(EntityState::Walking, spriteWalk);
     AddSpriteState(EntityState::AttackingMelee_0, spriteAttack0);
     AddSpriteState(EntityState::AttackingMelee_1, spriteAttack1);
+    AddSpriteState(EntityState::AttackingRanged, spriteInvest);
     AddSpriteState(EntityState::Recovering, spriteRecover);
     AddSpriteState(EntityState::Injured, spriteDamage);
     AddSpriteState(EntityState::Dead, spriteDeath);
@@ -138,11 +144,13 @@ void Boss::UpdateEntity (float dt) {
     Vec2 position = collider->box.GetPosition();
     Vec2 kidPosition = kid->box.GetPosition();
     RigidBody* kidRigidBody;
+    bool changeMyself = false;
 
     int direction = ((position.x - kidPosition.x) < 0.0f)? 1 : -1;
     if ((direction != movementDirection) and (not isAttacking)) {
         movementDirection = direction;
         FlipSprite(Sprite::HORIZONTAL);
+        changeMyself = true;
     }
 
     if ((state != Dead) and (hp <= 0)) {
@@ -156,28 +164,47 @@ void Boss::UpdateEntity (float dt) {
             barrierIsBroken = false;
     }
 
+    // if (isInvested) {
+    //     cooldownInvest.Update(dt);
+    //     if (cooldownInvest.IsOver()) {
+    //         cooldownInvest.Reset();
+    //         isInvested = false;
+    //     }
+    // }
+
     switch (state) {
         case Idle:
             restTimer.Update(dt);
             if (restTimer.IsOver()) {
                 restTimer.Reset();
 
-                if (position.DistanceTo(kidPosition) < ATTACK_MELEE0_DISTANCE)
-                    FormatState(AttackingMelee_0);
-                else if (position.DistanceTo(kidPosition) < ATTACK_MELEE1_DISTANCE)
+                if (position.DistanceTo(kidPosition) < ATTACK_MELEE0_DISTANCE) {
+                    if (rand()%100 < 40)
+                        FormatState(AttackingMelee_1);
+                    else FormatState(AttackingMelee_0);
+                } else if (position.DistanceTo(kidPosition) < ATTACK_MELEE1_DISTANCE)
                     FormatState(AttackingMelee_1);
 
                 else FormatState(Walking);
             } break;
 
         case Walking:
-            if (position.DistanceTo(kidPosition) < ATTACK_MELEE0_DISTANCE)
-                FormatState(AttackingMelee_0);
-            else if (position.DistanceTo(kidPosition) < ATTACK_MELEE1_DISTANCE)
+            if (position.DistanceTo(kidPosition) < ATTACK_MELEE0_DISTANCE) {
+                if (rand()%100 < 40)
+                    FormatState(AttackingMelee_1);
+                else FormatState(AttackingMelee_0);
+            } else if (position.DistanceTo(kidPosition) < ATTACK_MELEE1_DISTANCE)
                 FormatState(AttackingMelee_1);
 
-            else if (position.DistanceTo(kidPosition) < WALK_FAST_DISTANCE)
+            else if (position.DistanceTo(kidPosition) < WALK_FAST_DISTANCE) {
                 rigidBody->SetSpeedOnX(SPEED_WALK * movementDirection);
+                investidaTimer.Update(dt);
+                if (investidaTimer.IsOver()) {
+                    if (rand()%100 < 60)
+                        FormatState(AttackingRanged);
+                    investidaTimer.Reset();
+                }
+            }
             else rigidBody->SetSpeedOnX(SPEED_WALKt2 * movementDirection);
 
             break;
@@ -198,9 +225,11 @@ void Boss::UpdateEntity (float dt) {
             if (recoverTimer.IsOver()) {
                 damageTaken = 2;
 
-                if (position.DistanceTo(kidPosition) < ATTACK_MELEE0_DISTANCE)
-                    FormatState(AttackingMelee_0);
-                else if (position.DistanceTo(kidPosition) < ATTACK_MELEE1_DISTANCE)
+                if (position.DistanceTo(kidPosition) < ATTACK_MELEE0_DISTANCE) {
+                    if (rand()%100 < 40)
+                        FormatState(AttackingMelee_1);
+                    else FormatState(AttackingMelee_0);
+                } else if (position.DistanceTo(kidPosition) < ATTACK_MELEE1_DISTANCE)
                     FormatState(AttackingMelee_1);
 
                 else FormatState(Walking);
@@ -209,6 +238,14 @@ void Boss::UpdateEntity (float dt) {
         case AttackingMelee_0: case AttackingMelee_1:
             AttackMeleeUpdate(dt);
             break;
+        
+        case AttackingRanged:
+            if (changeMyself or (associated.box.GetPosition().x < 360) or (associated.box.GetPosition().x > 1470)) {
+                rigidBody->SetSpeedOnX(0);
+                FormatState(Idle);
+                restTimer.Update(0.65f);
+                // isInvested = true;
+            } break;
 
         default: break;
     }
@@ -218,8 +255,11 @@ bool Boss::NewStateRule (EntityState newState, int argsc, float argsv[]) {
     if (newState == state)
         return false;
 
+    // if (isInvested and ((newState == AttackingMelee_0) or (newState == AttackingMelee_1)))
+    //     return false;
+
     switch (state) {
-        case AttackingMelee_0: case AttackingMelee_1:
+        case AttackingMelee_0: case AttackingMelee_1: case AttackingRanged:
             if ((newState == Injured) and (damageTaken >= 2)) {
                 // hp -= argsv[AttackGeneric::_Damage];
                 return false;
@@ -236,7 +276,11 @@ bool Boss::NewStateRule (EntityState newState, int argsc, float argsv[]) {
         default: break;
     }
 
-    switch (newState) {        
+    switch (newState) {   
+        case AttackingRanged:
+            rigidBody->SetSpeedOnX(4.0f * SPEED_WALKt2 * movementDirection);
+            return true;
+
         case AttackingMelee_0:
             rigidBody->SetSpeedOnX(0.0f);
             attackState = _Stage0;

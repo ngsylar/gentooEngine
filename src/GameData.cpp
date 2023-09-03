@@ -52,3 +52,46 @@ void GameData::MultiConditionalChecks() {
     SDL_Log("USE CHARGED ATTACK: %s", (canUseChargedAttack?"YES":"NO"));
 
 }
+
+void GameData::ZerarTudo() {
+    //Items for the potion
+    firstItem = false;
+    secondItem = false;
+    thirdItem = false;
+    fourthItem = false;
+    itemCount = 0;
+
+    //Extra mechanisms for the door
+    firstMechanism = false;
+    secondMechanism = false;
+    thirdMechanism = false;
+    mechanismCount = 0;
+
+    //habilities
+    canUseChargedAttack = false;
+    canUseMana = false;
+    canUseMagicAttack = false;
+
+    //Boulders
+    boulder1 = false;
+    boulder2 = false;
+    boulder3 = false;
+    boulder4a = false;
+    boulder4b = false;
+
+    openedU2Gate = false;
+    openedU16Gate = false;
+    changedS3Scenario = false;
+
+    //Kiddo
+    kidHp = 0;
+    kidMp = 0;
+
+    //Chat controllers
+    firstChat = false;
+    firstChatAlche = false;
+
+    //Default first spawn point is on area S1, in front of the house
+    checkPoint = Zone::_S1;
+    revivePosition = Vec2(13, 18);
+}
